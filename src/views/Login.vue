@@ -8,15 +8,15 @@
     <v-toolbar-title class="pl-2">麻雀成績管理</v-toolbar-title>
   </v-app-bar>
 
-  <v-row align="center" justify="center" style="position: relative">
+  <v-row class="ma-0" align="center" justify="center" style="position: relative">
     <v-row justify="end" class="ma-5" style="position: absolute; top: 0; right: 0;">
-      <v-menu offset-x offset-y class="help" nudge-right="10px">
+      <v-menu offset-x offset-y class="help">
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on">
             <v-icon large>{{ icons.mdiHelpCircle }}</v-icon>
           </v-btn>
         </template>
-        <span>メールアドレスでアカウントを作成する場合は、「メールでログイン」を選択後、登録したいアドレスを入力してください。</span>
+        <span>アカウントを作成する場合は、「メールでログイン」を選択後、登録したいアドレスを入力してください。</span>
       </v-menu>
     </v-row>
     <div id="firebaseui-auth-container"></div>
@@ -105,6 +105,6 @@ export default class Login extends Vue {
   color: white;
   padding: 10px;
   font-size: 14px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.6);
 }
 </style>

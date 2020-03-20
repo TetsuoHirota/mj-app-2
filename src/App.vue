@@ -7,7 +7,4 @@
 #app {
   height: 100%;
 }
-.row {
-  margin: 0 !important;
-}
 </style>

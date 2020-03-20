@@ -6,14 +6,27 @@ import store from '../store'
 import Home from '../views/Home.vue'
 import Login from '@/views/Login.vue'
 import Profile from '@/views/Profile.vue'
+import HomeNav from '@/views/HomeNav.vue'
+import Friends from '@/views/Friends.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
     component: Home,
+    children: [
+      {
+        path: '/',
+        name: 'Home',
+        component: HomeNav
+      },
+      {
+        path: '/friends',
+        name: 'Friends',
+        component: Friends
+      }
+    ]
   },
   {
     path: '/login',
@@ -45,8 +58,6 @@ router.afterEach(() => {
           } 
         }
       })
-    } else {
-      store.dispatch("User/logout")
     }
   })
 })
