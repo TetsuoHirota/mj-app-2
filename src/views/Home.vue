@@ -72,7 +72,7 @@
             v-model="profileDialog"
             max-width="290px"
           >
-            <Profile @save="profileDialog = false" />
+            <Profile @close="profileDialog = false" />
           </v-dialog>
         </v-list-item>
 

@@ -46,7 +46,6 @@
             class="mt-4"
           >
             <v-btn
-              id="save"
               color="primary"
               @click="validate"
             >

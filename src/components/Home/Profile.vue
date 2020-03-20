@@ -1,7 +1,10 @@
 <template>
 <v-card class="py-5 px-7">
   <v-card-title class="pl-0">名前の変更</v-card-title>
-  <v-form ref="form" @submit.prevent>
+  <v-form
+    ref="form"
+    @submit.prevent
+  >
     <v-row>
       <v-text-field
         v-model="name"
@@ -14,8 +17,24 @@
       >
       </v-text-field>
     </v-row>
-    <v-row justify="end" class="my-3">
-      <v-btn id="save" color="primary" @click.stop="save">決定</v-btn>
+    <v-row
+      justify="end"
+      class="mt-3"
+    >
+      <v-btn
+        text
+        color="primary"
+        @click.stop="close"
+      >
+        キャンセル
+      </v-btn>
+      <v-btn
+        text
+        color="primary"
+        @click.stop="save"
+      >
+        決定
+      </v-btn>
     </v-row>
   </v-form>
 </v-card>
@@ -68,8 +87,13 @@ export default class Profile extends Vue {
         name: this.name
       });
       (this.$refs.form as HTMLFormElement).reset()
-      this.$emit("save")
+      this.$emit("close")
     }
+  }
+
+  close() {
+    (this.$refs.form as HTMLFormElement).reset()
+    this.$emit("close")
   }
 }
 </script>
