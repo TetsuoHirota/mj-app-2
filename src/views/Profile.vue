@@ -7,14 +7,21 @@
 
   <v-row justify="center" align="center">
     <div>
-      <p class="mx-8"><span class="title font-weight-bold mr-2">{{email}}</span>さん</p>
+
+      <!-- info -->
+      <p class="mx-8">
+        <span class="title font-weight-bold mr-2">{{email}}</span>さん
+      </p>
       <p class="caption mx-8 my-0">あなたのプロフィールを設定してください。</p>
       <p class="caption mx-8 mb-10">名前は後から変更できます。</p>
+
+      <!-- form -->
       <v-card class="py-5 px-7 mx-4">
         <v-form ref="form" @submit.prevent>
           <v-row>
             <v-text-field
               v-model="id"
+              @keyup.enter="validate"
               type="text"
               :rules="formRules.id"
               :prepend-icon="icons.mdiCardAccountDetails"
@@ -25,6 +32,7 @@
           <v-row>
             <v-text-field
               v-model="name"
+              @keyup.enter="validate"
               type="text"
               :rules="formRules.name"
               :prepend-icon="icons.mdiAccount"
@@ -33,8 +41,19 @@
             >
             </v-text-field>
           </v-row>
-          <v-row justify="end" class="mt-4">
-            <v-btn id="save" color="primary" @click="validate">決定</v-btn>
+          <v-row
+            justify="end"
+            class="mt-4"
+          >
+            <v-btn
+              id="save"
+              color="primary"
+              @click="validate"
+            >
+              決定
+            </v-btn>
+
+            <!-- 確認ダイアログ -->
             <v-dialog v-model="dialog">
               <v-card>
                 <v-card-title>以下の内容でよろしいですか？</v-card-title>
@@ -81,9 +100,6 @@ import { mdiAccount, mdiCardAccountDetails } from '@mdi/js'
   components: {}
 })
 export default class Profile extends Vue {
-  get email() {
-    return this.$store.getters["User/user"].email
-  }
   icons = {
     mdiAccount,
     mdiCardAccountDetails
@@ -91,8 +107,12 @@ export default class Profile extends Vue {
   dialog = false
   id = ""
   name = ""
-  usedIds: string[] = ["a"]
+  usedIds: string[] = []
   unsubscribe: any = null
+
+  get email() {
+    return this.$store.getters["User/user"].email
+  }
 
   get formRules() {
     return {
@@ -111,18 +131,12 @@ export default class Profile extends Vue {
   }
 
   mounted() {
-    this.id
     this.unsubscribe = db.collection("users").onSnapshot((querySnapshot) => {
       const ids: any = []
       querySnapshot.forEach((doc) => {
         ids.push(doc.data().mid)
       })
       this.usedIds = ids;
-    })
-    window.addEventListener("keyup", (e) => {
-      if (e.key === 'Enter') {
-        (document.getElementById("save") as HTMLElement).click()
-      }
     })
   }
 
@@ -164,7 +178,6 @@ export default class Profile extends Vue {
       name: this.name,
     }
     db.collection("users").doc(user.uid).update(userInfo)
-    // this.$store.dispatch("User/changeProfile", userInfo)
     this.$router.push({name: 'Home'})
   }
 

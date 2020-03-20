@@ -1,6 +1,6 @@
 <template>
 <div class="login">
-  <!-- ナビゲーション -->
+
   <v-app-bar
     color="indigo"
     dark
@@ -8,9 +8,23 @@
     <v-toolbar-title class="pl-2">麻雀成績管理</v-toolbar-title>
   </v-app-bar>
 
-  <v-row class="ma-0" align="center" justify="center" style="position: relative">
-    <v-row justify="end" class="ma-5" style="position: absolute; top: 0; right: 0;">
-      <v-menu offset-x offset-y class="help">
+  <v-row
+    class="ma-0"
+    align="center"
+    justify="center"
+    style="position: relative"
+  >
+
+    <!-- help -->
+    <v-row
+      justify="end"
+      class="ma-5"
+      style="position: absolute; top: 0; right: 0;"
+    >
+      <v-menu
+        offset-x
+        offset-y
+      >
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on">
             <v-icon large>{{ icons.mdiHelpCircle }}</v-icon>
@@ -19,8 +33,13 @@
         <span>アカウントを作成する場合は、「メールでログイン」を選択後、登録したいアドレスを入力してください。</span>
       </v-menu>
     </v-row>
+
+    <!-- firebaseui -->
     <div id="firebaseui-auth-container"></div>
+
+    <!-- loader -->
     <v-progress-circular id="loader" indeterminate color="prime"></v-progress-circular>
+
   </v-row>
 </div>
 </template>
@@ -31,7 +50,7 @@ import * as firebase from 'firebase/app'
 import * as firebaseui from 'firebaseui-ja'
 import { ui, db } from '@/firebase'
 import 'firebaseui-ja/dist/firebaseui.css'
-import { mdiEmail, mdiLock, mdiHelpCircle } from '@mdi/js'
+import { mdiHelpCircle } from '@mdi/js'
 
 @Component({
   components: {
@@ -72,8 +91,6 @@ export default class Login extends Vue {
   };
 
   icons = {
-    mdiEmail,
-    mdiLock,
     mdiHelpCircle
   }
 
@@ -86,10 +103,12 @@ export default class Login extends Vue {
   }
 
   addNewUser(userInfo: any) {
-    db.collection("users").doc(userInfo.uid).set({
+    const user = {
       uid: userInfo.uid,
-      email: userInfo.email,
-    })
+      email: userInfo.email
+    }
+    db.collection("users").doc(userInfo.uid).set(user)
+    this.$store.dispatch("User/login", user)
   }
 }
 </script>

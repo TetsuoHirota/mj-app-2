@@ -12,7 +12,7 @@
         <v-row class="mb-3">
           <v-icon dark size="50">{{ accountIcon }}</v-icon>
         </v-row>
-        <template v-if="user.isLogin === true">
+        <template v-if="user.isLogin">
           <v-row class="headline my-1">
             {{ user.name }}
           </v-row>
@@ -35,17 +35,12 @@
             </v-alert>
           </v-row>
         </template>
-        <template v-if="user.isLogin === false">
+        <template v-if="!user.isLogin">
           <v-row class="white--text headline">
             ユーザー情報なし
           </v-row>
           <v-row class="overline" style="opacity: .5">
-            ログインするとすべての機能が使えます
-          </v-row>
-          <v-row class="justify-center mt-5">
-            <v-btn color="primary">
-              新規アカウント作製
-            </v-btn>
+            ログインするとすべての機能が使えます。アカウント作成は「ログイン」から行ってください。
           </v-row>
         </template>
       </v-col>
@@ -63,19 +58,28 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item v-if="user.isLogin === true" @click="profileDialog = true">
+        <v-list-item
+          :disabled="!user.isLogin"
+          @click="profileDialog = true"
+        >
           <v-list-item-action>
             <v-icon>{{ icons.mdiAccountCog }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>名前変更</v-list-item-title>
           </v-list-item-content>
-          <v-dialog v-model="profileDialog" max-width="290px">
+          <v-dialog
+            v-model="profileDialog"
+            max-width="290px"
+          >
             <Profile @save="profileDialog = false" />
           </v-dialog>
         </v-list-item>
 
-        <v-list-item v-if="user.isLogin === true" @click="toFriends">
+        <v-list-item
+          :disabled="!user.isLogin"
+          @click="toFriends"
+        >
           <v-list-item-action>
             <v-icon>{{ icons.mdiAccountGroup }}</v-icon>
           </v-list-item-action>
@@ -84,7 +88,10 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item v-if="user.isLogin === true" @click="logout">
+        <v-list-item
+          v-if="user.isLogin === true"
+          @click="logout"
+        >
           <v-list-item-action>
             <v-icon>{{ icons.mdiLogoutVariant }}</v-icon>
           </v-list-item-action>
@@ -93,7 +100,10 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item v-if="user.isLogin === false" @click="login">
+        <v-list-item
+          v-if="user.isLogin === false"
+          @click="login"
+        >
           <v-list-item-action>
             <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
           </v-list-item-action>
@@ -114,7 +124,11 @@
     <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     <v-toolbar-title class="pl-2">麻雀成績管理</v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-btn icon v-if="user.isLogin === false" @click="login">
+    <v-btn
+      icon
+      v-if="user.isLogin === false"
+      @click="login"
+    >
       <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
     </v-btn>
   </v-app-bar>
@@ -132,19 +146,14 @@ import History from '@/components/History.vue'
 import Rules from '@/components/Rules.vue'
 import Profile from '@/components/Home/Profile.vue'
 import {
-  mdiLogoutVariant,
-  mdiLoginVariant,
   mdiAccountCircle,
   mdiAccountAlert,
-  mdiAccountGroup,
-  mdiAccountPlus,
-  mdiAccountCog,
-  mdiPencil,
-  mdiStore,
-  mdiHistory,
-  mdiChartBar,
   mdiCardAccountDetails,
-  mdiHome
+  mdiHome,
+  mdiAccountCog,
+  mdiAccountGroup,
+  mdiLogoutVariant,
+  mdiLoginVariant,
 } from '@mdi/js';
 
 @Component({
@@ -162,11 +171,6 @@ export default class Home extends Vue {
     mdiLoginVariant,
     mdiAccountGroup,
     mdiAccountCog,
-    mdiAccountPlus,
-    mdiPencil,
-    mdiStore,
-    mdiHistory,
-    mdiChartBar,
     mdiCardAccountDetails,
     mdiHome
   }
@@ -194,7 +198,9 @@ export default class Home extends Vue {
     const result = confirm("本当にログアウトしますか？")
     if (result) {
       this.$store.dispatch("User/logout")
-      this.$router.push({name: 'Home'})
+      if (this.$route.name !== 'Home') {
+        this.$router.push({name: 'Home'})
+      }
     }
   }
 
@@ -217,6 +223,7 @@ export default class Home extends Vue {
   }
 }
 </script>
+
 <style lang="scss" scoped>
 .home {
   height: 100%;
@@ -241,13 +248,4 @@ export default class Home extends Vue {
     top: -1px;
   }
 }
-
-// .v-btn:hover:before,
-// .v-btn:hover::before,
-// .v-btn:focus-within:before,
-// .v-btn:focus:before,
-// .v-btn:focus::before{
-//   opacity: 0 !important;
-// }
-
 </style>
