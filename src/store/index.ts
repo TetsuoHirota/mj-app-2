@@ -4,6 +4,9 @@ import createPersistedState from 'vuex-persistedstate'
 
 import User from './modules/user'
 import Display from './modules/display'
+import Friends from './modules/friends'
+import Rules from './modules/rules'
+import ScoreBoard from './modules/scoreBoard'
 
 Vue.use(Vuex)
 
@@ -16,7 +19,10 @@ export default new Vuex.Store({
   },
   modules: {
     User,
-    Display
+    Display,
+    Friends,
+    Rules,
+    ScoreBoard
   },
   plugins: [ createPersistedState() ]
 })

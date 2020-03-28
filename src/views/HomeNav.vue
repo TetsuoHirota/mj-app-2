@@ -7,6 +7,7 @@
     :continuous="false"
     :hide-delimiters="true"
     :show-arrows="false"
+    light
     height="100%"
   >
     <v-carousel-item>
@@ -58,10 +59,10 @@ import {
   mdiChartBar,
 } from '@mdi/js';
 
-import Data from '@/components/Data.vue'
-import Free from '@/components/Free.vue'
-import History from '@/components/History.vue'
-import Rules from '@/components/Rules.vue'
+import Data from '@/components/Home/Data.vue'
+import Free from '@/components/Home/Free.vue'
+import History from '@/components/Home/History.vue'
+import Rules from '@/components/Home/Rules.vue'
 
 @Component({
   components: {

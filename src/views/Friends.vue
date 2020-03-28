@@ -1,8 +1,11 @@
 <template>
 <div class="friends pa-4">
   <h2 class="headline grey--text">フレンド</h2>
-  <v-subheader>一覧</v-subheader>
-  <v-list style="overflow-y: auto">
+  <v-subheader>フレンド一覧</v-subheader>
+  <v-list
+    style="overflow-y: auto"
+    class="divider px-3"
+  >
     <v-list-item
       v-for="friend in friends"
       :key="friend.mid"
@@ -24,10 +27,13 @@
       dark
       color="deep-purple accent-4"
       height="45px"
+      @click="showFriendsAdd = true"
     >
       <v-icon class="mr-3">{{ icons.mdiAccountPlus }}</v-icon>
       フレンド追加
     </v-btn>
+    
+    <FriendsAdd @dialog="changeShowFriendsAdd" :parentShow="showFriendsAdd"/>
   </v-row>
 
 </div>  
@@ -37,26 +43,27 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { mdiAccount, mdiAccountPlus } from '@mdi/js'
 
+import FriendsAdd from '@/components/FriendsAdd.vue'
+
 @Component({
-  components: {}
+  components: {
+    FriendsAdd
+  }
 })
 export default class Friends extends Vue {
   icons = {
     mdiAccount,
     mdiAccountPlus
   }
-  friends = [
-    {
-      uid: "dsdfsdf",
-      mid: "asfjk",
-      name: "nameaaaaaa"
-    },
-    {
-      uid: "dsdfsvfsdfgvsdf",
-      mid: "asfjadgfdgk",
-      name: "nameaaaaaa"
-    },
-  ]
+  showFriendsAdd = false
+
+  get friends() {
+    return this.$store.getters["Friends/friends"]
+  }
+
+  changeShowFriendsAdd(value: any) {
+    this.showFriendsAdd = value
+  }
 
 }
 </script>
@@ -65,6 +72,15 @@ export default class Friends extends Vue {
 .friends {
   display: grid;
   grid-template-rows: auto auto 1fr 100px;
+}
+
+.divider {
+  >div {
+    border-bottom: 1px solid rgba(0,0,0,.12);
+    &:first-of-type {
+      border-top: 1px solid rgba(0,0,0,.12);
+    }
+  }
 }
 
 </style>

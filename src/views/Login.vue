@@ -34,11 +34,18 @@
       </v-menu>
     </v-row>
 
-    <!-- firebaseui -->
-    <div id="firebaseui-auth-container"></div>
+    <v-col align="center" class="pa-9">
+      <!-- firebaseui -->
+      <div id="firebaseui-auth-container"></div>
 
-    <!-- loader -->
-    <v-progress-circular id="loader" indeterminate color="prime"></v-progress-circular>
+      <!-- loader -->
+      <v-progress-circular
+        id="loader"
+        indeterminate
+        color="primary"
+      ></v-progress-circular>
+    </v-col>
+    
 
   </v-row>
 </div>
@@ -48,7 +55,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import * as firebase from 'firebase/app'
 import * as firebaseui from 'firebaseui-ja'
-import { ui, db } from '@/firebase'
+import { ui } from '@/firebase'
 import 'firebaseui-ja/dist/firebaseui.css'
 import { mdiHelpCircle } from '@mdi/js'
 
@@ -68,12 +75,16 @@ export default class Login extends Vue {
           isAnonymous: user.isAnonymous,
           isNewUser: info.isNewUser
         }
-        if (!userInfo.isAnonymous && userInfo.isNewUser) {
-          this.addNewUser(userInfo)
+        if (!userInfo.isNewUser) {         //既存ユーザー
+          this.login(userInfo)
+          return false
+        } else if (userInfo.isAnonymous) { //anonymous
+          return true
+        } else {                           //新規ユーザー  
+          this.signup(userInfo)
           this.nextStep()
           return false
         }
-        return true
       },
       uiShown: function() {
         (document.getElementById('loader') as HTMLElement).style.display = 'none';
@@ -102,13 +113,13 @@ export default class Login extends Vue {
     this.$router.push({name: 'Profile'})
   }
 
-  addNewUser(userInfo: any) {
-    const user = {
-      uid: userInfo.uid,
-      email: userInfo.email
-    }
-    db.collection("users").doc(userInfo.uid).set(user)
-    this.$store.dispatch("User/login", user)
+  signup(userInfo: any) {
+    this.$store.dispatch("User/signup", userInfo)
+  }
+
+  async login(userInfo: any) {
+    await this.$store.dispatch("User/login", userInfo)
+    this.$router.push('/')
   }
 }
 </script>
@@ -125,5 +136,9 @@ export default class Login extends Vue {
   padding: 10px;
   font-size: 14px;
   background: rgba(0,0,0,0.6);
+}
+
+.firebaseui-idp-list {
+  padding-left: 0 !important;
 }
 </style>

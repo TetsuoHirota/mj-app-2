@@ -169,14 +169,10 @@ export default class Profile extends Vue {
   }
 
   save() {
-    const user = this.$store.getters["User/user"]
-    const userInfo = {
-      uid: user.uid,
-      email: user.email,
+    this.$store.dispatch("User/changeProfile", {
       mid: this.id,
-      name: this.name,
-    }
-    db.collection("users").doc(user.uid).update(userInfo)
+      name: this.name
+    })
     this.$router.push({name: 'Home'})
   }
 

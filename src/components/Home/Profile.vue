@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Emit } from 'vue-property-decorator'
+import { Component, Vue  } from 'vue-property-decorator'
 import { db } from '@/firebase'
 import { mdiAccount } from '@mdi/js'
 

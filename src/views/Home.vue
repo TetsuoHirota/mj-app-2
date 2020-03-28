@@ -5,7 +5,7 @@
   <v-navigation-drawer
     v-model="drawer"
     disable-resize-watcher
-    absolute
+    app
   >
     <div class="menu-account indigo darken-4">
       <v-col class="pa-6 white--text">
@@ -47,77 +47,76 @@
     </div>
 
     <v-list dense flat>
-      <v-list-item-group>
 
-        <v-list-item @click="toHome">
-          <v-list-item-action>
-            <v-icon>{{ icons.mdiHome }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>ホーム</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+      <v-list-item @click="toHome">
+        <v-list-item-action>
+          <v-icon>{{ icons.mdiHome }}</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>ホーム</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
 
-        <v-list-item
-          :disabled="!user.isLogin"
-          @click="profileDialog = true"
+      <v-list-item
+        :disabled="!user.isLogin"
+        @click="profileDialog = true"
+      >
+        <v-list-item-action>
+          <v-icon>{{ icons.mdiAccountCog }}</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>名前変更</v-list-item-title>
+        </v-list-item-content>
+        <v-dialog
+          v-model="profileDialog"
+          max-width="290px"
         >
-          <v-list-item-action>
-            <v-icon>{{ icons.mdiAccountCog }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>名前変更</v-list-item-title>
-          </v-list-item-content>
-          <v-dialog
-            v-model="profileDialog"
-            max-width="290px"
-          >
-            <Profile @close="profileDialog = false" />
-          </v-dialog>
-        </v-list-item>
+          <Profile @close="profileDialog = false" />
+        </v-dialog>
+      </v-list-item>
 
-        <v-list-item
-          :disabled="!user.isLogin"
-          @click="toFriends"
-        >
-          <v-list-item-action>
-            <v-icon>{{ icons.mdiAccountGroup }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>フレンド</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+      <v-list-item
+        :disabled="!user.isLogin"
+        @click="toFriends"
+      >
+        <v-list-item-action>
+          <v-icon>{{ icons.mdiAccountGroup }}</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>フレンド</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
 
-        <v-list-item
-          v-if="user.isLogin === true"
-          @click="logout"
-        >
-          <v-list-item-action>
-            <v-icon>{{ icons.mdiLogoutVariant }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>ログアウト</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+      <v-list-item
+        v-if="user.isLogin === true"
+        @click="logout"
+      >
+        <v-list-item-action>
+          <v-icon>{{ icons.mdiLogoutVariant }}</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>ログアウト</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
 
-        <v-list-item
-          v-if="user.isLogin === false"
-          @click="login"
-        >
-          <v-list-item-action>
-            <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>ログイン</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+      <v-list-item
+        v-if="user.isLogin === false"
+        @click="login"
+      >
+        <v-list-item-action>
+          <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          <v-list-item-title>ログイン</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
 
-      </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
   
   <!-- ナビゲーション -->
   <v-app-bar
+    app
     color="indigo"
     dark
   >
@@ -133,17 +132,21 @@
     </v-btn>
   </v-app-bar>
 
-  <router-view/>
+  <v-content style="height: 100%">
+    <v-container
+      fluid
+      class="pa-0"
+      style="height: 100%"
+    >
+      <router-view/>
+    </v-container>
+  </v-content>
   
 </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import Data from '@/components/Data.vue'
-import Free from '@/components/Free.vue'
-import History from '@/components/History.vue'
-import Rules from '@/components/Rules.vue'
+import { Component, Vue } from 'vue-property-decorator';
 import Profile from '@/components/Home/Profile.vue'
 import {
   mdiAccountCircle,
@@ -158,10 +161,6 @@ import {
 
 @Component({
   components: {
-    Data,
-    Free,
-    History,
-    Rules,
     Profile
   }
 })
@@ -200,6 +199,9 @@ export default class Home extends Vue {
       this.$store.dispatch("User/logout")
       if (this.$route.name !== 'Home') {
         this.$router.push({name: 'Home'})
+        location.reload()
+      } else {
+        location.reload()
       }
     }
   }
@@ -227,8 +229,8 @@ export default class Home extends Vue {
 <style lang="scss" scoped>
 .home {
   height: 100%;
-  display: grid;
-  grid-template-rows: max-content 1fr;
+  // display: grid;
+  // grid-template-rows: max-content 1fr;
 }
 
 .row {
