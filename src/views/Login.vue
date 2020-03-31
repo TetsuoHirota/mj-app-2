@@ -8,46 +8,20 @@
     <v-toolbar-title class="pl-2">麻雀成績管理</v-toolbar-title>
   </v-app-bar>
 
-  <v-row
-    class="ma-0"
-    align="center"
-    justify="center"
-    style="position: relative"
-  >
+  <h1>ログイン</h1>
 
-    <!-- help -->
-    <v-row
-      justify="end"
-      class="ma-5"
-      style="position: absolute; top: 0; right: 0;"
-    >
-      <v-menu
-        offset-x
-        offset-y
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn icon v-on="on">
-            <v-icon large>{{ icons.mdiHelpCircle }}</v-icon>
-          </v-btn>
-        </template>
-        <span>アカウントを作成する場合は、「メールでログイン」を選択後、登録したいアドレスを入力してください。</span>
-      </v-menu>
-    </v-row>
+  <!-- firebaseui -->
+  <div class="firebaseui">
+    <div id="firebaseui-auth-container"></div>
+    <v-progress-circular
+      id="loader"
+      indeterminate
+      color="primary"
+    ></v-progress-circular>
+  </div>
 
-    <v-col align="center" class="pa-9">
-      <!-- firebaseui -->
-      <div id="firebaseui-auth-container"></div>
-
-      <!-- loader -->
-      <v-progress-circular
-        id="loader"
-        indeterminate
-        color="primary"
-      ></v-progress-circular>
-    </v-col>
+  <v-subheader class="my-9 mx-3">アカウントを作成する場合は、「メールでログイン」を選択後、登録したいアドレスを入力してください。</v-subheader>
     
-
-  </v-row>
 </div>
 </template>
 
@@ -75,15 +49,14 @@ export default class Login extends Vue {
           isAnonymous: user.isAnonymous,
           isNewUser: info.isNewUser
         }
-        if (!userInfo.isNewUser) {         //既存ユーザー
+        if (userInfo.isAnonymous) {         //anonymous
+          return true
+        } else if (!userInfo.isNewUser) {   //既存ユーザー
           this.login(userInfo)
           return false
-        } else if (userInfo.isAnonymous) { //anonymous
-          return true
-        } else {                           //新規ユーザー  
+        } else {                            //新規ユーザー  
           this.signup(userInfo)
-          this.nextStep()
-          return false
+          return true
         }
       },
       uiShown: function() {
@@ -109,10 +82,6 @@ export default class Login extends Vue {
     ui.start('#firebaseui-auth-container', this.uiConfig);
   }
 
-  nextStep() {
-    this.$router.push({name: 'Profile'})
-  }
-
   signup(userInfo: any) {
     this.$store.dispatch("User/signup", userInfo)
   }
@@ -124,21 +93,36 @@ export default class Login extends Vue {
 }
 </script>
 
+<style lang="scss">
+.firebaseui {
+  align-self: center;
+  ul {
+    list-style: none;
+    padding: 0 !important;
+  }
+  button {
+    transform: scale(1.1);
+    @include tab {
+      transform: scale(1);
+    }
+  }
+}
+</style>
 <style lang="scss" scoped>
 .login {
   height: 100%;
   display: grid;
-  grid-template-rows: max-content 1fr;
+  grid-template-rows: auto auto 1fr auto;
+
 }
 
-.v-menu__content {
-  color: white;
-  padding: 10px;
-  font-size: 14px;
-  background: rgba(0,0,0,0.6);
+.firebaseui {
+  align-self: center;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-.firebaseui-idp-list {
-  padding-left: 0 !important;
+.v-subheader {
+  justify-self: center;
 }
 </style>

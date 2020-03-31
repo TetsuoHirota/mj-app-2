@@ -1,0 +1,18 @@
+.v-btn:hover::before,
+.v-btn:focus-within::before,
+.v-btn:focus::before {
+  @include sp {
+    opacity: 0 !important;
+  }
+}
+
+.row {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.8rem;
+  padding-left: 30px;
+  margin: 10px 0;
+  color: rgba(0, 0, 0, 0.5);
+}

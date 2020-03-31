@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import { auth, db } from '@/firebase'
-// import store from '../store'
+import { auth } from '@/firebase'
+import store from '../store'
 
 import Home from '../views/Home.vue'
 import Login from '@/views/Login.vue'
 import Profile from '@/views/Profile.vue'
-import HomeNav from '@/views/HomeNav.vue'
+import Nav from '@/components/Home/Nav.vue'
 import Friends from '@/views/Friends.vue'
 import ScoreBoard from '@/views/ScoreBoard.vue'
 
@@ -20,11 +20,18 @@ const routes = [
   {
     path: '/',
     component: Home,
+    meta: {
+      requiresAuth: true
+    },
     children: [
       {
         path: '/',
+        redirect: '/home'
+      },
+      {
+        path: '/home',
         name: 'Home',
-        component: HomeNav
+        component: Nav
       },
       {
         path: '/friends',
@@ -46,7 +53,10 @@ const routes = [
   {
     path: '/scoreboard',
     name: 'ScoreBoard',
-    component: ScoreBoard
+    component: ScoreBoard,
+    meta: {
+      requiresAuth: true
+    },
   }
 ]
 
@@ -56,27 +66,44 @@ const router = new VueRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {
-//   let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-//   if (requiresAuth) {
-//     auth.onAuthStateChanged(user => {
-//       if (user) {
-//         // dbからユーザー情報を取得
-//         db.collection("users").doc(user.uid).get().then(doc => {
-//           if (doc.exists) {
-//             store.dispatch("User/login", doc.data())
-//             // store.dispatch("Friends/getFriends")     //フレンド取得
-//             next()
-//             if (!store.getters["User/user"].mid) {
-//               // router.push({ path: '/profile'}, () => {})
-//               next('/profile')
-//             } 
-//           }
-//         })
-//       }
-//     })
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const user = store.getters["User/user"]
 
+    //storeがログイン状態でないとき、ログイン処理をする
+    if (user.isLogin) {
+
+      // プロフィール未登録の場合、Profileに移動
+      if (user.mid === "") {
+        next({
+          path: '/profile',
+          query: { redirect: to.fullPath }
+        })
+      } else {
+        next()
+      }
+    } else {
+      auth.onAuthStateChanged(user => {
+  
+        //firebaseでログイン状態でないときはログインしない
+        if (user) {
+  
+          // ゲストの場合ログインしない
+          if (user.isAnonymous) {
+            next()
+          } else {
+            store.dispatch('User/login', user).then(() => {
+              next()
+            })
+          }
+        } else {
+          next()
+        }
+      })
+    }
+  } else {
+    next()
+  }
+})
 
 export default router

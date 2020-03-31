@@ -1,0 +1,27 @@
+@font-face {
+  font-family: 'Noto Sans CJK JP Subset';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Sans CJK JP'),
+    local('NotoSansCJKjp-Regular'),
+    local('NotoSansJP-Regular'),
+    url('~@/assets/font/NotoSansCJKjp/NotoSansCJKjp-Regular.woff2') format('woff2'),
+}
+
+@font-face {
+  font-family: 'Noto Sans CJK JP Subset';
+  font-style: normal;
+  font-weight: 500;
+  src: local('NotoSansCJKjp-Midium'),
+    local('NotoSansJP-Midium'),
+    url('~@/assets/font/NotoSansCJKjp/NotoSansCJKjp-Medium.woff2') format('woff2'),
+}
+
+@font-face {
+  font-family: 'Noto Sans CJK JP Subset';
+  font-style: normal;
+  font-weight: 700;
+  src: local('NotoSansCJKjp-Bold'),
+    local('NotoSansJP-Bold'),
+    url('~@/assets/font/NotoSansCJKjp/NotoSansCJKjp-Bold.woff2') format('woff2'),
+}

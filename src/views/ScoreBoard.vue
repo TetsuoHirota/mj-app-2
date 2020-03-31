@@ -129,7 +129,6 @@ export default class ScoreBoard extends Vue {
   }
 
   mounted() {
-    console.log("mpounted");
     this.$store.dispatch("ScoreBoard/startListener")
   }
 

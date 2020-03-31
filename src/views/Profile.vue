@@ -6,107 +6,116 @@
   </v-app-bar>
 
   <v-row justify="center" align="center">
-    <div>
+    <v-col class="px-8" align="center">
 
-      <!-- info -->
-      <p class="mx-8">
-        <span class="title font-weight-bold mr-2">{{email}}</span>さん
-      </p>
-      <p class="caption mx-8 my-0">あなたのプロフィールを設定してください。</p>
-      <p class="caption mx-8 mb-10">名前は後から変更できます。</p>
+      <!-- 情報 -->
+      <p><span class="display-2 font-weight-medium mr-2">{{ email }}</span>さん</p>
+      <v-subheader style="text-align: start; width: fit-content;">
+        あなたのプロフィールを完成させてください。名前は後から変更できます。
+      </v-subheader>
 
-      <!-- form -->
-      <v-card class="py-5 px-7 mx-4">
+      <!-- フォーム -->
+      <v-card
+        class="my-9 pa-2"
+        max-width="400px"
+      >
         <v-form ref="form" @submit.prevent>
-          <v-row>
+          <v-col>
             <v-text-field
+              label="ID"
               v-model="id"
               @keyup.enter="validate"
               type="text"
               :rules="formRules.id"
               :prepend-icon="icons.mdiCardAccountDetails"
-              label="ID"
             >
             </v-text-field>
-          </v-row>
-          <v-row>
             <v-text-field
+              label="名前"
               v-model="name"
               @keyup.enter="validate"
               type="text"
               :rules="formRules.name"
               :prepend-icon="icons.mdiAccount"
-              label="名前"
               hint="成績表に表示される名前です"
             >
             </v-text-field>
-          </v-row>
-          <v-row
-            justify="end"
-            class="mt-4"
-          >
-            <v-btn
-              color="primary"
-              @click="validate"
-            >
-              決定
-            </v-btn>
-
-            <!-- 確認ダイアログ -->
-            <v-dialog v-model="dialog">
-              <v-card>
-                <v-card-title>以下の内容でよろしいですか？</v-card-title>
-                <v-card-text>IDは変更することができません</v-card-text>
-                <v-card-text class="px-10 black--text">
-                  <p>ID: {{ id }}</p>
-                  <p>名前: {{ name }}</p>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="primary"
-                    text
-                    @click="dialog = false"
-                  >
-                    キャンセル
-                  </v-btn>
-
-                  <v-btn
-                    color="primary"
-                    text
-                    @click="save"
-                  >
-                    保存
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-row>
+            <v-row>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="primary"
+                @click="validate"
+              >
+                決定
+              </v-btn>
+            </v-row>
+          </v-col>
         </v-form>
       </v-card>
-    </div>
+
+      <!-- 確認ダイアログ -->
+      <v-dialog v-model="dialog" max-width="380px">
+        <v-card>
+          <v-card-title>
+            <h2>以下の内容でよろしいですか？</h2>
+            <v-subheader>IDは変更することができません</v-subheader>
+          </v-card-title>
+          <v-card-text class="px-10 font-weight-medium" style="color: rgba(0,0,0,.87)">
+            <p>ID: {{ id }}</p>
+            <p>名前: {{ name }}</p>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="primary"
+              text
+              @click="dialog = false"
+            >
+              キャンセル
+            </v-btn>
+
+            <v-btn
+              color="primary"
+              text
+              @click="save"
+            >
+              保存
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+    </v-col>
   </v-row>
 
 </div>  
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Mixins } from 'vue-property-decorator'
 import { db } from '@/firebase'
 import { mdiAccount, mdiCardAccountDetails } from '@mdi/js'
+import Utilities from '@/mixins/utilities.ts'
 
 @Component({
-  components: {}
+  components: {},
 })
-export default class Profile extends Vue {
+export default class Profile extends Mixins(Utilities) {
   icons = {
     mdiAccount,
     mdiCardAccountDetails
   }
+
   dialog = false
+
+  // フォーム
   id = ""
   name = ""
+
+  // 既存ユーザーID
   usedIds: string[] = []
+
+  // リスナー停止
   unsubscribe: any = null
 
   get email() {
@@ -143,25 +152,6 @@ export default class Profile extends Vue {
     this.unsubscribe()
   }
 
-  getLength(str: string) {
-    let result = 0;
-    for(let i=0;i<str.length;i++){
-      const chr = str.charCodeAt(i);
-      if((chr >= 0x00 && chr < 0x81) ||
-        (chr === 0xf8f0) ||
-        (chr >= 0xff61 && chr < 0xffa0) ||
-        (chr >= 0xf8f1 && chr < 0xf8f4)){
-        //半角文字の場合は1を加算
-        result += 1;
-      }else{
-        //それ以外の文字の場合は2を加算
-        result += 2;
-      }
-    }
-    //結果を返す
-    return result;
-  }
-
   validate() {
     if ((this.$refs.form as HTMLFormElement).validate()) {
       this.dialog = true
@@ -188,9 +178,5 @@ export default class Profile extends Vue {
 
 .row {
   margin: 0;
-}
-
-p {
-  word-break: break-all;
 }
 </style>

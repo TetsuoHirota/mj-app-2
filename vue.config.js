@@ -3,11 +3,18 @@ module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
-  pluginOptions: {
-    webpackBundleAnalyzer: {
-      openAnalyzer: false
+  css: {
+    loaderOptions: {
+      scss: {
+        prependData: '@import "./src/assets/scss/main.scss";'
+      }
     }
   },
+  // pluginOptions: {
+  //   webpackBundleAnalyzer: {
+  //     openAnalyzer: false
+  //   }
+  // },
   configureWebpack: {
     performance: {
       maxEntrypointSize: 1500000,
