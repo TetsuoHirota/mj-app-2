@@ -5,7 +5,7 @@
   <v-carousel
     v-model="nav"
     :continuous="false"
-    :hide-delimiters="true"
+    hide-delimiters
     :show-arrows="false"
     light
     height="100%"
@@ -31,19 +31,19 @@
     color="indigo"
   >
     <v-btn>
-      <span>ScoreBoard</span>
+      <span>成績表</span>
       <v-icon>{{ icons.mdiPencil }}</v-icon>
     </v-btn>
     <v-btn>
-      <span>Free</span>
+      <span>フリー</span>
       <v-icon>{{ icons.mdiStore }}</v-icon>
     </v-btn>
     <v-btn>
-      <span>History</span>
+      <span>履歴</span>
       <v-icon>{{ icons.mdiHistory }}</v-icon>
     </v-btn>
     <v-btn>
-      <span>Data</span>
+      <span>データ</span>
       <v-icon>{{ icons.mdiChartBar }}</v-icon>
     </v-btn>
   </v-bottom-navigation>
@@ -79,6 +79,7 @@ export default class HomeNav extends Vue {
     mdiHistory,
     mdiChartBar
   }
+  
   nav = 0
 
   created() {

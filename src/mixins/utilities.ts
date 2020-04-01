@@ -2,6 +2,7 @@ import { Vue, Component } from 'vue-property-decorator'
 
 @Component
 export default class Utilities extends Vue {
+  
   // 文字数カウント
   getLength(str: string) {
     let result = 0;

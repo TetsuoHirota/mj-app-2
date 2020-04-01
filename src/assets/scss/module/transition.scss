@@ -1,0 +1,25 @@
+.tr-list {
+  $sec: .8s;
+  &-move {
+    transition: transform $sec;
+  }
+  &-enter {
+    &-active {
+      opacity: 0;
+      transition: opacity $sec;
+    }
+    &-to {
+      opacity: 1;
+    }
+  }
+  &-leave {
+    &-active {
+      position: absolute;
+      transition: all $sec;
+    }
+    &-to {
+      opacity: 0;
+      transform: translateX(200px);
+    }
+  }
+}

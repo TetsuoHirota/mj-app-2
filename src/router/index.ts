@@ -36,7 +36,14 @@ const routes = [
       {
         path: '/friends',
         name: 'Friends',
-        component: Friends
+        component: Friends,
+        beforeEnter: (to: any, from: any, next: any) => {
+          if (store.getters["User/user"].isLogin) {
+            next()
+          } else {
+            next({ name: 'Home'})
+          }
+        }
       }
     ]
   },
@@ -45,7 +52,7 @@ const routes = [
     name: 'Login',
     component: Login,
     beforeEnter: (to: any, from: any, next: any) => {
-      if ( store.getters["User/user"].isLogin) {
+      if (store.getters["User/user"].isLogin) {
         next({ name: 'Home'})
       } else {
         next()

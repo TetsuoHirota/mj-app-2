@@ -8,7 +8,7 @@
     <v-toolbar-title class="pl-2">麻雀成績管理</v-toolbar-title>
   </v-app-bar>
 
-  <h1>ログイン</h1>
+  <h1 class="ml-5">ログイン</h1>
 
   <!-- firebaseui -->
   <div class="firebaseui">
@@ -118,8 +118,7 @@ export default class Login extends Vue {
 
 .firebaseui {
   align-self: center;
-  margin: 0 auto;
-  padding: 0 20px;
+  margin: 0 20px;
 }
 
 .v-subheader {

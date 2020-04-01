@@ -1,72 +1,62 @@
 <template>
 <div class="home">
 
-  <!-- メニュー -->
+  <!-- ドロワー -->
   <v-navigation-drawer
     v-model="drawer"
     disable-resize-watcher
     app
   >
-    <div class="menu-account indigo darken-4">
-      <v-col class="pa-6 white--text">
-        <v-row class="mb-3">
-          <v-icon dark size="50">{{ accountIcon }}</v-icon>
-        </v-row>
-        <template v-if="user.isLogin">
-          <v-row class="headline my-1">
-            {{ user.name }}
-          </v-row>
-          <v-row class="my-1" style="opacity: .5">
-            {{ user.email }}
-          </v-row>
-          <v-row class="mt-6">
-            <v-alert
-              class="pa-3 pl-5 white--text"
-              border="left"
-              color="deep-orange lighten-1"
-              width="100%"
-            >
-              <v-row class="mb-2">
-                <v-icon dark>{{ icons.mdiCardAccountDetails }}</v-icon><span class="mx-2">ID</span>
-              </v-row>
-              <v-row>
-                {{ user.mid }}
-              </v-row>
-            </v-alert>
-          </v-row>
-        </template>
-        <template v-if="!user.isLogin">
-          <v-row class="white--text headline">
-            ユーザー情報なし
-          </v-row>
-          <v-row class="overline" style="opacity: .5">
-            ログインするとすべての機能が使えます。アカウント作成は「ログイン」から行ってください。
-          </v-row>
-        </template>
-      </v-col>
-    </div>
+    <!-- ヘッダー -->
+    <v-col class="pa-6">
+      <v-row class="mb-3">
+        <v-icon size="50">{{ accountIcon }}</v-icon>
+      </v-row>
 
+      <!-- ログイン中 -->
+      <template v-if="user.isLogin">
+        <h2 style="color: rgba(0,0,0,.87);">{{ user.name }}</h2>
+        <h4 style="opacity: .6">{{ user.email }}</h4>
+        <v-alert
+          class="ma-0 mt-5 pa-3 pl-5 white--text"
+          border="left"
+          color="blue darken-1"
+        >
+          <v-row class="mb-2">
+            <v-icon dark>{{ icons.mdiCardAccountDetails }}</v-icon><span class="mx-2">ID :</span>
+          </v-row>
+          <v-row>{{ user.mid }}</v-row>
+        </v-alert>
+      </template>
+
+      <!-- ログアウト中 -->
+      <template v-if="!user.isLogin">
+        <v-alert type="info">ユーザー情報なし</v-alert>
+        <p class="body-2 ma-0 mt-2" style="opacity: .5">
+          ログインするとすべての機能が使えます。アカウント作成は「ログイン」から行ってください。
+        </p>
+      </template>
+    </v-col>
+
+    <v-divider></v-divider>
+
+    <!-- メニューリスト -->
     <v-list dense flat>
 
-      <v-list-item @click="toHome">
-        <v-list-item-action>
-          <v-icon>{{ icons.mdiHome }}</v-icon>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>ホーム</v-list-item-title>
-        </v-list-item-content>
+      <v-list-item
+        :to="{ name: 'Home' }"
+        @click="drawer = false"
+      >
+        <v-icon>{{ icons.mdiHome }}</v-icon>
+        <div class="list-title">ホーム</div>
       </v-list-item>
 
       <v-list-item
         :disabled="!user.isLogin"
         @click="profileDialog = true"
       >
-        <v-list-item-action>
-          <v-icon>{{ icons.mdiAccountCog }}</v-icon>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>名前変更</v-list-item-title>
-        </v-list-item-content>
+        <v-icon>{{ icons.mdiAccountCog }}</v-icon>
+        <div class="list-title">名前変更</div>
         <v-dialog
           v-model="profileDialog"
           max-width="290px"
@@ -77,44 +67,33 @@
 
       <v-list-item
         :disabled="!user.isLogin"
-        @click="toFriends"
+        :to="{ name: 'Friends' }"
+        @click="drawer = false"
       >
-        <v-list-item-action>
-          <v-icon>{{ icons.mdiAccountGroup }}</v-icon>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>フレンド</v-list-item-title>
-        </v-list-item-content>
+        <v-icon>{{ icons.mdiAccountGroup }}</v-icon>
+        <div class="list-title">フレンド</div>
       </v-list-item>
 
       <v-list-item
-        v-if="user.isLogin === true"
+        v-if="user.isLogin"
         @click="logout"
       >
-        <v-list-item-action>
-          <v-icon>{{ icons.mdiLogoutVariant }}</v-icon>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>ログアウト</v-list-item-title>
-        </v-list-item-content>
+        <v-icon>{{ icons.mdiLogoutVariant }}</v-icon>
+        <div class="list-title">ログアウト</div>
       </v-list-item>
 
       <v-list-item
-        v-if="user.isLogin === false"
-        @click="login"
+        v-if="!user.isLogin"
+        :to="{ name: 'Login'}"
       >
-        <v-list-item-action>
-          <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>ログイン</v-list-item-title>
-        </v-list-item-content>
+        <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
+        <div class="list-title">ログイン</div>
       </v-list-item>
 
     </v-list>
   </v-navigation-drawer>
   
-  <!-- ナビゲーション -->
+  <!-- アプリバー -->
   <v-app-bar
     app
     color="indigo"
@@ -125,13 +104,14 @@
     <v-spacer></v-spacer>
     <v-btn
       icon
-      v-if="user.isLogin === false"
-      @click="login"
+      v-if="!user.isLogin"
+      :to="{ name: 'Login'}"
     >
       <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
     </v-btn>
   </v-app-bar>
 
+  <!-- ボディ -->
   <v-content style="height: 100%">
     <v-container
       fluid
@@ -174,23 +154,20 @@ export default class Home extends Vue {
     mdiHome
   }
 
+  // 表示関係
+  drawer = false
+  profileDialog = false
+
   get accountIcon() {
-    if (this.user.isLogin === true) {
+    if (this.user.isLogin) {
       return mdiAccountCircle
     } else {
       return mdiAccountAlert
     }
   }
 
-  drawer = false
-  profileDialog = false
-
   get user() {
     return this.$store.getters['User/user']
-  }
-
-  login() {
-    this.$router.push({name: 'Login'})
   }
 
   logout() {
@@ -205,49 +182,30 @@ export default class Home extends Vue {
       }
     }
   }
-
-  toHome() {
-    if (this.$route.name !== 'Home') {
-      this.$router.push({name: 'Home'})
-    }
-    this.drawer = false
-  }
-
-  toProfile() {
-    this.$router.push({name: 'Profile'})
-  }
-
-  toFriends() {
-    if (this.$route.name !== 'Friends') {
-      this.$router.push({name: 'Friends'})
-    }
-    this.drawer = false
-  }
 }
 </script>
 
 <style lang="scss" scoped>
 .home {
   height: 100%;
-  // display: grid;
-  // grid-template-rows: max-content 1fr;
-}
-
-.row {
-  margin: 0;
 }
 
 .v-list-item {
-  &__action {
-    margin-right: 25px !important;
-  }
-  &__title {
-    display: flex;
-    align-items: center;
-  }
+  height: 48px;
   .v-icon {
     position: relative;
     top: -1px;
+  }
+  .list-title {
+    margin-left: 30px;
+  }
+  &--active {
+    .v-icon {
+      color: rgba(0, 0, 0, 0.54) !important;
+    }
+  }
+  &:hover {
+    background: rgba(0,0,0,.05);
   }
 }
 </style>

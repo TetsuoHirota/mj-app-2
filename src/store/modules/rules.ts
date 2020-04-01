@@ -23,15 +23,19 @@ const mutations = {
 const actions = {
   getRules: ({ rootGetters, commit }: any) => {
     const me = rootGetters["User/user"]
-    db.collection("users").doc(me.uid).collection("rules").get().then(querySnapshot => {
-      const rules: any = []
-      querySnapshot.forEach(doc => {
-        const rule = doc.data()
-        rule.id = doc.id
-        rules.push(rule)
+    if (me.uid) {
+      db.collection("users").doc(me.uid).collection("rules").get().then(querySnapshot => {
+        const rules: any = []
+        querySnapshot.forEach(doc => {
+          const rule = doc.data()
+          rule.id = doc.id
+          rules.push(rule)
+        })
+        commit("setRules", rules)
       })
-      commit("setRules", rules)
-    })
+    } else {
+      console.log("jkd");
+    }
   },
 
   addRule: ({ rootGetters, dispatch }: any, rule: any) => {

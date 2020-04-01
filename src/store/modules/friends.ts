@@ -23,6 +23,13 @@ const actions = {
     })
     dispatch("getFriends")
   },
+  
+  deleteFriend: ({ dispatch, rootGetters }: any, user: any) => {
+    const me = rootGetters["User/user"]
+    db.collection("users").doc(me.uid).collection("friends").doc(user.uid).delete()
+    db.collection("users").doc(user.uid).collection("friends").doc(me.uid).delete()
+    dispatch("getFriends")
+  },
 
   getFriends: ({ commit, rootGetters }: any) => {
     const me = rootGetters["User/user"]

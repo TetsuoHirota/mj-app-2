@@ -1,24 +1,35 @@
 <template>
 <div class="friends pa-4">
-  <h2 class="headline grey--text">フレンド</h2>
+
+  <h2>フレンド</h2>
+
   <v-subheader>フレンド一覧</v-subheader>
+
   <v-list
-    style="overflow-y: auto"
-    class="divider px-3"
+    class="px-3"
+    max-width="500px"
+    flat
   >
-    <v-list-item
-      v-for="friend in friends"
-      :key="friend.mid"
-    >
-      <v-list-item-avatar>
-        <v-icon>{{ icons.mdiAccount }}</v-icon>
-      </v-list-item-avatar>
-      <v-list-item-content class="ma-0 pa-0">
-        <v-list-item-title v-text="friend.name"></v-list-item-title>
-        <v-list-item-subtitle v-text="'ID: ' + friend.mid"></v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
+    <v-divider></v-divider>
+    <transition-group name="tr-list">
+      <div
+        v-for="friend in friends"
+        :key="friend.mid"
+      >
+        <v-list-item @click="openFriendDelete(friend)">
+          <v-list-item-avatar>
+            <v-icon>{{ icons.mdiAccount }}</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-content class="ma-0 pa-0">
+            <v-list-item-title v-text="friend.name" class="font-weight-medium"></v-list-item-title>
+            <v-list-item-subtitle v-text="'ID: ' + friend.mid"></v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider></v-divider>
+      </div>
+    </transition-group>
   </v-list>
+
   <v-row
     justify="center"
     align="center"
@@ -27,13 +38,14 @@
       dark
       color="deep-purple accent-4"
       height="45px"
-      @click="showFriendsAdd = true"
+      @click="openFriendAdd"
     >
       <v-icon class="mr-3">{{ icons.mdiAccountPlus }}</v-icon>
       フレンド追加
     </v-btn>
     
-    <FriendsAdd @dialog="changeShowFriendsAdd" :parentShow="showFriendsAdd"/>
+    <FriendAdd ref="friendAdd"/>
+    <FriendDelete ref="friendDelete"/>
   </v-row>
 
 </div>  
@@ -43,11 +55,13 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { mdiAccount, mdiAccountPlus } from '@mdi/js'
 
-import FriendsAdd from '@/components/FriendsAdd.vue'
+import FriendAdd from '@/components/Friends/FriendAdd.vue'
+import FriendDelete from '@/components/Friends/FriendDelete.vue'
 
 @Component({
   components: {
-    FriendsAdd
+    FriendAdd,
+    FriendDelete
   }
 })
 export default class Friends extends Vue {
@@ -61,8 +75,12 @@ export default class Friends extends Vue {
     return this.$store.getters["Friends/friends"]
   }
 
-  changeShowFriendsAdd(value: any) {
-    this.showFriendsAdd = value
+  openFriendAdd() {
+    (this.$refs as any).friendAdd.open()
+  }
+
+  openFriendDelete(friend: any) {
+    (this.$refs as any).friendDelete.open(friend)
   }
 
 }
@@ -70,17 +88,19 @@ export default class Friends extends Vue {
 
 <style lang="scss" scoped>
 .friends {
+  height: 100%;
   display: grid;
   grid-template-rows: auto auto 1fr 100px;
 }
 
-.divider {
-  >div {
-    border-bottom: 1px solid rgba(0,0,0,.12);
-    &:first-of-type {
-      border-top: 1px solid rgba(0,0,0,.12);
+.v-list {
+  width: 100%;
+  overflow-y: auto;
+  justify-self: center;
+  .v-list-item {
+    &:hover {
+      background: rgba(0,0,0,.05);
     }
   }
 }
-
 </style>
