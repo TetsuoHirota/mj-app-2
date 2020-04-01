@@ -44,11 +44,26 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
+    beforeEnter: (to: any, from: any, next: any) => {
+      if ( store.getters["User/user"].isLogin) {
+        next({ name: 'Home'})
+      } else {
+        next()
+      }
+    }
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: Profile
+    component: Profile,
+    beforeEnter: (to: any, from: any, next: any) => {
+      const mid = store.getters["User/user"].mid
+      if ( mid && mid === "") {
+        next()
+      } else {
+        next({ name: 'Home'})
+      }
+    }
   },
   {
     path: '/scoreboard',
@@ -74,7 +89,7 @@ router.beforeEach((to, from, next) => {
     if (user.isLogin) {
 
       // プロフィール未登録の場合、Profileに移動
-      if (user.mid === "") {
+      if (user.mid && user.mid === "") {
         next({
           path: '/profile',
           query: { redirect: to.fullPath }
