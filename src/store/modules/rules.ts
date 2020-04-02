@@ -1,5 +1,7 @@
 import { db } from '@/firebase'
 
+let unsubscribe: any = null
+
 const state = {
   rules: []
 }
@@ -21,41 +23,38 @@ const mutations = {
 }
 
 const actions = {
-  getRules: ({ rootGetters, commit }: any) => {
+  startListener: ({ commit, rootGetters }: any) => {
     const me = rootGetters["User/user"]
-    if (me.uid) {
-      db.collection("users").doc(me.uid).collection("rules").get().then(querySnapshot => {
-        const rules: any = []
-        querySnapshot.forEach(doc => {
-          const rule = doc.data()
-          rule.id = doc.id
-          rules.push(rule)
-        })
-        commit("setRules", rules)
+    unsubscribe = db.collection("users").doc(me.uid).collection("rules").onSnapshot(async (querySnapshot) => {
+      const rules: any = []
+      querySnapshot.forEach(doc => {
+        const rule = doc.data()
+        rule.id = doc.id
+        rules.push(rule)
       })
-    } else {
-      console.log("jkd");
-    }
+      commit("setRules", rules)
+    })
   },
 
-  addRule: ({ rootGetters, dispatch }: any, rule: any) => {
-    const me = rootGetters["User/user"]
-    db.collection("users").doc(me.uid).collection("rules").add(rule)
-    dispatch("getRules")
+  stopListener: () => {
+    unsubscribe()
   },
-  
-  deleteRule: ({ rootGetters, dispatch }: any, id: string) => {
-    const me = rootGetters["User/user"]
-    db.collection("users").doc(me.uid).collection("rules").doc(id).delete()
-    dispatch("getRules")
-  },
-  
-  changeRule: ({ rootGetters, dispatch }: any, rule: any) => {
+
+  addRule: ({ rootGetters }: any, rule: any) => {
     const me = rootGetters["User/user"]
     rule.lastUse = String(new Date())
-    db.collection("users").doc(me.uid).collection("rules").doc(rule.id).update(rule).then(() => {
-      dispatch("getRules")
-    })
+    db.collection("users").doc(me.uid).collection("rules").add(rule)
+  },
+  
+  deleteRule: ({ rootGetters }: any, id: string) => {
+    const me = rootGetters["User/user"]
+    db.collection("users").doc(me.uid).collection("rules").doc(id).delete()
+  },
+  
+  changeRule: ({ rootGetters }: any, rule: any) => {
+    const me = rootGetters["User/user"]
+    rule.lastUse = String(new Date())
+    db.collection("users").doc(me.uid).collection("rules").doc(rule.id).update(rule)
   },
 }
 

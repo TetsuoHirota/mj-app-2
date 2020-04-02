@@ -35,7 +35,7 @@ export default class FriendDelete extends Vue {
     this.show = true;
   }
 
-  deleteFriend () {
+  deleteFriend() {
     this.$store.dispatch("Friends/deleteFriend", this.friend)
     this.show = false;
   }

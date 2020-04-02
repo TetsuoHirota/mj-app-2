@@ -1,7 +1,11 @@
 <template>
-<div class="rules pa-5" @click="mode = 'default'">
-  <span class="headline">成績表</span>
+<div
+  class="rules pa-5"
+  @click="mode = 'normal'"
+>
+  <h2>成績表</h2>
   <v-subheader>ルールを選択してください</v-subheader>
+
   <v-alert
     v-if="rules.length == 0"
     color="#2A3B4D"
@@ -10,77 +14,67 @@
     dense
     class="ma-3"
   >
-    右下の＋マークからルールを追加すると、ゲームを開始できます。<div class=""></div>
+    右下の＋マークからルールを追加すると、ゲームを開始できます。
   </v-alert>
     
   <!-- ルールカード -->
-  <transition-group tag="div" class="cards" name="card">
+  <transition-group
+    tag="div"
+    class="cards"
+    name="tr-card"
+  >
     <v-card
       v-for="rule in rules"
       :key="rule.id"
-      raised
       color="teal darken-2"
       dark
-      class="my-2 card"
-      width="100%"
+      class="card ma-1 ma-sm-2"
     >
-      <v-card-title>
-        <div>
-          <span class="card__players mr-3">{{ mjPlayers(rule.players) }}</span>
-          <span class="card__rate">{{ mjRate(rule.rate) }}</span>
-        </div>
+
+      <v-card-title class="py-3 px-4">
+        <h3 class="display-2 mr-3">{{ playersLabel (rule.players) }}</h3>
+        <h4 class="display-1">{{ rateLabel (rule.rate) }}</h4>
       </v-card-title>
+
       <v-divider></v-divider>
-      <v-card-text>
+
+      <v-card-text class="body-2">
         <v-row>
-          <v-col>
-            <v-row>
-              <v-col cols="4">チップ :</v-col>
-              <v-col align="center"><span class="mr-2">{{ rule.chip }}</span>円</v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="4">ウマ :</v-col>
-              <v-col align="center">
-                <span class="mr-1">{{ rule.uma.first }}</span>
-                <span class="mr-1">{{ rule.uma.second }}</span>
-                <span class="mr-1">{{ rule.uma.third }}</span>
-                <span class="" v-if="rule.players === 4">{{ rule.uma.fourth }}</span>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="4">飛び賞 :</v-col>
-              <v-col align="center"><span class="mr-2">{{ rule.tobisyou }}</span>pt</v-col>
-            </v-row>
-          </v-col>
-          <v-col>
-            <v-row>
-              <v-col cols="4">清算 :</v-col>
-              <v-col align="center"><span class="">{{ mjRound(rule.round) }}</span></v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="4">持ち点 :</v-col>
-              <v-col align="center"><span class="mr-2">{{ rule.default }}</span>点</v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="4">返し :</v-col>
-              <v-col align="center"><span class="mr-2">{{ rule.oka }}</span>点</v-col>
-            </v-row>
-          </v-col>
+          <v-col>チップ :</v-col>
+          <v-col>{{ chipLabel (rule.chip) }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col>ウマ :</v-col>
+          <v-col>{{ umaLabel (rule.uma) }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col>飛び賞 :</v-col>
+          <v-col>{{ tobisyouLabel (rule.tobisyou) }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col>清算 :</v-col>
+          <v-col>{{ roundLabel (rule.round) }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col>持ち点 :</v-col>
+          <v-col>{{ defaultScoreLabel (rule.defaultScore) }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col>返し :</v-col>
+          <v-col>{{ okaLabel (rule.oka) }}</v-col>
         </v-row>
       </v-card-text>
 
       <!-- クリック用オーバーレイボタン -->
       <v-btn
-        v-if="mode == 'default'"
+        v-if="mode == 'normal'"
         absolute
-        style="top: 0; left: 0"
+        style="top: 0; left: 0; padding: 0;"
         height="100%"
         width="100%"
         color="transparent"
         @click="selectRule(rule)"
-      >
-      </v-btn>
-
+      ></v-btn>
 
       <!-- 編集用オーバーレイボタン -->
       <v-btn
@@ -109,7 +103,7 @@
         </v-btn>
       </transition>
 
-      <!-- 削除モード用オーバーレイ -->
+      <!-- 削除モード用オーバーレイボタン -->
       <v-overlay
         v-if="mode == 'delete'"
         absolute
@@ -139,7 +133,7 @@
     v-model="fab"
     absolute
     bottom
-    style="right: 20px; bottom: 20px"
+    style="right: 30px; bottom: 30px"
     direction="top"
     transition="slide-y-reverse-transition"
   >
@@ -154,21 +148,18 @@
         <v-icon v-else>{{ icons.mdiPlus }}</v-icon>
       </v-btn>
     </template>
-    <v-row style="position: relative">
-      <span class="fab-comment">追加</span>
       <v-btn
+        class="speed-dial__add"
         fab
         dark
         small
         color="indigo"
-        @click="changeShowRulesAdd(true)"
+        @click="openRuleAdd()"
       >
         <v-icon>{{ icons.mdiPlus }}</v-icon>
       </v-btn>
-    </v-row>
-    <v-row style="position: relative">
-      <span class="fab-comment">編集</span>
       <v-btn
+        class="speed-dial__edit"
         fab
         dark
         small
@@ -177,10 +168,8 @@
       >
         <v-icon>{{ icons.mdiPencil }}</v-icon>
       </v-btn>
-    </v-row>
-    <v-row style="position: relative">
-      <span class="fab-comment">削除</span>
       <v-btn
+        class="speed-dial__delete"
         fab
         dark
         small
@@ -189,73 +178,69 @@
       >
         <v-icon>{{ icons.mdiDelete }}</v-icon>
       </v-btn>
-    </v-row>
   </v-speed-dial>
 
+  <!-- 確認ダイアログ -->
   <v-snackbar
     v-model="confirm"
     style="bottom: 100px"
     vertical
   >
     前回使用したデータが残っています。続きから始めますか？
-    <v-row>
-      <v-spacer></v-spacer>
+    <v-row justify="center" class="mb-3">
       <v-btn
-        color="indigo"
-        text
-        class="font-weight-bold"
-        @click="startNewGame()"
-      >
-        いいえ
-      </v-btn>
-      <v-btn
-        color="indigo"
-        text
-        class="font-weight-bold"
+        class="mx-4"
+        color="primary"
         @click="startPreviousGame()"
       >
-        はい
+        続きから
+      </v-btn>
+      <v-btn
+        class="mx-4"
+        color="primary"
+        @click="startNewGame()"
+      >
+        新規ゲーム
       </v-btn>
     </v-row>
-    
   </v-snackbar>
 
-  <RulesAdd @show="changeShowRulesAdd" :parentShow="showRulesAdd"/>
-  <RuleChange @show="changeShowRuleChange" :parentShow="showRuleChange" :oldRule="oldRule" @newRule="getEditedRule"/>
+  <!-- 追加、編集コンポーネント -->
+  <RuleAdd ref="ruleAdd"/>
+  <RuleChange ref="ruleChange" :rule="ruleChange" @changeRule="getEditedRule"/>
+
 </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import {
-  mdiPlus,
-  mdiClose,
-  mdiPencil,
-  mdiDelete
-} from '@mdi/js'
-import RulesAdd from '@/components/RulesAdd.vue'
-import RuleChange from '@/components/RuleChange.vue'
-import { mjPlayers, mjRound, mjRateKanji } from '../RuleConfig'
+import { Component, Mixins } from 'vue-property-decorator';
+import { mdiPlus, mdiClose, mdiPencil, mdiDelete } from '@mdi/js'
+import RuleAdd from '@/components/Rules/RuleAdd.vue'
+import RuleChange from '@/components/Rules/RuleChange.vue'
+import RuleConfig from '@/mixins/ruleConfig'
 
 @Component({
   components: {
-    RulesAdd,
+    RuleAdd,
     RuleChange
   }
 })
-export default class Rules extends Vue {
+export default class Rules extends Mixins(RuleConfig) {
   icons = {
     mdiPlus,
     mdiClose,
     mdiPencil,
     mdiDelete
   }
+
+  // 表示関連
   fab = false
-  mode = "default"
-  showRulesAdd = false
-  showRuleChange = false
-  oldRule: any = {}
+  mode = "normal"
   confirm = false
+
+  // ルール変更用
+  ruleChange = {}
+
   selectedRule = {}
 
   get rules() {
@@ -263,27 +248,15 @@ export default class Rules extends Vue {
   }
 
   mounted() {
-    this.$store.dispatch("Rules/getRules")
+    this.$store.dispatch("Rules/startListener")
   }
 
-  mjPlayers(players: number) {
-    return mjPlayers[players]
+  destroyed() {
+    this.$store.dispatch("Rules/stopListener")
   }
 
-  mjRate(rate: number) {
-    return mjRateKanji[rate]
-  }
-
-  mjRound(round: number) {
-    return mjRound[round]
-  }
-
-  changeShowRulesAdd(value: boolean) {
-    this.showRulesAdd = value
-  }
-
-  changeShowRuleChange(value: boolean) {
-    this.showRuleChange = value
+  openRuleAdd() {
+    (this.$refs as any).ruleAdd.open()
   }
 
   deleteRule(id: string) {
@@ -291,13 +264,12 @@ export default class Rules extends Vue {
   }
 
   editRule(rule: any) {
-    this.oldRule = rule
-    this.showRuleChange = true
+    this.ruleChange = rule;
+    (this.$refs as any).ruleChange.open()
   }
 
   getEditedRule(rule: any) {
-    const newRule = JSON.parse(JSON.stringify(rule))
-    this.$store.dispatch("Rules/changeRule", newRule)
+    this.$store.dispatch("Rules/changeRule", this.ruleChange)
   }
 
   selectRule(rule: any) {
@@ -331,32 +303,25 @@ export default class Rules extends Vue {
 .rules {
   height: 100%;
   overflow-y: auto;
-  // display: grid;
-  // grid-template-rows: auto auto 1fr;
 }
 
 .cards {
-  margin: 0 10px;
   position: relative;
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 500px));
 }
 
 .card {
+  min-width: 300px;
   .col {
     padding: 0;
   }
-  &__players {
-    font-size: 30px;
-    font-family: serif;
-    font-weight: 500;
-  }
-  &__rate {
-    font-size: 20px;
-    font-family: serif;
-  }
   .v-card__text {
-    >.row >.col >.row >.col {
-      font-size: 13px;
-    }
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(3, auto);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -383,38 +348,6 @@ export default class Rules extends Vue {
   }
 }
 
-.card {
-  &-move {
-    transition: transform 1s;
-  }
-  // 要素が入るときのアニメーション
-  &-enter {
-    // アニメーションの初期設定（初期値とtransitionを設定する）
-    &-active {
-      opacity: 0;
-      transition: opacity 1s;
-    }
-    // アニメーション開始（目標のプロパティ値を設定する）
-    &-to {
-      opacity: 1;
-    }
-  }
-
-  // 要素が消える時のアニメーション
-  &-leave {
-    // アニメーションの初期設定
-    &-active {
-      // 要素が消える場合はabsoluteにする（重要！）
-      position: absolute;
-      transition: all 1s;
-    }
-    &-to {
-      opacity: 0;
-      transform: translateX(1000px);
-    }
-  }
-}
-
 .btn {
   &-enter-active, &-leave-active {
     transition: transform opacity;
@@ -423,6 +356,48 @@ export default class Rules extends Vue {
   &-enter, &-leave-to {
     opacity: 0;
     transform: scale(0);
+  }
+}
+</style>
+
+<style lang="scss">
+.rules {
+  .v-speed-dial__list {
+    .speed-dial {
+      &__add::after {
+        content: "追加";
+        position: absolute;
+        right: 48px;
+        color: rgba(0,0,0,.8);
+        font-size: 14px;
+        box-shadow: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, .8);
+        padding: 5px 10px;
+      }
+      &__edit::after {
+        content: "編集";
+        position: absolute;
+        right: 48px;
+        color: rgba(0,0,0,.8);
+        font-size: 14px;
+        box-shadow: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, .8);
+        padding: 5px 10px;
+      }
+      &__delete::after {
+        content: "削除";
+        position: absolute;
+        right: 48px;
+        color: rgba(0,0,0,.8);
+        font-size: 14px;
+        box-shadow: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, .8);
+        padding: 5px 10px;
+      }
+    }
   }
 }
 </style>

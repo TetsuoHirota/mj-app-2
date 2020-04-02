@@ -12,15 +12,19 @@ const mutations = {
   changeIsLogin: (state: any, isLogin: boolean) => {
     state.isLogin = isLogin
   },
+
   changeUid: (state: any, uid: string) => {
     state.uid = uid
   },
+
   changeMid: (state: any, mid: string) => {
     state.mid = mid
   },
+
   changeEmail: (state: any, email: string) => {
     state.email = email
   },
+
   changeName: (state: any, name: string) => {
     state.name = name
   },
@@ -62,6 +66,11 @@ const actions = {
     db.collection("users").doc(state.uid).update(user)
     commit("changeMid", user.mid)
     commit("changeName", user.name)
+  },
+
+  changeName: ({ commit, state }: any, name: string) => {
+    db.collection("users").doc(state.uid).update({ name: name })
+    commit("changeName", name)
   }
 }
 

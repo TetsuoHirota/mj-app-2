@@ -5,13 +5,14 @@
   max-width="400px"
 >
   <v-card>
+
     <v-card-title>
-      <span class="headline">ルール変更</span>
+      <h3 class="display-1">ルール変更</h3>
     </v-card-title>
 
-    <v-form ref="newRuleForm">
-      <v-card-text class="pt-0">
-        <v-col class="form">
+    <v-card-text class="pt-0">
+      <v-col class="form">
+        <v-form ref="newRuleForm">
 
           <v-row>
             <v-col class="form__title">
@@ -19,8 +20,9 @@
             </v-col>
             <v-col class="form__value">
               <v-select
-                v-model="oldRule.players"
-                :items="formItems.players"
+                v-model="rule.players"
+                @change="rule.uma = null"
+                :items="ruleItems.players"
                 item-text="label"
                 item-value="value"
                 :rules="[v => !!v || v == 0 || 'プレイ人数を選択してください']"
@@ -36,8 +38,8 @@
             </v-col>
             <v-col class="form__value">
               <v-select
-                v-model="oldRule.rate"
-                :items="formItems.rate"
+                v-model="rule.rate"
+                :items="ruleItems.rate"
                 item-text="label"
                 item-value="value"
                 :rules="[v => !!v || v == 0 || 'レートを選択してください']"
@@ -53,8 +55,8 @@
             </v-col>
             <v-col class="form__value">
               <v-select
-                v-model="oldRule.chip"
-                :items="formItems.chip"
+                v-model="rule.chip"
+                :items="ruleItems.chip"
                 item-text="label"
                 item-value="value"
                 :rules="[v => !!v || v == 0 || 'チップを選択してください']"
@@ -70,8 +72,8 @@
             </v-col>
             <v-col class="form__value">
               <v-select
-                v-model="oldRule.uma"
-                :items="oldRule.players === 4 ? formItems.uma4 : formItems.uma3"
+                v-model="rule.uma"
+                :items="rule.players === 4 ? ruleItems.uma4 : ruleItems.uma3"
                 item-text="label"
                 item-value="value"
                 :rules="[v => !!v || v == 0 || 'ウマを選択してください']"
@@ -87,9 +89,10 @@
             </v-col>
             <v-col class="form__value">
               <v-select
-                v-model="oldRule.tobisyou"
-                :items="formItems.tobisyou"
-                suffix="pt"
+                v-model="rule.tobisyou"
+                :items="ruleItems.tobisyou"
+                item-text="label"
+                item-value="value"
                 :rules="[v => !!v || v == 0 || '飛び賞を選択してください']"
                 required
               >
@@ -103,8 +106,8 @@
             </v-col>
             <v-col class="form__value">
               <v-select
-                v-model="oldRule.round"
-                :items="formItems.round"
+                v-model="rule.round"
+                :items="ruleItems.round"
                 item-text="label"
                 item-value="value"
                 :rules="[v => !!v || v == 0 || '清算方法を選択してください']"
@@ -120,9 +123,11 @@
             </v-col>
             <v-col class="form__value">
               <v-select
-                v-model="oldRule.default"
-                :items="formItems.default"
-                suffix="点持ち"
+                v-model="rule.defaultScore"
+                :items="ruleItems.defaultScore"
+                item-text="label"
+                item-value="value"
+                suffix="持ち"
                 :rules="[v => !!v || v == 0 || '持ち点を選択してください']"
                 required
               >
@@ -136,9 +141,11 @@
             </v-col>
             <v-col class="form__value">
               <v-select
-                v-model="oldRule.oka"
-                :items="formItems.oka"
-                suffix="点返し"
+                v-model="rule.oka"
+                :items="ruleItems.oka"
+                item-text="label"
+                item-value="value"
+                suffix="返し"
                 :rules="[v => !!v || v == 0 || 'オカを選択してください']"
                 required
               >
@@ -146,64 +153,34 @@
             </v-col>
           </v-row>
 
-        </v-col>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="close">閉じる</v-btn>
-        <v-btn color="blue darken-1" text @click="save">保存</v-btn>
-      </v-card-actions>
+        </v-form>
+      </v-col>
+    </v-card-text>
 
-    </v-form>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="blue darken-1" text @click="close">閉じる</v-btn>
+      <v-btn color="blue darken-1" text @click="save">保存</v-btn>
+    </v-card-actions>
+
   </v-card>
 </v-dialog>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
-import { mjRound, mjPlayers, mjRate, formItems } from './RuleConfig'
+import { Component, Mixins, Prop } from 'vue-property-decorator'
+import RuleConfig from '@/mixins/ruleConfig'
 
 @Component({
   components: {}
 })
-export default class RulesAdd extends Vue {
-  // 表示非表示切り替え
-  @Prop() parentShow: any
-  get show() {
-    return this.parentShow
-  }
-  set show(value) {
-    this.$emit("show", value)
-  }
+export default class RulesAdd extends Mixins(RuleConfig) {
+  show = false
 
-  @Prop() oldRule: any
+  @Prop() rule: any
 
-  // newRule = {
-  //   players: null,
-  //   rate: null,
-  //   chip: null,
-  //   uma: null,
-  //   tobisyou: null,
-  //   round: null,
-  //   oka: null,
-  //   default: null,
-  //   lastUse: new Date()
-  // }
-
-  // newRule = this.oldRule
-
-  formItems = formItems
-
-  mjPlayers(players: number) {
-    return mjPlayers[players]
-  }
-
-  mjRate(rate: number) {
-    return mjRate[rate]
-  }
-
-  mjRound(round: number) {
-    return mjRound[round]
+  open() {
+    this.show = true
   }
 
   close() {
@@ -212,7 +189,7 @@ export default class RulesAdd extends Vue {
 
   save() {
     if ((this.$refs.newRuleForm as HTMLFormElement).validate()) {
-      this.$emit("newRule", this.oldRule)
+      this.$emit("changeRule")
       this.show = false
     }
   }

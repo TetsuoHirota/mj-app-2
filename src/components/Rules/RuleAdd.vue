@@ -6,7 +6,7 @@
 >
   <v-card>
     <v-card-title>
-      <span class="headline">新規ルール作成</span>
+      <h3 class="display-1">新規ルール作成</h3>
     </v-card-title>
 
     <v-form ref="newRuleForm">
@@ -38,7 +38,13 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="close">閉じる</v-btn>
+        <v-btn
+          color="blue darken-1"
+          text
+          @click="close"
+        >
+          閉じる
+        </v-btn>
       </v-card-actions>
     </div>
 
@@ -49,7 +55,7 @@
           <v-select
             label="レート"
             v-model="newRule.rate"
-            :items="formItems.rate"
+            :items="ruleItems.rate"
             item-text="label"
             item-value="value"
             :rules="[v => !!v || v == 0 || 'レートを選択してください']"
@@ -59,7 +65,7 @@
           <v-select
             label="チップ"
             v-model="newRule.chip"
-            :items="formItems.chip"
+            :items="ruleItems.chip"
             item-text="label"
             item-value="value"
             :rules="[v => !!v || v == 0 || 'チップを選択してください']"
@@ -69,7 +75,7 @@
           <v-select
             label="ウマ"
             v-model="newRule.uma"
-            :items="newRule.players === 4 ? formItems.uma4 : formItems.uma3"
+            :items="newRule.players === 4 ? ruleItems.uma4 : ruleItems.uma3"
             item-text="label"
             item-value="value"
             :rules="[v => !!v || v == 0 || 'ウマを選択してください']"
@@ -79,8 +85,9 @@
           <v-select
             label="飛び賞"
             v-model="newRule.tobisyou"
-            :items="formItems.tobisyou"
-            suffix="pt"
+            :items="ruleItems.tobisyou"
+            item-text="label"
+            item-value="value"
             :rules="[v => !!v || v == 0 || '飛び賞を選択してください']"
             required
           >
@@ -88,7 +95,7 @@
           <v-select
             label="清算方法"
             v-model="newRule.round"
-            :items="formItems.round"
+            :items="ruleItems.round"
             item-text="label"
             item-value="value"
             :rules="[v => !!v || v == 0 || '清算方法を選択してください']"
@@ -97,9 +104,11 @@
           </v-select>
           <v-select
             label="持ち点"
-            v-model="newRule.default"
-            :items="formItems.default"
-            suffix="点持ち"
+            v-model="newRule.defaultScore"
+            :items="ruleItems.defaultScore"
+            item-text="label"
+            item-value="value"
+            suffix="持ち"
             :rules="[v => !!v || v == 0 || '持ち点を選択してください']"
             required
           >
@@ -107,8 +116,10 @@
           <v-select
             label="オカ"
             v-model="newRule.oka"
-            :items="formItems.oka"
-            suffix="点返し"
+            :items="ruleItems.oka"
+            item-text="label"
+            item-value="value"
+            suffix="返し"
             :rules="[v => !!v || v == 0 || 'オカを選択してください']"
             required
           >
@@ -129,22 +140,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
-import { formItems } from './RuleConfig'
+import { Component, Mixins, Prop } from 'vue-property-decorator'
+import RuleConfig from '@/mixins/ruleConfig'
 
 @Component({
   components: {}
 })
-export default class RulesAdd extends Vue {
-  // 表示非表示切り替え
-  @Prop() parentShow: any
-  get show() {
-    return this.parentShow
-  }
-  set show(value) {
-    this.$emit("show", value)
-  }
-
+export default class RuleAdd extends Mixins(RuleConfig) {
+  show = false
   state = 0
 
   newRule = {
@@ -155,16 +158,17 @@ export default class RulesAdd extends Vue {
     tobisyou: null,
     round: null,
     oka: null,
-    default: null,
-    lastUse: ""
+    defaultScore: null,
   }
 
-  formItems = formItems
+  open() {
+    this.show = true
+  }
 
   close() {
     (this.$refs.newRuleForm as HTMLFormElement).reset()
     this.state = 0
-    this.$emit("show", false)
+    this.show = false
   }
 
   back() {
@@ -174,17 +178,9 @@ export default class RulesAdd extends Vue {
 
   save() {
     if ((this.$refs.newRuleForm as HTMLFormElement).validate()) {
-      this.newRule.lastUse = String(new Date())
-      const rule = JSON.parse(JSON.stringify(this.newRule))
-      this.$store.dispatch("Rules/addRule", rule)
+      this.$store.dispatch("Rules/addRule", this.newRule)
+      this.close();
     }
-    this.close();
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.row {
-  margin: 0;
-}
-</style>

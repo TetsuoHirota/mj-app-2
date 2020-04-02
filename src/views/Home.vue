@@ -60,6 +60,7 @@
         <v-dialog
           v-model="profileDialog"
           max-width="290px"
+          persistent
         >
           <Profile @close="profileDialog = false" />
         </v-dialog>
@@ -198,6 +199,7 @@ export default class Home extends Vue {
   }
   .list-title {
     margin-left: 30px;
+    color: rgba(0, 0, 0, 0.8);
   }
   &--active {
     .v-icon {
