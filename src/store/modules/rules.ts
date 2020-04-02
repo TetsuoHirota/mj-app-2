@@ -19,6 +19,12 @@ const mutations = {
     state.rules = state.rules.filter((rule: any) => {
       return rule.id !== id
     })
+  },
+
+  changeRule: (state: any, rule: any) => {
+    const index = state.rules.findIndex((e: any) => e.id === rule.id)
+    state.rules.splice(index, 1)
+    state.rules.push(rule)
   }
 }
 
@@ -40,21 +46,34 @@ const actions = {
     unsubscribe()
   },
 
-  addRule: ({ rootGetters }: any, rule: any) => {
+  addRule: ({ rootGetters, commit }: any, rule: any) => {
     const me = rootGetters["User/user"]
     rule.lastUse = String(new Date())
-    db.collection("users").doc(me.uid).collection("rules").add(rule)
+    if (me.isLogin){
+      db.collection("users").doc(me.uid).collection("rules").add(rule)
+    } else {
+      rule.id = String(new Date())
+      commit("addRule", rule)
+    }
   },
   
-  deleteRule: ({ rootGetters }: any, id: string) => {
+  deleteRule: ({ rootGetters, commit }: any, id: string) => {
     const me = rootGetters["User/user"]
-    db.collection("users").doc(me.uid).collection("rules").doc(id).delete()
+    if (me.isLogin) {
+      db.collection("users").doc(me.uid).collection("rules").doc(id).delete()
+    } else {
+      commit("deleteRule", id)
+    }
   },
   
-  changeRule: ({ rootGetters }: any, rule: any) => {
+  changeRule: ({ rootGetters, commit }: any, rule: any) => {
     const me = rootGetters["User/user"]
     rule.lastUse = String(new Date())
-    db.collection("users").doc(me.uid).collection("rules").doc(rule.id).update(rule)
+    if (me.isLogin) {
+      db.collection("users").doc(me.uid).collection("rules").doc(rule.id).update(rule)
+    } else {
+      commit("changeRule", rule)
+    }
   },
 }
 

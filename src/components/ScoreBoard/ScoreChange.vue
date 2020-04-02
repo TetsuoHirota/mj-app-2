@@ -221,7 +221,7 @@ export default class ScoreChange extends Vue {
     }, 0)
     if (players !== this.rule.players) {
       this.errorMessage = this.rule.players + "人分の数値を入力してください"
-    } else if (total !== this.rule.players * this.rule.default) {
+    } else if (total !== this.rule.players * this.rule.defaultScore) {
       this.errorMessage = "収支が合いません"
     } else {
       this.errorMessage = ""
@@ -251,12 +251,16 @@ export default class ScoreChange extends Vue {
     }
     oka -= third
     // 四位処理
-    let fourth = this.round(scores[3].score - this.rule.oka) + this.rule.uma.fourth
-    if (fourth < 0 && this.tobashiId !== "") {
-      fourth -= this.rule.tobisyou;
-      tobisyou += this.rule.tobisyou;
+    let fourth = null
+    if (this.rule.players == 4) {
+
+      fourth = this.round(scores[3].score - this.rule.oka) + this.rule.uma.fourth
+      if (fourth < 0 && this.tobashiId !== "") {
+        fourth -= this.rule.tobisyou;
+        tobisyou += this.rule.tobisyou;
+      }
+      oka -= fourth
     }
-    oka -= fourth
     // 一位処理
     const first = oka + tobisyou
 
@@ -313,13 +317,6 @@ export default class ScoreChange extends Vue {
       this.$store.dispatch("ScoreBoard/changeScore", { index: this.index, scores: this.scores})
       this.show = false
     }
-    
-    // if (this.validate() == 0) {
-
-    //   console.log("0");
-    // } else {
-    //   console.log("not");
-    // }
   }
 
   deleteScore() {

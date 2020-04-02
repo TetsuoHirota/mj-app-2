@@ -44,7 +44,7 @@ const actions = {
     commit("changeEmail", user.email)
   },
 
-  login: ({commit}: any, user: any) => {
+  login: ({ commit }: any, user: any) => {
     return new Promise((resolve) => {
       db.collection("users").doc(user.uid).get().then(doc => {
       const user: any = doc.data()

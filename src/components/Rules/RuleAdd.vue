@@ -166,9 +166,8 @@ export default class RuleAdd extends Mixins(RuleConfig) {
   }
 
   close() {
-    (this.$refs.newRuleForm as HTMLFormElement).reset()
-    this.state = 0
     this.show = false
+    this.back()
   }
 
   back() {
@@ -178,7 +177,8 @@ export default class RuleAdd extends Mixins(RuleConfig) {
 
   save() {
     if ((this.$refs.newRuleForm as HTMLFormElement).validate()) {
-      this.$store.dispatch("Rules/addRule", this.newRule)
+      const rule = JSON.parse(JSON.stringify(this.newRule))
+      this.$store.dispatch("Rules/addRule", rule)
       this.close();
     }
   }

@@ -85,7 +85,7 @@
 
       <v-list-item
         v-if="!user.isLogin"
-        :to="{ name: 'Login'}"
+        @click="login"
       >
         <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
         <div class="list-title">ログイン</div>
@@ -106,7 +106,7 @@
     <v-btn
       icon
       v-if="!user.isLogin"
-      :to="{ name: 'Login'}"
+      @click="login"
     >
       <v-icon>{{ icons.mdiLoginVariant }}</v-icon>
     </v-btn>
@@ -171,6 +171,11 @@ export default class Home extends Vue {
     return this.$store.getters['User/user']
   }
 
+  login() {
+    localStorage.clear()
+    this.$router.push({ name: 'Login' })
+  }
+
   logout() {
     const result = confirm("本当にログアウトしますか？")
     if (result) {
@@ -190,24 +195,31 @@ export default class Home extends Vue {
 .home {
   height: 100%;
 }
+</style>
 
-.v-list-item {
-  height: 48px;
-  .v-icon {
-    position: relative;
-    top: -1px;
-  }
-  .list-title {
-    margin-left: 30px;
-    color: rgba(0, 0, 0, 0.8);
-  }
-  &--active {
+<style lang="scss">
+.home {
+  .v-list-item {
+    height: 48px;
     .v-icon {
-      color: rgba(0, 0, 0, 0.54) !important;
+      position: relative;
+      top: -1px;
+    }
+    .list-title {
+      margin-left: 30px;
+    }
+    &--active {
+      .v-icon {
+        color: rgba(0, 0, 0, 0.54) !important;
+      }
+    }
+    &:hover {
+      background: rgba(0,0,0,.05);
+      @include sp {
+        background: none;
+      }
     }
   }
-  &:hover {
-    background: rgba(0,0,0,.05);
-  }
 }
+
 </style>

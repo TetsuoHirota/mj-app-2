@@ -4,7 +4,7 @@
   @click="mode = 'normal'"
 >
   <h2>成績表</h2>
-  <v-subheader>ルールを選択してください</v-subheader>
+  <v-subheader>ルールを選択してゲーム開始</v-subheader>
 
   <v-alert
     v-if="rules.length == 0"
@@ -16,6 +16,20 @@
   >
     右下の＋マークからルールを追加すると、ゲームを開始できます。
   </v-alert>
+
+  <v-btn
+    v-if="isPreviousGame"
+    absolute
+    top
+    right
+    dark
+    class="btn__previous-game"
+    color="blue-grey"
+    :to="{ name: 'ScoreBoard'}"
+  >
+    前回の続き
+    <v-icon>{{ icons.mdiPlay }}</v-icon>
+  </v-btn>
     
   <!-- ルールカード -->
   <transition-group
@@ -30,7 +44,6 @@
       dark
       class="card ma-1 ma-sm-2"
     >
-
       <v-card-title class="py-3 px-4">
         <h3 class="display-2 mr-3">{{ playersLabel (rule.players) }}</h3>
         <h4 class="display-1">{{ rateLabel (rule.rate) }}</h4>
@@ -73,7 +86,7 @@
         height="100%"
         width="100%"
         color="transparent"
-        @click="selectRule(rule)"
+        @click="startNewGame(rule)"
       ></v-btn>
 
       <!-- 編集用オーバーレイボタン -->
@@ -180,31 +193,6 @@
       </v-btn>
   </v-speed-dial>
 
-  <!-- 確認ダイアログ -->
-  <v-snackbar
-    v-model="confirm"
-    style="bottom: 100px"
-    vertical
-  >
-    前回使用したデータが残っています。続きから始めますか？
-    <v-row justify="center" class="mb-3">
-      <v-btn
-        class="mx-4"
-        color="primary"
-        @click="startPreviousGame()"
-      >
-        続きから
-      </v-btn>
-      <v-btn
-        class="mx-4"
-        color="primary"
-        @click="startNewGame()"
-      >
-        新規ゲーム
-      </v-btn>
-    </v-row>
-  </v-snackbar>
-
   <!-- 追加、編集コンポーネント -->
   <RuleAdd ref="ruleAdd"/>
   <RuleChange ref="ruleChange" :rule="ruleChange" @changeRule="getEditedRule"/>
@@ -214,7 +202,7 @@
 
 <script lang="ts">
 import { Component, Mixins } from 'vue-property-decorator';
-import { mdiPlus, mdiClose, mdiPencil, mdiDelete } from '@mdi/js'
+import { mdiPlus, mdiClose, mdiPencil, mdiDelete, mdiPlay } from '@mdi/js'
 import RuleAdd from '@/components/Rules/RuleAdd.vue'
 import RuleChange from '@/components/Rules/RuleChange.vue'
 import RuleConfig from '@/mixins/ruleConfig'
@@ -230,29 +218,35 @@ export default class Rules extends Mixins(RuleConfig) {
     mdiPlus,
     mdiClose,
     mdiPencil,
-    mdiDelete
+    mdiDelete,
+    mdiPlay
   }
 
   // 表示関連
   fab = false
   mode = "normal"
-  confirm = false
 
   // ルール変更用
   ruleChange = {}
 
-  selectedRule = {}
+  get isLogin() {
+    return this.$store.getters["User/user"].isLogin
+  }
+
+  get isPreviousGame() {
+    return this.$store.getters["ScoreBoard/id"] !== ""
+  }
 
   get rules() {
     return this.$store.getters["Rules/rules"]
   }
 
   mounted() {
-    this.$store.dispatch("Rules/startListener")
+    if (this.isLogin) this.$store.dispatch("Rules/startListener")
   }
 
   destroyed() {
-    this.$store.dispatch("Rules/stopListener")
+    if (this.isLogin) this.$store.dispatch("Rules/stopListener")
   }
 
   openRuleAdd() {
@@ -264,31 +258,17 @@ export default class Rules extends Mixins(RuleConfig) {
   }
 
   editRule(rule: any) {
-    this.ruleChange = rule;
+    this.ruleChange = { ...rule };  //deep copy
     (this.$refs as any).ruleChange.open()
   }
 
-  getEditedRule(rule: any) {
+  getEditedRule() {
     this.$store.dispatch("Rules/changeRule", this.ruleChange)
   }
 
-  selectRule(rule: any) {
-    this.selectedRule = rule
-    if (this.$store.getters["ScoreBoard/id"] == "") {
-      this.startNewGame()
-    } else {
-      this.confirm = true
-    }
-  }
-
-  startPreviousGame() {
-    this.$store.dispatch("Rules/changeRule", this.selectedRule)
-    this.$router.push({name: 'ScoreBoard'})
-  }
-
-  startNewGame() {
-    this.$store.dispatch("Rules/changeRule", this.selectedRule)
-    this.$store.dispatch("ScoreBoard/newGame", this.selectedRule)
+  startNewGame(rule: any) {
+    this.$store.dispatch("Rules/changeRule", rule) // lastUse更新
+    this.$store.dispatch("ScoreBoard/newGame", rule)
     this.$router.push({name: 'ScoreBoard'})
   }
 
@@ -296,13 +276,18 @@ export default class Rules extends Mixins(RuleConfig) {
 </script>
 
 <style lang="scss" scoped>
-.row {
-  margin: 0;
-}
-
 .rules {
   height: 100%;
   overflow-y: auto;
+}
+
+.btn__previous-game {
+  margin: 10px 20px;
+  @include sp {
+    margin: 8px 0;
+    height: 30px !important;
+    font-size: .9rem;
+  }
 }
 
 .cards {

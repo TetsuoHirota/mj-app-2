@@ -50,6 +50,7 @@ export default class RuleConfig extends Vue {
       { label: "0 - 30", value: { first: 30, second: 0, third: -30 } },
     ],
     tobisyou: [
+      { label: "なし", value: 0 },
       { label: "5000点", value: 5000 },
       { label: "10000点", value: 10000 },
       { label: "20000点", value: 20000 },
