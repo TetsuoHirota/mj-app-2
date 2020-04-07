@@ -175,8 +175,4 @@ export default class Profile extends Mixins(Utilities) {
   display: grid;
   grid-auto-rows: max-content 1fr;
 }
-
-.row {
-  margin: 0;
-}
 </style>

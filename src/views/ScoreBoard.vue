@@ -7,7 +7,7 @@
     color="indigo"
     dark
   >
-    <v-btn icon to="/">
+    <v-btn icon :to="{ name: 'Home'}">
       <v-icon large>{{ icons.mdiChevronLeft }}</v-icon>
     </v-btn>
     <v-toolbar-title class="pl-1">成績表</v-toolbar-title>
@@ -18,6 +18,7 @@
       left
       bottom
       :close-on-content-click="false"
+      v-model="showMenu"
     >
       <template v-slot:activator="{ on }">
         <v-btn icon v-on="on">
@@ -38,14 +39,30 @@
               v-model="isPtMode"
               hide-details
               class="ma-0 pa-0"
+              :label="isPtMode ? 'ON' : 'OFF'"
             ></v-switch>
-            {{ isPtMode ? 'ON' : 'OFF'}}
           </v-row>
         </v-list-item>
         <v-divider></v-divider>
         <v-list-item
+          @click="openPlayersModal"
+          class="py-3"
+        >
+          <v-icon>{{ icons.mdiAccount }}</v-icon>
+          <div class="list-title">プレイヤー変更</div>
+        </v-list-item>
+        <v-divider></v-divider>
+        <v-list-item
+          @click="endScoreBoard"
+          class="py-3"
+        >
+          <v-icon>{{ icons.mdiCog }}</v-icon>
+          <div class="list-title">ルール変更</div>
+        </v-list-item>
+        <v-divider></v-divider>
+        <v-list-item
           @click="deleteScoreBoard"
-          class="d-flex justify-center py-3"
+          class="py-3"
         >
           <v-icon>{{ icons.mdiDelete }}</v-icon>
           <div class="list-title">削除</div>
@@ -53,7 +70,7 @@
         <v-divider></v-divider>
         <v-list-item
           @click="endScoreBoard"
-          class="d-flex justify-center py-3"
+          class="py-3"
         >
           <v-icon>{{ icons.mdiClose }}</v-icon>
           <div class="list-title">終了</div>
@@ -62,6 +79,7 @@
     </v-menu>
   </v-app-bar>
 
+  <!-- カルーセル -->
   <v-content style="height: 100%">
     <v-container
       fluid
@@ -75,6 +93,7 @@
         :hide-delimiters="true"
         :show-arrows="false"
         height="100%"
+        touchless
       >
         <v-carousel-item>
           <Score/>
@@ -89,6 +108,7 @@
     </v-container>
   </v-content>
 
+  <!-- ナビゲーション -->
   <v-bottom-navigation
     v-model="nav"
     grow
@@ -96,27 +116,32 @@
     color="teal"
   >
     <v-btn>
-      <span>Score</span>
+      <span>成績表</span>
       <v-icon>{{ icons.mdiFormatListNumbered }}</v-icon>
     </v-btn>
     <v-btn>
-      <span>Data</span>
+      <span>集計</span>
       <v-icon>{{ icons.mdiChartBar }}</v-icon>
     </v-btn>
     <v-btn>
-      <span>Graph</span>
+      <span>グラフ</span>
       <v-icon>{{ icons.mdiChartTimelineVariant }}</v-icon>
     </v-btn>
   </v-bottom-navigation>
+
+  <!-- モーダル -->
+  <PlayersChange ref="playersChange"/>
+
   
 </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import Score from '@/components/ScoreBoard/Score.vue'
 import Data from '@/components/ScoreBoard/Data.vue'
 import Graph from '@/components/ScoreBoard/Graph.vue'
+import PlayersChange from '@/components/ScoreBoard/PlayersChange.vue'
 import {
   mdiChevronLeft,
   mdiFormatListNumbered,
@@ -133,7 +158,8 @@ import {
   components: {
     Score,
     Data,
-    Graph
+    Graph,
+    PlayersChange
   }
 })
 export default class ScoreBoard extends Vue {
@@ -149,32 +175,38 @@ export default class ScoreBoard extends Vue {
     mdiClose
   }
 
+  showMenu = false
   nav = 0
 
   // ポイント入力
-  isPtMode = false
+  isPtMode = this.$store.getters["ScoreBoard/isPtMode"]
 
-  // get isLogin() {
-  //   return this.$store.getters["User/user"].isLogin
-  // }
+  @Watch('isPtMode')
+  changeIsPtMode() {
+    this.$store.dispatch("ScoreBoard/changeIsPtMode", this.isPtMode)
+  }
+
+  get isLogin() {
+    return this.$store.getters["User/user"].isLogin
+  }
+
+  openPlayersModal() {
+    (this.$refs as any).playersChange.open()
+    this.showMenu = false
+  }
 
   deleteScoreBoard() {
-    this.$store.dispatch("ScoreBoard/deleteScoreBoard");
-    this.$router.push({ name: 'Home'})
+    const result = confirm("本当に削除しますか？")
+    if (result) {
+      this.$store.dispatch("ScoreBoard/deleteScoreBoard");
+      this.$router.push({ name: 'Home'})
+    }
   }
 
   endScoreBoard() {
     this.$store.dispatch("ScoreBoard/endScoreBoard");
     this.$router.push({ name: 'Home'})
   }
-
-  // mounted() {
-  //   if (this.isLogin) this.$store.dispatch("ScoreBoard/startListener")
-  // }
-
-  // destroyed() {
-  //   if (this.isLogin) this.$store.dispatch("ScoreBoard/stopListener")
-  // }
 }
 </script>
 
@@ -188,12 +220,14 @@ export default class ScoreBoard extends Vue {
 .scoreBoard-menu-list {
   .v-list-item {
     text-align: center;
+    display: flex;
     .v-icon {
       position: relative;
       top: -1px;
     }
     .list-title {
-      margin-left: 20px;
+      margin-left: 10px;
+      flex: 1;
     }
     &--active {
       .v-icon {

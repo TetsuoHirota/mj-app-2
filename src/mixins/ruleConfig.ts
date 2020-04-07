@@ -74,22 +74,23 @@ export default class RuleConfig extends Vue {
     ]
   }
 
-  playersLabel (value: any) {
+  // 表示用
+  playersLabel(value: any) {
     const players = this.ruleItems.players.find(item => item.value === value)
     return players ? players.label : null
   }
   
-  rateLabel (value: any) {
+  rateLabel(value: any) {
     const rate = this.ruleItems.rate.find(item => item.value === value)
     return rate ? rate.label : null
   }
 
-  chipLabel (value: any) {
+  chipLabel(value: any) {
     const chip = this.ruleItems.chip.find(item => item.value === value)
     return chip ? chip.label : null
   }
 
-  umaLabel (value: any) {
+  umaLabel(value: any) {
     const uma4 = this.ruleItems.uma4.find(item => {
       return item.value.first === value.first
         && item.value.second === value.second
@@ -104,24 +105,119 @@ export default class RuleConfig extends Vue {
     return uma4 ? uma4.label : uma3 ? uma3.label : null
   }
 
-  tobisyouLabel (value: any) {
+  tobisyouLabel(value: any) {
     const tobisyou = this.ruleItems.tobisyou.find(item => item.value === value)
     return tobisyou ? tobisyou.label : null
   }
 
-  roundLabel (value: any) {
+  roundLabel(value: any) {
     const round = this.ruleItems.round.find(item => item.value === value)
     return round ? round.label : null
   }
 
-  okaLabel (value: any) {
+  okaLabel(value: any) {
     const oka = this.ruleItems.oka.find(item => item.value === value)
     return oka ? oka.label : null
   }
 
-  defaultScoreLabel (value: any) {
+  defaultScoreLabel(value: any) {
     const defaultScore = this.ruleItems.defaultScore.find(item => item.value === value)
     return defaultScore ? defaultScore.label : null
   }
 
+  // 清算方法
+  round(round: number, score: number) {
+    let rounded = 0;
+    switch (round) {
+      case 0:
+        rounded = this.gosyarokunyuu(score);
+        break;
+      case 1:
+        rounded = this.sisyagonyuu(score);
+        break;
+      case 2:
+        rounded =  this.kirisute(score);
+        break;
+      case 3:
+        rounded = this.kiriage(score);
+        break;
+    }
+    return rounded;
+  }
+
+  gosyarokunyuu(score: number) {
+    const int = Math.floor(score / 1000);
+    const dec = score % 1000;
+    let ans = 0;
+    if (int >= 0) {
+      if (dec >= 600) {
+        ans = int + 1;
+      } else {
+        ans = int;
+      }
+    } else if (int < 0) {
+      if (dec <= -600 || dec == 0) {
+        ans = int;
+      } else {
+        ans = int + 1;
+      }
+    }
+    return ans;
+  }
+  
+  sisyagonyuu(score: number) {
+    const int = Math.floor(score / 1000);
+    const dec = score % 1000;
+    let ans = 0;
+    if (int >= 0) {
+      if (dec >= 500) {
+        ans = int + 1;
+      } else {
+        ans = int;
+      }
+    } else if (int < 0) {
+      if (dec <= -500 || dec == 0) {
+        ans = int;
+      } else {
+        ans = int + 1;
+      }
+    }
+    return ans;
+  }
+
+  kiriage(score: number) {
+    const int = Math.floor(score / 1000);
+    const dec = score % 1000;
+    let ans = 0;
+    if (score > 0) {
+      if (dec > 0) {
+        ans = int +1;
+      } else {
+        ans = int;
+      }
+    } else if (score < 0) {
+      if (dec >= 0) {
+        ans = int;
+      } else {
+        ans = int + 1;
+      }
+    }
+    return ans;
+  }
+
+  kirisute(score: number) {
+    const int = Math.floor(score / 1000);
+    const dec = score % 1000;
+    let ans = 0;
+    if (score >= 0) {
+      ans = int;
+    } else if (score < 0) {
+      if (dec > 0) {
+        ans = int - 1;
+      } else {
+        ans = int;
+      }
+    }
+    return ans;
+  }
 }

@@ -1,45 +1,46 @@
 <template>
   <div class="score">
+
+    <!-- ヘッダー -->
     <header>
-      <div class="header__head"></div>
+      <div class="tr-head"></div>
       <div
-        class="header__body px-1"
+        class="tr-body"
         v-for="player in players"
         :key="player.uid"
       >
         <v-btn
-          :class="{ 'isLinked' :player.isLinked }"
-          :text="!player.isLinked"
-          :color="player.isLinked ? 'teal' : ''"
-          :dark="player.isLinked"
-          style="text-transform: none; font-weight: 700;"
+          class="name-btn"
+          text
           @click="changePlayer(player)"
+          :color="player.isLinked ? 'teal' : ''"
         >
           {{ player.name }}
         </v-btn>
       </div>
     </header>
 
+    <!-- ボディ -->
     <body>
       <div
         class="body__row"
         v-for="index in games"
         :key="index"
-        style="position: relative"
       >
-        <div class="body__index">{{ index }}</div>
+        <div class="tr-head">{{ index }}</div>
         <div
-          class="body__score"
+          class="tr-body"
           v-for="player in players"
           :key="player.uid"
-          :class="{ 'minus': getScore(player.uid, index) < 0}"
+          :class="{ 'minus': getScore(index, player.uid) < 0}"
         >
-          {{ getScore(player.uid, index) }}
+          {{ getScore(index, player.uid) }}
         </div>
         <v-btn
           absolute
           text
           tile
+          color="#DDD"
           height="100%"
           width="100%"
           @click="changeScore(index)"
@@ -48,11 +49,12 @@
       </div>
     </body>
 
+    <!-- フッター -->
     <footer>
       <div class="footer__row">
-        <div class="footer__head">計</div>
+        <div class="tr-head">計</div>
         <div
-          class="footer__body"
+          class="tr-body"
           v-for="player in players"
           :key="player.uid"
           :class="{ 'minus': getTotal(player.uid) < 0}"
@@ -62,9 +64,30 @@
       </div>
       <v-divider></v-divider>
       <div class="footer__row">
-        <div class="footer__head">￥</div>
+        <div class="tr-head">
+          <img class="casino-chip" src="@/assets/svgs/casino-chip.svg" alt="">
+        </div>
         <div
-          class="footer__body"
+          class="tr-body"
+          v-for="player in players"
+          :key="player.uid"
+        >
+          <v-chip
+            v-if="getChip(player.uid) || getChip(player.uid) === 0"
+            color="orange"
+            dark
+            small
+            class="px-2"
+          >
+            ￥ {{ getChip(player.uid) > 0 ? '+' : '' }}{{ getChip(player.uid) }}
+          </v-chip>
+        </div>
+      </div>
+      <v-divider></v-divider>
+      <div class="footer__row">
+        <div class="tr-head">￥</div>
+        <div
+          class="tr-body"
           v-for="player in players"
           :key="player.uid"
           :class="{ 'minus': getYen(player.uid) < 0}"
@@ -74,67 +97,92 @@
       </div>
     </footer>
 
+    <!-- ボタン -->
+    <v-btn
+      class="btn btn__player"
+      absolute
+      fab
+      dark
+      color="pink"
+      @click="openPlayersModal"
+    >
+      <v-icon>{{ icons.mdiAccount }}</v-icon>
+    </v-btn>
+    <v-btn
+      class="btn btn__chip"
+      absolute
+      fab
+      color="orange"
+      @click="openChipsModal"
+    >
+      <img style="height: 20px;" src="@/assets/svgs/casino-chip-white.svg" alt="">
+    </v-btn>
+    <v-btn
+      class="btn btn__score"
+      absolute
+      fab
+      color="primary"
+      @click="openScoresModal"
+    >
+      <v-icon>{{ icons.mdiPlus }}</v-icon>
+    </v-btn>
+
 
     <!-- モーダル -->
     <ScoreChange ref="scoreChange"/>
-    <!-- <PlayerChange @show="showPlayerChange = $event" :parentShow="showPlayerChange" /> -->
+    <PlayersChange ref="playersChange"/>
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import {
-
-} from '@mdi/js';
+import { Component, Mixins } from 'vue-property-decorator';
+import scoreClac from '@/mixins/scoreCalc'
+import Utilities from '@/mixins/utilities'
+import { mdiPlus, mdiAccount } from '@mdi/js'
 import ScoreChange from './ScoreChange.vue'
-import PlayerChange from './PlayerChange.vue'
+import PlayersChange from './PlayersChange.vue'
 
 @Component({
   components: {
     ScoreChange,
-    PlayerChange
+    PlayersChange
   }
 })
-export default class Score extends Vue {
-  games = 50
-
-  get players() {
-    return this.$store.getters["ScoreBoard/players"]
+export default class Score extends Mixins(scoreClac, Utilities) {
+  icons = {
+    mdiPlus,
+    mdiAccount,
   }
 
-  get rule() {
-    return this.$store.getters["ScoreBoard/rule"]
-  }
+  games = 200
 
-  get scores() {
-    return this.$store.getters["ScoreBoard/scores"]
+  mounted() {
+
+    // 長い名前の文字サイズ変更
+    const a = document.getElementsByClassName("name-btn")
+    for (let i = 0; i < a.length; i++) {
+      const length = this.getLength((a[i] as any).innerText)
+      if (length > 9) (a[i] as HTMLElement).style.fontSize = "0.8rem"
+    }
+
   }
 
   get chips() {
     return this.$store.getters["ScoreBoard/chips"]
   }
 
-  getScore(uid: string, index: number) {
-    const game = this.scores[index-1]
-    if (!game) {
-      return null;
-    } else {
+  getScore(index: number, uid: string) {
+    const game = this.scores[index - 1]
+    if (!game) return null
+    else {
       const score = game.find((score: any) => {
         return score.uid === uid;
       });
-      if (!score){
-        return null;
-      } else {
-        return score.pt;
-      }
+      return !score ? null : score.pt
     }
   }
 
-  getTotal(uid: string) {
-    return -3
-  }
-
-  getYen(uid: string) {
-    return -5
+  getChip(uid: string) {
+    return null
   }
 
   changePlayer(player: any) {
@@ -144,13 +192,27 @@ export default class Score extends Vue {
   changeScore(index: number) {
     (this.$refs as any).scoreChange.open(index)
   }
+
+  openPlayersModal() {
+    (this.$refs as any).playersChange.open()
+  }
+
+  openChipsModal() {
+    
+  }
+
+  openScoresModal() {
+    const length = this.scores.length;
+    (this.$refs as any).scoreChange.open(length + 1)
+  }
 }
 
 </script>
 
 <style lang="scss" scoped>
-$table-head: 40px;
-$table-body: 60px;
+$padding: 10px;
+$tr-head: 30px;
+$tr-body: 70px;
 
 .score {
   height: 100%;
@@ -159,50 +221,59 @@ $table-body: 60px;
   grid-template-rows: auto 1fr auto;
 }
 
-header {
-  padding: 10px;
+.tr-head {
+  flex: 0 0 $tr-head;
+  min-width: $tr-head;
   display: flex;
-  border-bottom: 2px solid rgba(0,0,0,0.12);
-  .header__head {
-    min-width: $table-head;
-  }
-  .header__body {
-    min-width: $table-body;
-    flex: 1;
-    display: flex;
-    justify-content: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.tr-body {
+  flex: 1 0 $tr-body;
+  min-width: $tr-body;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+header {
+  padding: $padding;
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0px -1px 10px 0px rgba(0, 0, 0, 0.12);
+  display: flex;
+  .tr-body {
     .v-btn {
-      padding: 0;
-      width: 100%;
+      padding: 0 !important;
+      margin: 0 4px;
+      font-size: 0.9rem;
+      overflow: hidden;
+      text-transform: none;
+      width: calc(100% - 8px);
+      max-width: 200px;
+      min-width: 0;
     }
   }
 }
 
 body {
   height: 100%;
-  margin: 0 10px;
+  padding: 0 $padding;
   overflow-y: auto;
   display: flex;
   flex-flow: column;
+  &::-webkit-scrollbar {
+    @media (min-width: $sp) {
+      display: none;
+    }
+  }
   .body__row {
     display: flex;
     min-height: 30px;
     border-bottom: 1px solid rgba(0,0,0,0.12);
+    position: relative;
     &:last-of-type {
       border: none;
-    }
-    .body__index {
-      min-width: $table-head;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .body__score {
-      min-width: $table-body;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
   }
 }
@@ -210,23 +281,40 @@ body {
 footer {
   display: flex;
   flex-flow: column;
-  padding: 0 10px;
-  border-top: 2px solid rgba(0,0,0,0.12);
+  padding: 0 $padding;
+  border-top: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   .footer__row {
     display: flex;
     min-height: 40px;
-    .footer__head {
-      min-width: $table-head;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  }
+  .casino-chip {
+    height: 19px;
+  }
+}
+
+.btn {
+  bottom: 138px;
+  @include sp {
+    height: 40px;
+    width: 40px;
+  }
+  &__player {
+    right: 188px;
+    @include sp {
+      right: 118px;
     }
-    .footer__body {
-      min-width: $table-body;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+  }
+  &__chip {
+    right: 108px;
+    @include sp {
+      right: 68px;
+    }
+  }
+  &__score {
+    right: 28px;
+    @include sp {
+      right: 18px;
     }
   }
 }

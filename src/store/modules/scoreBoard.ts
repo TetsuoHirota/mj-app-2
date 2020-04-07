@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { db } from '@/firebase'
 import * as firebase from 'firebase/app'
 
@@ -21,6 +22,7 @@ const state = {
   rule: {},
   scores: [],
   chips: [],
+  isPtMode: false
 }
 
 const mutations = {
@@ -39,68 +41,95 @@ const mutations = {
   changePlayers: (state: any, players: any) => {
     state.players = players
   },
+
+  changePlayer: (state: any, { player, index }: any) => {
+    Vue.set(state.players, index, player)
+  },
+
+  addPlayer: (state: any, player: any) => {
+    state.players.push(player)
+  },
+
+  deletePlayer: (state: any, index: number) => {
+    state.players.splice(index, 1)
+  },
   
   changeRule: (state: any, rule: any) => {
     state.rule = rule
   },
+
+  changeAllScores: (state: any, scores: any) => {
+    state.scores = scores
+  },
   
   changeScores: (state: any, data: any) => {
-    if (state.scores.length < data.index) {
-      state.scores[state.scores.length] = data.scores
+    const length = state.scores.length
+    if (length < data.index) {
+      state.scores.push(data.scores)
     } else {
-      state.scores[data.index - 1] = data.scores
+      Vue.set(state.scores, data.index - 1, data.scores)
     }
   },
 
   deleteScores: (state: any, index: number) => {
-    state.scores.splice( index - 1, 1)
+    state.scores.splice(index - 1, 1)
   },
+
+  changeChips: (state: any, chips: any) => {
+    state.chips = chips
+  },
+
+  changeIsPtMode: (state: any, isPtMode: boolean) => {
+    state.isPtMode = isPtMode
+  }
 }
 
 const actions = {
 
   // 成績表関連
   newGame: ({ commit, rootGetters, dispatch }: any, rule: any) => {
+    commit("resetScoreBoard")
     const me = rootGetters["User/user"]
     const players: any = []
-    const data: any = {
-      rule: rule,
-      players: players,
-      scores: [],
-      chips: []
-    }
+    let id = ""
+
     // player設定
     for (let i = 1; i <= rule.players; i ++) {
-      data.players.push({
+      players.push({
         uid: "player" + i,
         name: "player" + i,
         isLinked: false
       })
     }
+
     // ログイン状態で分岐
     if (me.isLogin) {
-      data.players[0] = {
+      players[0] = {
         uid: me.uid,
         name: me.name,
         isLinked: true
       }
-      commit("changeRule", data.rule)
-      commit("changePlayers", data.players)
-      db.collection("scores").add(data).then(doc => {
-        data.id = doc.id
-        commit("changeId", data.id)
-        dispatch("addPlayerScoreBoardId", { playerId: me.uid, ScoreBoardId: doc.id })
-      })
-    } else {
-      commit("changeId", String(new Date()))
-      commit("changeRule", data.rule)
-      commit("changePlayers", data.players)
     }
+
+    db.collection("scores").add({
+      players: players,
+      rule: rule,
+      scores: {},  //object変換してから代入する
+      chips: []
+    }).then(doc => {
+      id = doc.id
+      if (me.isLogin) dispatch("addPlayerScoreBoardId", { playerId: me.uid, scoreBoardId: doc.id })
+      console.log(id);
+      commit("changeId", id)
+    })
+    
+    commit("changePlayers", players)
+    commit("changeRule", rule)
   },
 
   deleteScoreBoard: ({ commit, state, rootGetters }: any) => {
     const me = rootGetters["User/user"]
-    if (me.isLogin) db.collection("scores").doc(state.id).delete()
+    db.collection("scores").doc(state.id).delete()
     commit("resetScoreBoard")
   },
 
@@ -110,9 +139,12 @@ const actions = {
 
   // リスナー関連
   // startListener: ({ commit, state }: any) => {
-  //   unsubscribe = db.collection("scores").doc(state.id).onSnapshot(doc => {
-  //     // commit("changeData", doc.data())
-  //     console.log(doc.data());
+  //   console.log("listen");
+  //   unsubscribe = db.collection("scores").doc(state.id).onSnapshot((doc: any) => {
+  //     // commit("changeChips", doc.data().chips)
+  //     // commit("changePlayers", doc.data().players)
+  //     // commit("changeRule", doc.data().rule)
+  //     // commit("changeAllScores", doc.data().scores)
   //   })
   // },
 
@@ -121,9 +153,15 @@ const actions = {
   // },
 
   // プレイヤーの打った成績表のIDを記録
-  addPlayerScoreBoardId: ({ commit }: any, { playerId, ScoreBoardId }: any) => {
+  addPlayerScoreBoardId: ({ commit }: any, { playerId, scoreBoardId }: any) => {
     db.collection("users").doc(playerId).update({
-      scoreBoards: firebase.firestore.FieldValue.arrayUnion(ScoreBoardId)
+      scoreBoards: firebase.firestore.FieldValue.arrayUnion(scoreBoardId)
+    })
+  },
+
+  deletePlayerScoreBoardId: ({ commit }: any, { playerId, scoreBoardId }: any) => {
+    db.collection("users").doc(playerId).update({
+      scoreBoards: firebase.firestore.FieldValue.arrayRemove(scoreBoardId)
     })
   },
   
@@ -132,20 +170,52 @@ const actions = {
     commit("setRule", rule)
   },
 
+  //プレイヤー関連
+  addPlayer: ({ commit, state, dispatch }: any, player: any) => {
+    commit("addPlayer", player)
+    db.collection("scores").doc(state.id).update({
+      players: state.players
+    })
+    if (player.isLinked) dispatch("addPlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
+  },
+  
+  deletePlayer: ({ commit, state, dispatch }: any, { player, index }: any) => {
+    commit("deletePlayer", index)
+    db.collection("scores").doc(state.id).update({
+      players: state.players
+    })
+    if (player.isLinked) dispatch("deletePlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
+  },
+  
+  changePlayer: ({ commit, state, dispatch }: any, { player, index }: any) => {
+    commit("changePlayer", { player: player, index: index })
+    db.collection("scores").doc(state.id).update({
+      players: state.players
+    })
+    if (state.players[index].isLinked) dispatch("deletePlayerScoreBoardId", { playerId: state.players[index].uid, scoreBoardId: state.id })
+    if (player.isLinked) dispatch("addPlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
+  },
+
   // スコア関連
-  changeScore: ({ commit, state }: any, { index, scores }: any) => {
+  changeScores: ({ commit, state }: any, { index, scores }: any) => {
     commit("changeScores", { index: index, scores: scores })
     db.collection("scores").doc(state.id).update({
       scores: formatNestedArray(state.scores)
     })
   },
 
-  deleteScore: ({ commit, state }: any, index: number) => {
+  deleteScores: ({ commit, state }: any, index: number) => {
     commit("deleteScores", index)
     db.collection("scores").doc(state.id).update({
       scores: formatNestedArray(state.scores)
     })
+
   },
+
+  // 入力モード切り替え
+  changeIsPtMode: ({ commit }: any, isPtMode: boolean) => {
+    commit("changeIsPtMode", isPtMode)
+  }
 }
 
 const getters = {
@@ -171,6 +241,10 @@ const getters = {
 
   players: (state: any) => {
     return state.players
+  },
+
+  isPtMode: (state: any) => {
+    return state.isPtMode
   }
 }
 

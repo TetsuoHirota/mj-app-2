@@ -197,10 +197,6 @@ export default class RulesAdd extends Mixins(RuleConfig) {
 </script>
 
 <style lang="scss" scoped>
-.row {
-  margin: 0;
-}
-
 .form {
   .col {
     padding: 0;
