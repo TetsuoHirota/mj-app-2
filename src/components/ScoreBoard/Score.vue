@@ -12,8 +12,9 @@
         <v-btn
           class="name-btn"
           text
-          @click="changePlayer(player)"
+          @click="openPlayersModal"
           :color="player.isLinked ? 'teal' : ''"
+          :class="{ 'small--text': getLength(player.name) > 9}"
         >
           {{ player.name }}
         </v-btn>
@@ -155,17 +156,6 @@ export default class Score extends Mixins(scoreClac, Utilities) {
 
   games = 200
 
-  mounted() {
-
-    // 長い名前の文字サイズ変更
-    const a = document.getElementsByClassName("name-btn")
-    for (let i = 0; i < a.length; i++) {
-      const length = this.getLength((a[i] as any).innerText)
-      if (length > 9) (a[i] as HTMLElement).style.fontSize = "0.8rem"
-    }
-
-  }
-
   get chips() {
     return this.$store.getters["ScoreBoard/chips"]
   }
@@ -212,7 +202,7 @@ export default class Score extends Mixins(scoreClac, Utilities) {
 <style lang="scss" scoped>
 $padding: 10px;
 $tr-head: 30px;
-$tr-body: 70px;
+$tr-body: 80px;
 
 .score {
   height: 100%;
@@ -252,6 +242,9 @@ header {
       width: calc(100% - 8px);
       max-width: 200px;
       min-width: 0;
+    }
+    .small--text {
+      font-size: 0.85rem;
     }
   }
 }
@@ -295,26 +288,34 @@ footer {
 
 .btn {
   bottom: 138px;
+
+  $right-sp: 18px;
+  $distance-sp: 58px;
+  $size-sp: 45px;
+
+  $right-lg: 28px;
+  $distance-lg: 80px;
+
   @include sp {
-    height: 40px;
-    width: 40px;
+    height: $size-sp;
+    width: $size-sp;
   }
   &__player {
-    right: 188px;
+    right: calc(#{$right-lg} + (#{$distance-lg} * 2));
     @include sp {
-      right: 118px;
+      right: calc(#{$right-sp} + (#{$distance-sp} * 2));
     }
   }
   &__chip {
-    right: 108px;
+    right: calc(#{$right-lg} + #{$distance-lg});
     @include sp {
-      right: 68px;
+      right: calc(#{$right-sp} + #{$distance-sp});
     }
   }
   &__score {
-    right: 28px;
+    right: $right-lg;
     @include sp {
-      right: 18px;
+      right: $right-sp;
     }
   }
 }

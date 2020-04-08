@@ -258,7 +258,7 @@ export default class Rules extends Mixins(RuleConfig) {
   }
 
   editRule(rule: any) {
-    this.ruleChange = { ...rule };  //deep copy
+    this.ruleChange = { ...rule };
     (this.$refs as any).ruleChange.open()
   }
 

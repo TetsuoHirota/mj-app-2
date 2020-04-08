@@ -119,7 +119,6 @@ const actions = {
     }).then(doc => {
       id = doc.id
       if (me.isLogin) dispatch("addPlayerScoreBoardId", { playerId: me.uid, scoreBoardId: doc.id })
-      console.log(id);
       commit("changeId", id)
     })
     
@@ -127,8 +126,7 @@ const actions = {
     commit("changeRule", rule)
   },
 
-  deleteScoreBoard: ({ commit, state, rootGetters }: any) => {
-    const me = rootGetters["User/user"]
+  deleteScoreBoard: ({ commit, state }: any) => {
     db.collection("scores").doc(state.id).delete()
     commit("resetScoreBoard")
   },
@@ -136,21 +134,6 @@ const actions = {
   endScoreBoard: ({ commit }: any) => {
     commit("resetScoreBoard")
   },
-
-  // リスナー関連
-  // startListener: ({ commit, state }: any) => {
-  //   console.log("listen");
-  //   unsubscribe = db.collection("scores").doc(state.id).onSnapshot((doc: any) => {
-  //     // commit("changeChips", doc.data().chips)
-  //     // commit("changePlayers", doc.data().players)
-  //     // commit("changeRule", doc.data().rule)
-  //     // commit("changeAllScores", doc.data().scores)
-  //   })
-  // },
-
-  // stopListener: () => {
-  //   unsubscribe()
-  // },
 
   // プレイヤーの打った成績表のIDを記録
   addPlayerScoreBoardId: ({ commit }: any, { playerId, scoreBoardId }: any) => {
@@ -166,8 +149,11 @@ const actions = {
   },
   
   // ルール関連
-  setRule: ({ commit }: any, rule: any) => {
-    commit("setRule", rule)
+  changeRule: ({ commit, state }: any, rule: any) => {
+    commit("changeRule", rule)
+    db.collection("scores").doc(state.id).update({
+      rule: rule
+    })
   },
 
   //プレイヤー関連
@@ -188,12 +174,12 @@ const actions = {
   },
   
   changePlayer: ({ commit, state, dispatch }: any, { player, index }: any) => {
+    if (state.players[index].isLinked) dispatch("deletePlayerScoreBoardId", { playerId: state.players[index].uid, scoreBoardId: state.id })
+    if (player.isLinked) dispatch("addPlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
     commit("changePlayer", { player: player, index: index })
     db.collection("scores").doc(state.id).update({
       players: state.players
     })
-    if (state.players[index].isLinked) dispatch("deletePlayerScoreBoardId", { playerId: state.players[index].uid, scoreBoardId: state.id })
-    if (player.isLinked) dispatch("addPlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
   },
 
   // スコア関連

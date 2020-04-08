@@ -53,7 +53,7 @@
         </v-list-item>
         <v-divider></v-divider>
         <v-list-item
-          @click="endScoreBoard"
+          @click="openRuleModal"
           class="py-3"
         >
           <v-icon>{{ icons.mdiCog }}</v-icon>
@@ -131,8 +131,8 @@
 
   <!-- モーダル -->
   <PlayersChange ref="playersChange"/>
+  <RuleChange ref="ruleChange" :rule="ruleChange" @changeRule="getEditedRule"/>
 
-  
 </div>
 </template>
 
@@ -142,6 +142,7 @@ import Score from '@/components/ScoreBoard/Score.vue'
 import Data from '@/components/ScoreBoard/Data.vue'
 import Graph from '@/components/ScoreBoard/Graph.vue'
 import PlayersChange from '@/components/ScoreBoard/PlayersChange.vue'
+import RuleChange from '@/components/Rules/RuleChange.vue'
 import {
   mdiChevronLeft,
   mdiFormatListNumbered,
@@ -159,7 +160,8 @@ import {
     Score,
     Data,
     Graph,
-    PlayersChange
+    PlayersChange,
+    RuleChange
   }
 })
 export default class ScoreBoard extends Vue {
@@ -180,6 +182,9 @@ export default class ScoreBoard extends Vue {
 
   // ポイント入力
   isPtMode = this.$store.getters["ScoreBoard/isPtMode"]
+
+  // ルール変更用
+  ruleChange = {}
 
   @Watch('isPtMode')
   changeIsPtMode() {
@@ -206,6 +211,15 @@ export default class ScoreBoard extends Vue {
   endScoreBoard() {
     this.$store.dispatch("ScoreBoard/endScoreBoard");
     this.$router.push({ name: 'Home'})
+  }
+
+  openRuleModal() {
+    this.ruleChange = this.$store.getters["ScoreBoard/rule"];
+    (this.$refs as any).ruleChange.open()
+  }
+
+  getEditedRule() {
+    this.$store.dispatch("ScoreBoard/changeRule", this.ruleChange)
   }
 }
 </script>

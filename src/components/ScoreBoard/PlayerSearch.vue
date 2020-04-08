@@ -6,15 +6,14 @@
     <v-card>
 
       <v-card-title>
-        <h3 class="display-2 font-weight-medium grey--text">プレイヤー選択</h3>
+        <h3 class="display-1 font-weight-medium grey--text">プレイヤー選択</h3>
       </v-card-title>
       
       <v-card-text>
-        <v-divider></v-divider>
         <v-subheader>フレンドから選ぶ</v-subheader>
         <v-list
-          max-height="200px"
-          style="overflow-y: auto"
+          max-height="400px"
+          class="friend-list px-2"
         >
           <v-list-item
             v-for="friend in friends"
@@ -33,7 +32,7 @@
 
           </v-list-item>
         </v-list>
-        <v-divider></v-divider>
+        <v-divider class="my-8"></v-divider>
         <v-subheader>プレイヤー名入力</v-subheader>
         <v-row
           align="center"
@@ -52,6 +51,7 @@
           </v-form>
           <v-btn
             @click="saveNewName"
+            color="primary"
           >
             決定
           </v-btn>
@@ -155,5 +155,14 @@ export default class PlayerSearch extends Mixins(Utilities) {
 </script>
 
 <style lang="scss" scoped>
-
+.friend-list {
+  overflow-y: auto;
+  box-shadow: 0 0 3px 1px teal inset;
+  border-radius: 10px;
+  .v-list-item {
+    &:not(:last-of-type) {
+      border-bottom: 1px solid rgba(0,0,0,.12);
+    }
+  }
+}
 </style>

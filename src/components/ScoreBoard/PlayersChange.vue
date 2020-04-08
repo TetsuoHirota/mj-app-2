@@ -6,10 +6,10 @@
     <v-card>
 
       <v-card-title>
-        <h3 class="display-2 font-weight-medium grey--text">プレイヤー変更</h3>
+        <h3 class="display-1 font-weight-medium grey--text">プレイヤー変更</h3>
       </v-card-title>
       
-      <v-card-text>
+      <v-card-text class="pa-6">
         <v-row
           v-for="(player, index) in players"
           :key="player.uid"
@@ -34,7 +34,7 @@
         <transition name="error">
           <v-alert
             type="error"
-            class="py-2 my-3"
+            class="py-2 mt-6 mb-0"
             v-if="errorMessage"
           >
             {{ errorMessage }}
@@ -45,14 +45,14 @@
           <v-btn
             outlined
             color="primary"
-            class="mt-4"
+            class="my-8"
             @click="addPlayer"
           >
             <v-icon class="mr-2">{{ icons.mdiAccountPlus }}</v-icon>
             追加
           </v-btn>
         </v-row>
-        <v-subheader class="mt-4 caption">プレイヤーを変更、削除すると元のプレイヤーのデータは失われます。</v-subheader>
+        <v-subheader class="caption">プレイヤーを変更、削除すると元のプレイヤーのデータは失われます。</v-subheader>
       </v-card-text>
 
     </v-card>
