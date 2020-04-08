@@ -54,13 +54,37 @@ export default class ScoreCalc extends Vue {
   }
 
   getYen(uid: string) {
-    return this.getTotal(uid) * this.rule.rate * 10
+    return this.getTotal(uid) * this.rule.rate * 10 + Number(this.getChip(uid))
   }
 
   getChip(uid: string) {
     const chips = this.$store.getters["ScoreBoard/chips"]
-    const userChip = chips.find((e: any) => e.uid === uid).chip
-    if (userChip || userChip === 0) return userChip * this.rule.chip
+    const userChip = chips.find((e: any) => e.uid === uid)
+    if (userChip && (userChip.chip || userChip.chip === 0)) return userChip.chip * this.rule.chip
     else return null
+  }
+
+  getRank(uid: string) {
+    const ranks: number[] = []
+    this.scores.forEach((data: any) => {
+      data.forEach((e: any) => {
+        if (e.uid === uid) ranks.push(e.rank)
+      })
+    })
+    const rank: number[] = [0, 0, 0, 0]
+    ranks.forEach((e: number) => {
+      rank[e - 1] += 1
+    })
+    let percent: string[] = []
+    let average = ""
+    if (ranks.length !== 0) {
+      percent = rank.map((e: number) => (e / ranks.length * 100).toFixed(1))
+      average = (ranks.reduce((a, x) => a + x, 0) / ranks.length).toFixed(2)
+    }
+    return {
+      average: average,
+      rank: rank,
+      percent: percent
+    }
   }
 }

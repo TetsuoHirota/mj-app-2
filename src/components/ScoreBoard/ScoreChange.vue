@@ -192,7 +192,7 @@ export default class ScoreChange extends Mixins(RuleConfig) {
       const value = this.isPtMode ? item.pt : item.score
       return value ? true : value === 0 ? true : false
     })
-    
+
     // スコアの高い順に並び替え
     scores.sort((a: any, b: any) => this.isPtMode ? b.pt - a.pt : b.score - a.score)
     let first = 0       //一位に追加されるpt
