@@ -198,7 +198,7 @@ export default class ScoreChange extends Mixins(RuleConfig) {
     let first = 0       //一位に追加されるpt
     let tobisyou = 0  //飛ばした人に追加されるpt
 
-    for (let i = 1; i < this.scores.length; i ++) {
+    for (let i = 1; i < scores.length; i ++) {
       const uma =
         i === 1 ? this.rule.uma.second :
         i === 2 ? this.rule.uma.third :
@@ -248,7 +248,6 @@ export default class ScoreChange extends Mixins(RuleConfig) {
         if (this.isPtMode) this.scores.forEach((e: any) => e.score = null)
         else this.scores.forEach((e: any) => e.pt = null)
       })
-
       let scores = this.scores
       if (!this.isPtMode) scores = this.getPt()
       this.$store.dispatch("ScoreBoard/changeScores", { index: this.index, scores: scores })

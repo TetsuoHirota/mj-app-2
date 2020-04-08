@@ -11,7 +11,14 @@
       
       <v-card-text>
         <v-subheader>フレンドから選ぶ</v-subheader>
+        <v-alert
+          v-if="!friends.length"
+          type="info"
+        >
+          フレンドがいません
+        </v-alert>
         <v-list
+          v-if="friends.length"
           max-height="400px"
           class="friend-list px-2"
         >
@@ -27,12 +34,9 @@
               <v-list-item-title v-text="friend.name" class="font-weight-medium"></v-list-item-title>
               <v-list-item-subtitle v-text="'ID: ' + friend.mid"></v-list-item-subtitle>
             </v-list-item-content>
-          
-
-
           </v-list-item>
         </v-list>
-        <v-divider class="my-8"></v-divider>
+        <v-divider class="mt-8"></v-divider>
         <v-subheader>プレイヤー名入力</v-subheader>
         <v-row
           align="center"

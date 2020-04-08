@@ -35,6 +35,17 @@ export default class ScoreCalc extends Vue {
     return playerScores
   }
 
+  getScore(index: number, uid: string) {
+    const game = this.scores[index - 1]
+    if (!game) return null
+    else {
+      const score = game.find((score: any) => {
+        return score.uid === uid;
+      });
+      return !score ? null : score.pt
+    }
+  }
+
   getTotal(uid: string) {
     const myData = this.playerScores.filter((e: any) => e.uid === uid)[0]
     return myData.scores.reduce((total: number, item: any) => {
@@ -44,5 +55,12 @@ export default class ScoreCalc extends Vue {
 
   getYen(uid: string) {
     return this.getTotal(uid) * this.rule.rate * 10
+  }
+
+  getChip(uid: string) {
+    const chips = this.$store.getters["ScoreBoard/chips"]
+    const userChip = chips.find((e: any) => e.uid === uid).chip
+    if (userChip || userChip === 0) return userChip * this.rule.chip
+    else return null
   }
 }

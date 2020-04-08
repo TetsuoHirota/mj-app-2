@@ -91,7 +91,6 @@ const actions = {
     commit("resetScoreBoard")
     const me = rootGetters["User/user"]
     const players: any = []
-    let id = ""
 
     // player設定
     for (let i = 1; i <= rule.players; i ++) {
@@ -109,25 +108,24 @@ const actions = {
         name: me.name,
         isLinked: true
       }
-    }
+      db.collection("scores").add({
+        players: players,
+        rule: rule,
+        scores: {},  //object変換してから代入する
+        chips: []
+      }).then(doc => {
+        dispatch("addPlayerScoreBoardId", { playerId: me.uid, scoreBoardId: doc.id })
+        commit("changeId", doc.id)
+      })
+    } else commit("changeId", String(new Date()))
 
-    db.collection("scores").add({
-      players: players,
-      rule: rule,
-      scores: {},  //object変換してから代入する
-      chips: []
-    }).then(doc => {
-      id = doc.id
-      if (me.isLogin) dispatch("addPlayerScoreBoardId", { playerId: me.uid, scoreBoardId: doc.id })
-      commit("changeId", id)
-    })
-    
     commit("changePlayers", players)
     commit("changeRule", rule)
   },
 
-  deleteScoreBoard: ({ commit, state }: any) => {
-    db.collection("scores").doc(state.id).delete()
+  deleteScoreBoard: ({ commit, state, rootGetters }: any) => {
+    const me = rootGetters["User/user"]
+    if (me.isLogin) db.collection("scores").doc(state.id).delete()
     commit("resetScoreBoard")
   },
 
@@ -136,66 +134,83 @@ const actions = {
   },
 
   // プレイヤーの打った成績表のIDを記録
-  addPlayerScoreBoardId: ({ commit }: any, { playerId, scoreBoardId }: any) => {
-    db.collection("users").doc(playerId).update({
+  addPlayerScoreBoardId: ({ rootGetters }: any, { playerId, scoreBoardId }: any) => {
+    const me = rootGetters["User/user"]
+    if (me.isLogin) db.collection("users").doc(playerId).update({
       scoreBoards: firebase.firestore.FieldValue.arrayUnion(scoreBoardId)
     })
   },
 
-  deletePlayerScoreBoardId: ({ commit }: any, { playerId, scoreBoardId }: any) => {
-    db.collection("users").doc(playerId).update({
+  deletePlayerScoreBoardId: ({ rootGetters }: any, { playerId, scoreBoardId }: any) => {
+    const me = rootGetters["User/user"]
+    if (me.isLogin) db.collection("users").doc(playerId).update({
       scoreBoards: firebase.firestore.FieldValue.arrayRemove(scoreBoardId)
     })
   },
   
   // ルール関連
-  changeRule: ({ commit, state }: any, rule: any) => {
+  changeRule: ({ commit, state, rootGetters }: any, rule: any) => {
+    const me = rootGetters["User/user"]
     commit("changeRule", rule)
-    db.collection("scores").doc(state.id).update({
+    if (me.isLogin) db.collection("scores").doc(state.id).update({
       rule: rule
     })
   },
 
   //プレイヤー関連
-  addPlayer: ({ commit, state, dispatch }: any, player: any) => {
+  addPlayer: ({ commit, state, dispatch, rootGetters }: any, player: any) => {
+    const me = rootGetters["User/user"]
     commit("addPlayer", player)
-    db.collection("scores").doc(state.id).update({
+    if (me.isLogin) db.collection("scores").doc(state.id).update({
       players: state.players
     })
     if (player.isLinked) dispatch("addPlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
   },
   
-  deletePlayer: ({ commit, state, dispatch }: any, { player, index }: any) => {
+  deletePlayer: ({ commit, state, dispatch, rootGetters }: any, { player, index }: any) => {
+    const me = rootGetters["User/user"]
     commit("deletePlayer", index)
-    db.collection("scores").doc(state.id).update({
+    if (me.isLogin) db.collection("scores").doc(state.id).update({
       players: state.players
     })
     if (player.isLinked) dispatch("deletePlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
   },
   
-  changePlayer: ({ commit, state, dispatch }: any, { player, index }: any) => {
+  changePlayer: ({ commit, state, dispatch, rootGetters }: any, { player, index }: any) => {
+    const me = rootGetters["User/user"]
     if (state.players[index].isLinked) dispatch("deletePlayerScoreBoardId", { playerId: state.players[index].uid, scoreBoardId: state.id })
     if (player.isLinked) dispatch("addPlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
     commit("changePlayer", { player: player, index: index })
-    db.collection("scores").doc(state.id).update({
+    if (me.isLogin) db.collection("scores").doc(state.id).update({
       players: state.players
     })
   },
 
   // スコア関連
-  changeScores: ({ commit, state }: any, { index, scores }: any) => {
+  changeScores: ({ commit, state, rootGetters }: any, { index, scores }: any) => {
+    const me = rootGetters["User/user"]
     commit("changeScores", { index: index, scores: scores })
-    db.collection("scores").doc(state.id).update({
+    if (me.isLogin) db.collection("scores").doc(state.id).update({
       scores: formatNestedArray(state.scores)
     })
   },
 
-  deleteScores: ({ commit, state }: any, index: number) => {
+  deleteScores: ({ commit, state, rootGetters }: any, index: number) => {
+    const me = rootGetters["User/user"]
     commit("deleteScores", index)
-    db.collection("scores").doc(state.id).update({
+    if (me.isLogin) db.collection("scores").doc(state.id).update({
       scores: formatNestedArray(state.scores)
     })
 
+  },
+
+  // チップ関連
+  changeChips: ({ commit, state, rootGetters }: any, chips: any) => {
+    const me = rootGetters["User/user"]
+    commit("changeChips", chips)
+    if (me.isLogin) db.collection("scores").doc(state.id).update({
+      chips: chips
+    })
   },
 
   // 入力モード切り替え

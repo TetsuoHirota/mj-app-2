@@ -14,7 +14,6 @@
           text
           @click="openPlayersModal"
           :color="player.isLinked ? 'teal' : ''"
-          :class="{ 'small--text': getLength(player.name) > 9}"
         >
           {{ player.name }}
         </v-btn>
@@ -128,10 +127,11 @@
       <v-icon>{{ icons.mdiPlus }}</v-icon>
     </v-btn>
 
-
     <!-- モーダル -->
     <ScoreChange ref="scoreChange"/>
     <PlayersChange ref="playersChange"/>
+    <ChipsChange ref="chipsChange"/>
+
   </div>
 </template>
 <script lang="ts">
@@ -141,11 +141,13 @@ import Utilities from '@/mixins/utilities'
 import { mdiPlus, mdiAccount } from '@mdi/js'
 import ScoreChange from './ScoreChange.vue'
 import PlayersChange from './PlayersChange.vue'
+import ChipsChange from './ChipsChange.vue'
 
 @Component({
   components: {
     ScoreChange,
-    PlayersChange
+    PlayersChange,
+    ChipsChange
   }
 })
 export default class Score extends Mixins(scoreClac, Utilities) {
@@ -154,30 +156,7 @@ export default class Score extends Mixins(scoreClac, Utilities) {
     mdiAccount,
   }
 
-  games = 200
-
-  get chips() {
-    return this.$store.getters["ScoreBoard/chips"]
-  }
-
-  getScore(index: number, uid: string) {
-    const game = this.scores[index - 1]
-    if (!game) return null
-    else {
-      const score = game.find((score: any) => {
-        return score.uid === uid;
-      });
-      return !score ? null : score.pt
-    }
-  }
-
-  getChip(uid: string) {
-    return null
-  }
-
-  changePlayer(player: any) {
-    // this.showPlayerChange = true
-  }
+  games = 100
 
   changeScore(index: number) {
     (this.$refs as any).scoreChange.open(index)
@@ -188,7 +167,7 @@ export default class Score extends Mixins(scoreClac, Utilities) {
   }
 
   openChipsModal() {
-    
+    (this.$refs as any).chipsChange.open()
   }
 
   openScoresModal() {
@@ -202,13 +181,14 @@ export default class Score extends Mixins(scoreClac, Utilities) {
 <style lang="scss" scoped>
 $padding: 10px;
 $tr-head: 30px;
-$tr-body: 80px;
+$tr-body: 78px;
 
 .score {
   height: 100%;
   overflow-x: auto;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  font-size: .9rem;
 }
 
 .tr-head {
@@ -236,15 +216,12 @@ header {
     .v-btn {
       padding: 0 !important;
       margin: 0 4px;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
       overflow: hidden;
       text-transform: none;
       width: calc(100% - 8px);
       max-width: 200px;
       min-width: 0;
-    }
-    .small--text {
-      font-size: 0.85rem;
     }
   }
 }
