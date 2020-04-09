@@ -2,8 +2,6 @@ import Vue from 'vue'
 import { db } from '@/firebase'
 import * as firebase from 'firebase/app'
 
-// let unsubscribe: any = null
-
 // firestoreのための配列→オブジェクト変換
 function formatNestedArray(arr: any) {
   interface Obj {
@@ -111,8 +109,9 @@ const actions = {
       db.collection("scores").add({
         players: players,
         rule: rule,
-        scores: {},  //object変換してから代入する
-        chips: []
+        scores: {},
+        chips: [],
+        date: String(new Date())
       }).then(doc => {
         dispatch("addPlayerScoreBoardId", { playerId: me.uid, scoreBoardId: doc.id })
         commit("changeId", doc.id)

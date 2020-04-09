@@ -181,7 +181,7 @@ export default class Score extends Mixins(scoreClac, Utilities) {
 <style lang="scss" scoped>
 $padding: 10px;
 $tr-head: 30px;
-$tr-body: 70px;
+$tr-body: 75px;
 
 .score {
   height: 100%;

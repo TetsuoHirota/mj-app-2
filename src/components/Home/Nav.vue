@@ -43,7 +43,7 @@
       <v-icon>{{ icons.mdiHistory }}</v-icon>
     </v-btn>
     <v-btn>
-      <span>データ</span>
+      <span>戦績</span>
       <v-icon>{{ icons.mdiChartBar }}</v-icon>
     </v-btn>
   </v-bottom-navigation>

@@ -7,6 +7,7 @@ import Display from './modules/display'
 import Friends from './modules/friends'
 import Rules from './modules/rules'
 import ScoreBoard from './modules/scoreBoard'
+import PersonalData from './modules/personalData'
 
 Vue.use(Vuex)
 
@@ -22,7 +23,8 @@ export default new Vuex.Store({
     Display,
     Friends,
     Rules,
-    ScoreBoard
+    ScoreBoard,
+    PersonalData
   },
   plugins: [ createPersistedState() ]
 })

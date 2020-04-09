@@ -126,7 +126,6 @@ export default class ChipsChange extends Vue {
   }
 
   save() {
-    console.log(this.chips);
     if (this.total !== 0) {
       this.errorMessage = `合計が${this.total}枚になるように入力してください (現在合計: ${this.total}枚)`
     } else {
