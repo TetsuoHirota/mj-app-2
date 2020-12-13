@@ -1,7 +1,6 @@
-import * as firebase from "firebase/app"
-import * as firebaseui from "firebaseui-ja"
-import "firebase/auth"
-import "firebase/firestore"
+import firebase from "firebase/app"
+import "firebase/auth";
+import "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAtKaNsfOgd_zKHaQyWtLUBaLMgN8ReKSE",
@@ -14,8 +13,7 @@ const firebaseConfig = {
   measurementId: "G-S6CKY20RF7"
 }
 
-const firebaseApp = firebase.initializeApp(firebaseConfig)
+const firebaseApp = firebase.initializeApp(firebaseConfig);
 
-export const db = firebaseApp.firestore()
-export const auth = firebaseApp.auth()
-export const ui = new firebaseui.auth.AuthUI(firebase.auth())
+export const db = firebaseApp.firestore();
+export const auth = firebaseApp.auth();

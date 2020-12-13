@@ -3,11 +3,11 @@ import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
-import vuetify from './plugins/vuetify'
+const vuetify = process.env.NODE_ENV === "production"
+  ? require('./plugins/vuetify').default
+  : require('./plugins/vuetify-dev').default;
 
 import './assets/font/NotoSansCJKjp/NotoSansCJKjp.scss'
-
-Vue.config.productionTip = false;
 
 new Vue({
   router,

@@ -1,23 +1,11 @@
 <template>
 <div class="login">
 
-  <v-app-bar
-    color="indigo"
-    dark
-  >
-    <v-toolbar-title class="pl-2">麻雀成績管理</v-toolbar-title>
-  </v-app-bar>
-
   <h1 class="ml-5">ログイン</h1>
 
   <!-- firebaseui -->
   <div class="firebaseui">
     <div id="firebaseui-auth-container"></div>
-    <v-progress-circular
-      id="loader"
-      indeterminate
-      color="primary"
-    ></v-progress-circular>
   </div>
 
   <v-subheader class="my-9 mx-3">アカウントを作成する場合は、「メールでログイン」を選択後、登録したいアドレスを入力してください。</v-subheader>
@@ -26,51 +14,43 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import * as firebase from 'firebase/app'
-import * as firebaseui from 'firebaseui-ja'
-import { ui } from '@/firebase'
-import 'firebaseui-ja/dist/firebaseui.css'
+import { Component, Vue } from 'vue-property-decorator';
+import firebase from 'firebase/app';
+import firebaseui from 'firebaseui-ja';
+import 'firebaseui-ja/dist/firebaseui.css';
+import { UserInfo } from '@/models/user';
+
 import { mdiHelpCircle } from '@mdi/js'
 
-@Component({
-  components: {
-    },
-})
+@Component
 export default class Login extends Vue {
-  uiConfig = {
+
+  ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+  uiConfig: firebaseui.auth.Config = {
     callbacks: {
       signInSuccessWithAuthResult: (authResult: any) => {
         const user = authResult.user
         const info = authResult.additionalUserInfo
-        const userInfo = {
+        const userInfo: UserInfo = {
           uid: user.uid,
           email: user.email,
-          isAnonymous: user.isAnonymous,
-          isNewUser: info.isNewUser
+          mid: '',
+          name: '',
         }
-        if (userInfo.isAnonymous) {         //anonymous
-          return true
-        } else if (!userInfo.isNewUser) {   //既存ユーザー
-          this.login(userInfo)
-          return false
-        } else {                            //新規ユーザー  
-          this.signup(userInfo)
-          return true
-        }
+        info.isNewUser ? this.signUp(userInfo) : this.login();
+        return false;
       },
       uiShown: function() {
-        (document.getElementById('loader') as HTMLElement).style.display = 'none';
+        // (document.getElementById('loader') as HTMLElement).style.display = 'none';
       }
     },
-    signInSuccessUrl: '/',
     signInOptions: [
       {
         provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
         requireDisplayName: false
       },
       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
     ],
   };
 
@@ -79,16 +59,27 @@ export default class Login extends Vue {
   }
 
   mounted() {
-    ui.start('#firebaseui-auth-container', this.uiConfig);
+    this.ui.start('#firebaseui-auth-container', this.uiConfig);
   }
 
-  signup(userInfo: any) {
-    this.$store.dispatch("User/signup", userInfo)
+  signUp(userInfo: UserInfo) {
+    this.$store.dispatch('user/signUp', userInfo)
+      .then(() => {
+        this.$router.push({ name: 'home'});
+      })
+      .catch(err => {
+        throw new Error(err);
+      })
   }
 
-  async login(userInfo: any) {
-    await this.$store.dispatch("User/login", userInfo)
-    this.$router.push('/')
+  login() {
+    this.$store.dispatch("user/login")
+      .then(() => {
+        this.$router.push({ name: 'home'})
+      })
+      .catch(err => {
+        throw new Error(err);
+      })
   }
 }
 </script>

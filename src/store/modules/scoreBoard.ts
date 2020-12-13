@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { db } from '@/firebase'
-import * as firebase from 'firebase/app'
+import firebase from 'firebase/app'
 
 // firestoreのための配列→オブジェクト変換
 function formatNestedArray(arr: any) {

@@ -1,131 +1,53 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import { auth } from '@/firebase'
-import store from '../store'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import store from '../store';
 
-import Home from '../views/Home.vue'
-import Login from '@/views/Login.vue'
-import Profile from '@/views/Profile.vue'
-import Nav from '@/components/Home/Nav.vue'
-import Friends from '@/views/Friends.vue'
-import ScoreBoard from '@/views/ScoreBoard.vue'
+import Home from '../views/Home.vue';
 
-Vue.use(VueRouter)
+const Login = () => import('../views/Login.vue');
+
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/index.html',
-    redirect: '/'
-  },
-  {
     path: '/',
+    name: 'home',
     component: Home,
-    meta: {
-      requiresAuth: true
-    },
-    children: [
-      {
-        path: '/',
-        redirect: '/home'
-      },
-      {
-        path: '/home',
-        name: 'Home',
-        component: Nav
-      },
-      {
-        path: '/friends',
-        name: 'Friends',
-        component: Friends,
-        beforeEnter: (to: any, from: any, next: any) => {
-          if (store.getters["User/user"].isLogin) {
-            next()
-          } else {
-            next({ name: 'Home'})
-          }
-        }
-      }
-    ]
+    meta: { requiresAuth: true },
   },
   {
     path: '/login',
-    name: 'Login',
+    name: 'login',
     component: Login,
-    beforeEnter: (to: any, from: any, next: any) => {
-      if (store.getters["User/user"].isLogin) {
-        next({ name: 'Home'})
-      } else {
-        next()
-      }
-    }
-  },
-  {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile,
-    beforeEnter: (to: any, from: any, next: any) => {
-      const mid = store.getters["User/user"].mid
-      if ( mid && mid === "") {
-        next()
-      } else {
-        next({ name: 'Home'})
-      }
-    }
-  },
-  {
-    path: '/scoreboard',
-    name: 'ScoreBoard',
-    component: ScoreBoard,
-    meta: {
-      requiresAuth: true
-    },
   }
-]
+];
 
 const router = new VueRouter({
-  mode: 'history',
-  base: '/',
   routes
-})
+});
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    const user = store.getters["User/user"]
-
-    //storeがログイン状態でないとき、ログイン処理をする
-    if (user.isLogin) {
-
-      // プロフィール未登録の場合、Profileに移動
-      if (user.mid && user.mid === "") {
-        next({
-          path: '/profile',
-          query: { redirect: to.fullPath }
+    const isLoggedIn = store.getters["user/isLoggedIn"];
+    // このルートはログインされているかどうか認証が必要です。
+    // もしされていないならば、ログインページにリダイレクトします。
+    if (!isLoggedIn) {
+      store.dispatch('loading/changeIsLoading', true);
+      store.dispatch('user/login')
+        .then(() => {
+          next();
+          store.dispatch('loading/changeIsLoading', false);
         })
-      } else {
-        next()
-      }
+        .catch(() => {
+          next({ name: 'login' })
+          store.dispatch('loading/changeIsLoading', false);
+        })
     } else {
-      auth.onAuthStateChanged(user => {
-  
-        //firebaseでログイン状態でないときはログインしない
-        if (user) {
-  
-          // ゲストの場合ログインしない
-          if (user.isAnonymous) {
-            next()
-          } else {
-            store.dispatch('User/login', user).then(() => {
-              next()
-            })
-          }
-        } else {
-          next()
-        }
-      })
+      next()
     }
   } else {
-    next()
+    next() // next() を常に呼び出すようにしてください!
   }
 })
 
-export default router
+export default router;
