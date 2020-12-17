@@ -1,14 +1,9 @@
 <template>
   <div class="score">
-
     <!-- ヘッダー -->
     <header>
       <div class="tr-head"></div>
-      <div
-        class="tr-body"
-        v-for="player in players"
-        :key="player.uid"
-      >
+      <div class="tr-body" v-for="player in players" :key="player.uid">
         <v-btn
           class="name-btn"
           text
@@ -22,17 +17,13 @@
 
     <!-- ボディ -->
     <body>
-      <div
-        class="body__row"
-        v-for="index in games"
-        :key="index"
-      >
+      <div class="body__row" v-for="index in games" :key="index">
         <div class="tr-head">{{ index }}</div>
         <div
           class="tr-body"
           v-for="player in players"
           :key="player.uid"
-          :class="{ 'minus': getScore(index, player.uid) < 0}"
+          :class="{ minus: getScore(index, player.uid) < 0 }"
         >
           {{ getScore(index, player.uid) }}
         </div>
@@ -57,7 +48,7 @@
           class="tr-body"
           v-for="player in players"
           :key="player.uid"
-          :class="{ 'minus': getTotal(player.uid) < 0}"
+          :class="{ minus: getTotal(player.uid) < 0 }"
         >
           {{ getTotal(player.uid) }}
         </div>
@@ -65,13 +56,9 @@
       <v-divider></v-divider>
       <div class="footer__row">
         <div class="tr-head">
-          <img class="casino-chip" src="@/assets/svgs/casino-chip.svg" alt="">
+          <img class="casino-chip" src="@/assets/svgs/casino-chip.svg" alt="" />
         </div>
-        <div
-          class="tr-body"
-          v-for="player in players"
-          :key="player.uid"
-        >
+        <div class="tr-body" v-for="player in players" :key="player.uid">
           <v-chip
             v-if="getChip(player.uid) || getChip(player.uid) === 0"
             color="orange"
@@ -79,7 +66,7 @@
             small
             class="px-2"
           >
-            ￥ {{ getChip(player.uid) > 0 ? '+' : '' }}{{ getChip(player.uid) }}
+            ￥ {{ getChip(player.uid) > 0 ? "+" : "" }}{{ getChip(player.uid) }}
           </v-chip>
         </div>
       </div>
@@ -90,7 +77,7 @@
           class="tr-body"
           v-for="player in players"
           :key="player.uid"
-          :class="{ 'minus': getYen(player.uid) < 0}"
+          :class="{ minus: getYen(player.uid) < 0 }"
         >
           {{ getYen(player.uid) }}
         </div>
@@ -115,7 +102,11 @@
       color="orange"
       @click="openChipsModal"
     >
-      <img style="height: 20px;" src="@/assets/svgs/casino-chip-white.svg" alt="">
+      <img
+        style="height: 20px;"
+        src="@/assets/svgs/casino-chip-white.svg"
+        alt=""
+      />
     </v-btn>
     <v-btn
       class="btn btn__score"
@@ -128,54 +119,46 @@
     </v-btn>
 
     <!-- モーダル -->
-    <ScoreChange ref="scoreChange"/>
-    <PlayersChange ref="playersChange"/>
-    <ChipsChange ref="chipsChange"/>
-
+    <ScoreChange ref="scoreChange" />
+    <PlayersChange ref="playersChange" />
+    <ChipsChange ref="chipsChange" />
   </div>
 </template>
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
-import scoreClac from '@/mixins/scoreCalc'
-import Utilities from '@/mixins/utilities'
-import { mdiPlus, mdiAccount } from '@mdi/js'
-import ScoreChange from './ScoreChange.vue'
-import PlayersChange from './PlayersChange.vue'
-import ChipsChange from './ChipsChange.vue'
+import { Component, Mixins } from "vue-property-decorator";
+import scoreClac from "@/mixins/scoreCalc";
+import Utilities from "@/mixins/utilities";
+import ScoreChange from "./ScoreChange.vue";
+import PlayersChange from "./PlayersChange.vue";
+import ChipsChange from "./ChipsChange.vue";
 
 @Component({
   components: {
     ScoreChange,
     PlayersChange,
-    ChipsChange
-  }
+    ChipsChange,
+  },
 })
 export default class Score extends Mixins(scoreClac, Utilities) {
-  icons = {
-    mdiPlus,
-    mdiAccount,
-  }
-
-  games = 100
+  games = 100;
 
   changeScore(index: number) {
-    (this.$refs as any).scoreChange.open(index)
+    (this.$refs as any).scoreChange.open(index);
   }
 
   openPlayersModal() {
-    (this.$refs as any).playersChange.open()
+    (this.$refs as any).playersChange.open();
   }
 
   openChipsModal() {
-    (this.$refs as any).chipsChange.open()
+    (this.$refs as any).chipsChange.open();
   }
 
   openScoresModal() {
     const length = this.scores.length;
-    (this.$refs as any).scoreChange.open(length + 1)
+    (this.$refs as any).scoreChange.open(length + 1);
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -188,7 +171,7 @@ $tr-body: 75px;
   overflow-x: auto;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .tr-head {
@@ -209,7 +192,7 @@ $tr-body: 75px;
 
 header {
   padding: $padding;
-  border-bottom: 1px solid rgba(0,0,0,0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: 0px -1px 10px 0px rgba(0, 0, 0, 0.12);
   display: flex;
   .tr-body {
@@ -240,7 +223,7 @@ body {
   .body__row {
     display: flex;
     min-height: 30px;
-    border-bottom: 1px solid rgba(0,0,0,0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     position: relative;
     &:last-of-type {
       border: none;
@@ -252,7 +235,7 @@ footer {
   display: flex;
   flex-flow: column;
   padding: 0 $padding;
-  border-top: 1px solid rgba(0,0,0,0.12);
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   .footer__row {
     display: flex;
@@ -300,5 +283,4 @@ footer {
 .minus {
   color: red;
 }
-
 </style>

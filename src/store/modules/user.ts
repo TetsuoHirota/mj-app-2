@@ -11,7 +11,15 @@ const generateId = (len: number) => {
   return name.join('')
 }
 
-const state = () => ({
+interface State {
+  isLoggedIn: boolean;
+  uid: string;
+  email: string;
+  mid: string;
+  name: string;
+}
+
+const state = (): State => ({
   isLoggedIn: false,
   uid: '',
   email: '',
@@ -26,7 +34,7 @@ const mutations = {
     state.isLoggedIn = true;
     state.uid = userInfo.uid;
     state.email = userInfo.email;
-    state.mid = userInfo.email;
+    state.mid = userInfo.mid;
     state.name = userInfo.name;
     console.debug(state);
   }
@@ -59,7 +67,7 @@ const actions = {
     return;
   },
 
-  login: async ({commit}: any) => {
+  login: ({commit}: any) => {
     console.debug("login!");
     return new Promise((resolve, reject) => {
       auth.onAuthStateChanged(user => {
@@ -78,7 +86,7 @@ const actions = {
                   name: data.name
                 } as UserInfo)
                 console.debug("commit");
-                resolve();
+                resolve('resolved');
               } else {
                 console.debug("doc doesnt exist");
                 reject();
@@ -90,15 +98,25 @@ const actions = {
         }
       })
     })
+  },
+
+  logout: ({commit}: any) => {
+    return auth.signOut();
   }
 }
 
 const getters = {
-  isLoggedIn: (state: any) => {
+  isLoggedIn: (state: State) => {
     return state.isLoggedIn;
   },
-  user: (state: any) => {
-    return state
+  user: (state: State) => {
+    const user: UserInfo = {
+      uid: state.uid,
+      mid: state.mid,
+      email: state.email,
+      name: state.name
+    }
+    return user
   }
 }
 

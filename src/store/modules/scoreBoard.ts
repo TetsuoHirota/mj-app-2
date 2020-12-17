@@ -2,6 +2,8 @@ import Vue from 'vue'
 import { db } from '@/firebase'
 import firebase from 'firebase/app'
 
+import { ScoreBoard } from '@/models/scoreBoard';
+
 // firestoreのための配列→オブジェクト変換
 function formatNestedArray(arr: any) {
   interface Obj {
@@ -14,16 +16,16 @@ function formatNestedArray(arr: any) {
   return obj;
 }
 
-const state = {
-  id: "",
-  players: [],
-  rule: {},
-  scores: [],
-  chips: [],
-  isPtMode: false
+interface State {
+  scoreBoards: ScoreBoard[];
 }
 
+const state = () => ({
+  scoreBoards: [],
+})
+
 const mutations = {
+
   resetScoreBoard: (state: any) => {
     state.id = ""
     state.players = []
@@ -83,6 +85,9 @@ const mutations = {
 }
 
 const actions = {
+  startScoreBoardsListener: (state: any) => {
+    console.debug("startScoreBoardsListner!");
+  },
 
   // 成績表関連
   newGame: ({ commit, rootGetters, dispatch }: any, rule: any) => {
@@ -219,6 +224,9 @@ const actions = {
 }
 
 const getters = {
+  scoreBoards: (state: State) => {
+    return state.scoreBoards
+  },
   state: (state: any) => {
     return state
   },
