@@ -6,6 +6,10 @@ const vuetifyOptional =
 module.exports = {
   configureWebpack: {
     plugins: [...vuetifyOptional],
+    performance: {
+      maxEntrypointSize: 1500000,
+      maxAssetSize: 1500000,
+    },
   },
   transpileDependencies: vuetifyOptional.length > 0 ? ["vuetify"] : [],
   css: {
@@ -13,12 +17,6 @@ module.exports = {
       scss: {
         prependData: '@import "./src/assets/scss/main.scss";',
       },
-    },
-  },
-  configureWebpack: {
-    performance: {
-      maxEntrypointSize: 1500000,
-      maxAssetSize: 1500000,
     },
   },
 };

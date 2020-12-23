@@ -1,22 +1,18 @@
 import { auth, db } from '@/firebase';
 import { UserInfo } from '@/models/user';
 
-const generateId = (len: number) => {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+const generateId = () => {
+  const chars = 'abcdefghijkmnopqrstuvwxyz0123456789'
   const name = []
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < 6; i++) {
     const num = Math.floor(chars.length * Math.random())
     name.push(chars[num])
   }
   return name.join('')
 }
 
-interface State {
+interface State extends UserInfo {
   isLoggedIn: boolean;
-  uid: string;
-  email: string;
-  mid: string;
-  name: string;
 }
 
 const state = (): State => ({
@@ -24,25 +20,28 @@ const state = (): State => ({
   uid: '',
   email: '',
   mid: '',
-  name: ''
+  name: '',
+  scoreBoardIds: []
 })
 
 const mutations = {
-  login: (state: any, userInfo: UserInfo) => {
-    console.debug("commit login");
-    console.debug(userInfo);
+  login: (state: State, userInfo: UserInfo) => {
     state.isLoggedIn = true;
     state.uid = userInfo.uid;
     state.email = userInfo.email;
     state.mid = userInfo.mid;
     state.name = userInfo.name;
-    console.debug(state);
+    state.scoreBoardIds = userInfo.scoreBoardIds;
+  },
+
+  logout: (state: State) => {
+    console.log("logout")
+    state.isLoggedIn = false;
   }
 }
 
 const actions = {
   signUp: async ({ commit }: any, userInfo: UserInfo) => {
-    console.debug("signup");
     const mids: string[] = [];
     await db.collection('users')
       .get()
@@ -51,29 +50,24 @@ const actions = {
           mids.push(doc.data().mid)
         })
       });
-    console.debug(mids);
-    let mid = generateId(8);
+    let mid = generateId();
     while (mids.includes(mid)) {
-      mid = generateId(8);
+      mid = generateId();
     }
-    console.debug("generate mid: " + mid);
     await db.collection('users').doc(userInfo.uid).set({
       uid: userInfo.uid,
       email: userInfo.email,
       mid: mid,
-      name: '名無し'
+      name: '名無し',
+      scoreBoardIds: []
     } as UserInfo)
-    console.debug("sinup finished");
     return;
   },
 
-  login: ({commit}: any) => {
-    console.debug("login!");
+  login: ({ commit }: any) => {
     return new Promise((resolve, reject) => {
       auth.onAuthStateChanged(user => {
         if (user) {
-          console.debug("user exists");
-          console.debug(user);
           db.collection('users').doc(user.uid)
             .get()
             .then(doc => {
@@ -83,24 +77,29 @@ const actions = {
                   uid: data.uid,
                   email: data.email,
                   mid: data.mid,
-                  name: data.name
+                  name: data.name,
+                  scoreBoardIds: data.scoreBoardIds
                 } as UserInfo)
-                console.debug("commit");
-                resolve('resolved');
+                resolve('')
               } else {
-                console.debug("doc doesnt exist");
-                reject();
+                commit('logout');
+                reject('データベースにユーザーが存在していません')
               }
             })
+            .catch(err => {
+              commit('logout');
+              reject(err)
+            })
         } else {
-          console.debug("user doesnt exist");
-          reject();
+          commit('logout');
+          reject('ログインしていません')
         }
       })
     })
   },
 
-  logout: ({commit}: any) => {
+  logout: ({ commit }: any) => {
+    commit('logout');
     return auth.signOut();
   }
 }
@@ -114,7 +113,8 @@ const getters = {
       uid: state.uid,
       mid: state.mid,
       email: state.email,
-      name: state.name
+      name: state.name,
+      scoreBoardIds: state.scoreBoardIds
     }
     return user
   }

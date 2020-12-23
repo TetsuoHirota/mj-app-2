@@ -62,4 +62,12 @@ export default class Home extends Vue {
   height: 100%;
   width: 100%;
 }
+
+.v-btn:hover::before,
+.v-btn:focus-within::before,
+.v-btn:focus::before {
+  @include sp {
+    opacity: 0 !important;
+  }
+}
 </style>

@@ -2,8 +2,8 @@ import { Rule } from '@/models/scoreBoard';
 
 type RuleConfig = {
   [P in keyof Rule]: {
-    label: string,
-    value: Rule[P]
+    label: string;
+    value: Rule[P];
   }[]
 }
 
@@ -56,18 +56,21 @@ export const ruleConfig: RuleConfig = {
     { label: "35000点", value: 35000 },
     { label: "40000点", value: 40000 },
   ],
-  // uma4: [
-  //   { label: "なし", value: { first: 0, second: 0, third: 0, fourth: 0 } },
-  //   { label: "5 - 10", value: { first: 10, second: 5, third: -5, fourth: -10 } },
-  //   { label: "10 - 20", value: { first: 20, second: 10, third: -10, fourth: -20 } },
-  //   { label: "10 - 30", value: { first: 30, second: 10, third: -10, fourth: 30 } },
-  //   { label: "20 - 40", value: { first: 40, second: 20, third: -20, fourth: -40 } },
-  //   { label: "30 - 60", value: { first: 60, second: 30, third: -30, fourth: -60 } },
-  // ],
-  // uma3: [
-  //   { label: "なし", value: { first: 0, second: 0, third: 0 } },
-  //   { label: "0 - 10", value: { first: 10, second: 0, third: -10 } },
-  //   { label: "0 - 20", value: { first: 20, second: 0, third: -20 } },
-  //   { label: "0 - 30", value: { first: 30, second: 0, third: -30 } },
-  // ],
+  uma: [
+    { label: '', value: [0, 0] }
+  ],
+  uma4: [
+    { label: "なし", value: [0, 0] },
+    { label: "5 - 10", value: [5, 10] },
+    { label: "10 - 20", value: [10, 20] },
+    { label: "10 - 30", value: [10, 30] },
+    { label: "20 - 40", value: [20, 40] },
+    { label: "30 - 60", value: [30, 60] },
+  ],
+  uma3: [
+    { label: "なし", value: [0, 0] },
+    { label: "0 - 10", value: [0, 10] },
+    { label: "0 - 20", value: [0, 20] },
+    { label: "0 - 30", value: [0, 30] },
+  ],
 }

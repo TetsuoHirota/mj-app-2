@@ -5,15 +5,25 @@ export interface Rule {
   rate: number;
   chip: number;
   defaultScore: number;
-  round: 'goshya'|'sisya'|'kirisute'|'kiriage';
+  round: 'goshya' | 'sisya' | 'kirisute' | 'kiriage';
   tobisyou: number;
   oka: number;
-  uma: [number, number];
+  uma4?: [number, number];
+  uma3?: [number, number];
+  uma: [number, number]
+}
+
+export interface Score {
+  uid: string,
+  pt: number,
+  score: number,
+  rank: number
 }
 
 export interface ScoreBoard {
-  id: string;
+  id?: string,
   players: UserInfo[];
+  scores: Score[][];
   rule: Rule;
   createdAt: Date;
 }

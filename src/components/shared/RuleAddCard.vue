@@ -1,170 +1,256 @@
 <template>
-  <v-card>
+  <v-card class="py-3">
     <v-card-title>
-      <h4 class="">ルール設定</h4>
+      ルール設定
     </v-card-title>
 
-    <v-form ref="newRuleForm">
-      <v-card-text class="pt-0">
-        <v-row justify="space-between">
-          <div>ゲームモード</div>
-          <v-button-toggle v-model="playerNumber">
-            <v-btn
-              v-for="playerNumber in config.playerNumber"
-              :value="playerNumber.value"
-              >三麻</v-btn
+    <v-card-text class="px-6 py-3">
+      <v-form ref="form">
+        <v-row dense align="center">
+          <v-col cols="5">ゲームモード</v-col>
+          <v-col align="center">
+            <v-btn-toggle
+              mandatory
+              v-model="playerNumber"
+              dense
+              color="primary"
             >
-          </v-button-toggle>
-          <v-btn
-            dark
-            color="indigo"
-            width="40%"
-            x-large
-            @click="(newRule.players = 3), (state = 1)"
-          >
-            三麻
-          </v-btn>
-          <v-btn
-            dark
-            color="indigo"
-            width="40%"
-            x-large
-            @click="(newRule.players = 4), (state = 1)"
-          >
-            四麻
-          </v-btn>
+              <v-btn
+                v-for="(playerNumber, index) in ruleConfig.playerNumber"
+                :value="playerNumber.value"
+                :key="index"
+                >{{ playerNumber.label }}</v-btn
+              >
+            </v-btn-toggle>
+          </v-col>
         </v-row>
-      </v-card-text>
+        <v-row align="center">
+          <v-col cols="5">レート</v-col>
+          <v-col>
+            <v-select
+              hide-details="auto"
+              v-model="rate"
+              :items="ruleConfig.rate"
+              item-text="label"
+              item-value="value"
+              required
+            >
+            </v-select>
+          </v-col>
+        </v-row>
+        <v-row align="center">
+          <v-col cols="5">チップ</v-col>
+          <v-col>
+            <v-select
+              hide-details="auto"
+              v-model="chip"
+              :items="ruleConfig.chip"
+              item-text="label"
+              item-value="value"
+              required
+            >
+            </v-select>
+          </v-col>
+        </v-row>
+        <v-row align="center">
+          <v-col cols="5">ウマ</v-col>
+          <v-col>
+            <v-select
+              hide-details="auto"
+              v-model="uma"
+              :items="playerNumber === 4 ? ruleConfig.uma4 : ruleConfig.uma3"
+              item-text="label"
+              item-value="value"
+              required
+            >
+            </v-select>
+          </v-col>
+        </v-row>
+        <v-row align="center">
+          <v-col cols="5">飛び賞</v-col>
+          <v-col>
+            <v-select
+              hide-details="auto"
+              v-model="tobisyou"
+              :items="ruleConfig.tobisyou"
+              item-text="label"
+              item-value="value"
+              required
+            >
+            </v-select>
+          </v-col>
+        </v-row>
+        <v-row dense align="center" justify="center">
+          <v-expansion-panels flat tile class="mt-2">
+            <v-expansion-panel>
+              <v-expansion-panel-header class="pa-0"
+                >詳細設定</v-expansion-panel-header
+              >
+              <v-expansion-panel-content>
+                <v-row align="center">
+                  <v-col cols="5">清算方法</v-col>
+                  <v-col>
+                    <v-select
+                      hide-details="auto"
+                      v-model="round"
+                      :items="ruleConfig.round"
+                      item-text="label"
+                      item-value="value"
+                      required
+                    >
+                    </v-select>
+                  </v-col>
+                </v-row>
+                <v-row align="center">
+                  <v-col cols="5">持ち点</v-col>
+                  <v-col>
+                    <v-select
+                      hide-details="auto"
+                      v-model="defaultScore"
+                      :items="ruleConfig.defaultScore"
+                      item-text="label"
+                      item-value="value"
+                      required
+                    >
+                    </v-select>
+                  </v-col>
+                </v-row>
+                <v-row align="center">
+                  <v-col cols="5">オカ</v-col>
+                  <v-col>
+                    <v-select
+                      hide-details="auto"
+                      v-model="oka"
+                      :items="ruleConfig.oka"
+                      item-text="label"
+                      item-value="value"
+                      required
+                    >
+                    </v-select>
+                  </v-col>
+                </v-row>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </v-row>
+      </v-form>
+    </v-card-text>
+
+    <v-card-actions>
+      <v-btn color="blue darken-1" text @click="close">キャンセル</v-btn>
       <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" text @click="close">
-        閉じる
-      </v-btn>
-      <v-col>
-        <v-select
-          label="レート"
-          v-model="newRule.rate"
-          :items="ruleItems.rate"
-          item-text="label"
-          item-value="value"
-          :rules="[(v) => !!v || v == 0 || 'レートを選択してください']"
-          required
-        >
-        </v-select>
-        <v-select
-          label="チップ"
-          v-model="newRule.chip"
-          :items="ruleItems.chip"
-          item-text="label"
-          item-value="value"
-          :rules="[(v) => !!v || v == 0 || 'チップを選択してください']"
-          required
-        >
-        </v-select>
-        <v-select
-          label="ウマ"
-          v-model="newRule.uma"
-          :items="newRule.players === 4 ? ruleItems.uma4 : ruleItems.uma3"
-          item-text="label"
-          item-value="value"
-          :rules="[(v) => !!v || v == 0 || 'ウマを選択してください']"
-          required
-        >
-        </v-select>
-        <v-select
-          label="飛び賞"
-          v-model="newRule.tobisyou"
-          :items="ruleItems.tobisyou"
-          item-text="label"
-          item-value="value"
-          :rules="[(v) => !!v || v == 0 || '飛び賞を選択してください']"
-          required
-        >
-        </v-select>
-        <v-select
-          label="清算方法"
-          v-model="newRule.round"
-          :items="ruleItems.round"
-          item-text="label"
-          item-value="value"
-          :rules="[(v) => !!v || v == 0 || '清算方法を選択してください']"
-          required
-        >
-        </v-select>
-        <v-select
-          label="持ち点"
-          v-model="newRule.defaultScore"
-          :items="ruleItems.defaultScore"
-          item-text="label"
-          item-value="value"
-          suffix="持ち"
-          :rules="[(v) => !!v || v == 0 || '持ち点を選択してください']"
-          required
-        >
-        </v-select>
-        <v-select
-          label="オカ"
-          v-model="newRule.oka"
-          :items="ruleItems.oka"
-          item-text="label"
-          item-value="value"
-          suffix="返し"
-          :rules="[(v) => !!v || v == 0 || 'オカを選択してください']"
-          required
-        >
-        </v-select>
-      </v-col>
-      <v-card-actions>
-        <v-btn color="blue darken-1" text @click="back">戻る</v-btn>
-        <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="close">閉じる</v-btn>
-        <v-btn color="blue darken-1" text @click="save">保存</v-btn>
-      </v-card-actions>
-    </v-form>
+      <v-btn color="blue darken-1" dark @click="start">開始</v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop } from "vue-property-decorator";
-import RuleConfig from "@/mixins/ruleConfig";
+import { Component, Vue, Watch } from "vue-property-decorator";
+import { ruleConfig } from "@/config/rule";
+import { Rule } from "@/models/scoreBoard";
 
 @Component({
   components: {},
 })
-export default class RuleAdd extends Mixins(RuleConfig) {
-  show = false;
-  state = 0;
+export default class RuleAdd extends Vue {
+  ruleConfig = ruleConfig;
 
-  newRule = {
-    players: null,
-    rate: null,
-    chip: null,
-    uma: null,
-    tobisyou: null,
-    round: null,
-    oka: null,
-    defaultScore: null,
-  };
+  playerNumber = ruleConfig.playerNumber[0].value;
+  rate = ruleConfig.rate[0].value;
+  chip = ruleConfig.chip[0].value;
+  uma = ruleConfig.uma[0].value;
+  tobisyou = ruleConfig.tobisyou[0].value;
+  round = ruleConfig.round[0].value;
+  defaultScore = ruleConfig.defaultScore[0].value;
+  oka = ruleConfig.oka[1].value;
 
-  open() {
-    this.show = true;
+  @Watch("playerNumber")
+  setRule(newNum: number) {
+    if (newNum === ruleConfig.playerNumber[0].value) {
+      this.setRuleFor4();
+    } else {
+      this.setRuleFor3();
+    }
+  }
+
+  setRuleFor4() {
+    this.rate = ruleConfig.rate[0].value;
+    this.chip = ruleConfig.chip[0].value;
+    this.uma = ruleConfig.uma[0].value;
+    this.tobisyou = ruleConfig.tobisyou[0].value;
+    this.round = ruleConfig.round[0].value;
+    this.defaultScore = ruleConfig.defaultScore[0].value;
+    this.oka = ruleConfig.oka[1].value;
+  }
+
+  setRuleFor3() {
+    this.rate = ruleConfig.rate[0].value;
+    this.chip = ruleConfig.chip[0].value;
+    this.uma = ruleConfig.uma[0].value;
+    this.tobisyou = ruleConfig.tobisyou[0].value;
+    this.round = ruleConfig.round[0].value;
+    this.defaultScore = ruleConfig.defaultScore[2].value;
+    this.oka = ruleConfig.oka[3].value;
   }
 
   close() {
-    this.show = false;
-    this.back();
+    this.setRuleFor4();
+    this.$emit("request-close");
   }
 
-  back() {
-    (this.$refs.newRuleForm as HTMLFormElement).reset();
-    this.state = 0;
-  }
-
-  save() {
-    if ((this.$refs.newRuleForm as HTMLFormElement).validate()) {
-      const rule = JSON.parse(JSON.stringify(this.newRule));
-      this.$store.dispatch("Rules/addRule", rule);
-      this.close();
+  async start() {
+    this.$store.dispatch("app/isLoading", true);
+    const rule: Rule = {
+      playerNumber: this.playerNumber,
+      rate: this.rate,
+      chip: this.chip,
+      uma: this.uma,
+      tobisyou: this.tobisyou,
+      round: this.round,
+      defaultScore: this.defaultScore,
+      oka: this.oka,
+    };
+    if ((this.$refs.form as HTMLFormElement).validate()) {
+      await this.$store
+        .dispatch("scoreBoard/createScoreBoard", rule)
+        .then((id) => {
+          console.log(id);
+        })
+        .catch((err) => {
+          this.$store.dispatch("app/error", err);
+        });
+      this.$store.dispatch("app/isLoading", false);
+      this.setRuleFor4();
+    } else {
+      this.$store.dispatch("app/error", "入力に不備があります");
+      this.$store.dispatch("app/isLoading", false);
     }
   }
+
+  save() {}
 }
 </script>
+
+<style lang="scss">
+.v-text-field {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.v-expansion-panel {
+  color: inherit !important;
+}
+
+.v-expansion-panel-header {
+  font-size: 14px !important;
+  justify-content: flex-end !important;
+}
+
+.v-expansion-panel-header__icon {
+  margin-left: 10px !important;
+}
+
+.v-expansion-panel-content__wrap {
+  padding: 0 !important;
+}
+</style>

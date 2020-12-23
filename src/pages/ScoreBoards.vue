@@ -29,12 +29,13 @@
         fab
         large
         absolute
+        @click="openAddRule"
       >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-fab-transition>
-    <v-dialog v-model="showRuleAddModal" persistent max-width="600px">
-      <RuleAddCard></RuleAddCard>
+    <v-dialog v-model="showRuleAddModal" max-width="600px">
+      <RuleAddCard @request-close="showRuleAddModal = false"></RuleAddCard>
     </v-dialog>
   </div>
 </template>
@@ -51,7 +52,7 @@ import RuleAddCard from "@/components/shared/RuleAddCard.vue";
 })
 export default class ScoreBoards extends Vue {
   showAddButton = false;
-  showRuleAddModal = true;
+  showRuleAddModal = false;
 
   get scoreBoards(): ScoreBoard[] {
     return this.$store.getters["scoreBoard/scoreBoards"];
@@ -65,6 +66,10 @@ export default class ScoreBoards extends Vue {
     setTimeout(() => {
       this.showAddButton = true;
     }, 100);
+  }
+
+  openAddRule() {
+    this.showRuleAddModal = true;
   }
 }
 </script>

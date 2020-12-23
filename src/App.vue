@@ -14,6 +14,12 @@
         <router-view></router-view>
       </v-container>
     </v-main>
+    <v-snackbar app color="error" :value="errorMessage" :timeout="4000">
+      <v-row dense class="flex-nowrap">
+        <v-icon class="mr-4">mdi-alert</v-icon>
+        {{ errorMessage }}
+      </v-row>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -42,7 +48,11 @@ export default class App extends Vue {
   }
 
   get isLoading() {
-    return this.$store.getters["loading/isLoading"];
+    return this.$store.getters["app/isLoading"];
+  }
+
+  get errorMessage() {
+    return this.$store.getters["app/error"];
   }
 
   fetchRoute() {
@@ -63,6 +73,7 @@ export default class App extends Vue {
 <style lang="scss" scoped>
 .v-application {
   height: 100%;
+  font-family: "Noto Sans CJK JP Subset", Roboto, sans-serif;
 }
 
 .v-app-bar {

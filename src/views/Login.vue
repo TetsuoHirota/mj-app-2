@@ -35,6 +35,7 @@ export default class Login extends Vue {
           email: user.email,
           mid: "",
           name: "",
+          scoreBoardIds: [],
         };
         info.isNewUser ? this.signUp(userInfo) : this.login();
         return false;

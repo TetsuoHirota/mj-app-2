@@ -60,9 +60,9 @@ export default class Drawer extends Vue {
   }
 
   async logout() {
-    this.$store.dispatch("loading/changeIsLoading", true);
+    this.$store.dispatch("app/isLoading", true);
     await this.$store.dispatch("user/logout");
-    this.$store.dispatch("loading/changeIsLoading", false);
+    this.$store.dispatch("app/isLoading", false);
     this.$router.push({ name: "login" });
   }
 

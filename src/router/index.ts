@@ -32,15 +32,16 @@ router.beforeEach((to, from, next) => {
     // このルートはログインされているかどうか認証が必要です。
     // もしされていないならば、ログインページにリダイレクトします。
     if (!isLoggedIn) {
-      store.dispatch('loading/changeIsLoading', true);
+      store.dispatch('app/isLoading', true);
       store.dispatch('user/login')
         .then(() => {
           next();
-          store.dispatch('loading/changeIsLoading', false);
+          store.dispatch('app/isLoading', false);
         })
-        .catch(() => {
+        .catch(err => {
+          store.dispatch('app/error', err);
           next({ name: 'login' })
-          store.dispatch('loading/changeIsLoading', false);
+          store.dispatch('app/isLoading', false);
         })
     } else {
       next()

@@ -1,8 +1,9 @@
-import Vue from 'vue'
-import { db } from '@/firebase'
-import firebase from 'firebase/app'
+import Vue from 'vue';
+import { db } from '@/firebase';
+import firebase from 'firebase/app';
 
-import { ScoreBoard } from '@/models/scoreBoard';
+import { ScoreBoard, Rule } from '@/models/scoreBoard';
+import { UserInfo } from '@/models/user';
 
 // firestoreのための配列→オブジェクト変換
 function formatNestedArray(arr: any) {
@@ -16,12 +17,17 @@ function formatNestedArray(arr: any) {
   return obj;
 }
 
+let unsubscribeScoreBoardIds: any = null;
+let unsubscribeScoreBoards: any = null;
+
 interface State {
   scoreBoards: ScoreBoard[];
+  scoreBoard: ScoreBoard;
 }
 
 const state = () => ({
   scoreBoards: [],
+  scoreBoard: []
 })
 
 const mutations = {
@@ -34,8 +40,8 @@ const mutations = {
     state.chips = []
   },
 
-  changeId: (state: any, id: string) => {
-    state.id = id
+  setScoreBoardId: (state: any, id: string) => {
+    state.scoreboard.id = id
   },
 
   changePlayers: (state: any, players: any) => {
@@ -53,7 +59,7 @@ const mutations = {
   deletePlayer: (state: any, index: number) => {
     state.players.splice(index, 1)
   },
-  
+
   changeRule: (state: any, rule: any) => {
     state.rule = rule
   },
@@ -61,7 +67,7 @@ const mutations = {
   changeAllScores: (state: any, scores: any) => {
     state.scores = scores
   },
-  
+
   changeScores: (state: any, data: any) => {
     const length = state.scores.length
     if (length < data.index) {
@@ -85,46 +91,57 @@ const mutations = {
 }
 
 const actions = {
-  startScoreBoardsListener: (state: any) => {
-    console.debug("startScoreBoardsListner!");
-  },
-
-  // 成績表関連
-  newGame: ({ commit, rootGetters, dispatch }: any, rule: any) => {
-    commit("resetScoreBoard")
-    const me = rootGetters["User/user"]
-    const players: any = []
-
-    // player設定
-    for (let i = 1; i <= rule.players; i ++) {
+  createScoreBoard: async ({ rootGetters, dispatch }: any, rule: Rule) => {
+    const user: UserInfo = rootGetters['user/user'];
+    const players: UserInfo[] = [user];
+    for (let i = 1; i < rule.playerNumber; i++) {
       players.push({
-        uid: "player" + i,
-        name: "player" + i,
-        isLinked: false
+        uid: `_player${i}`,
+        name: `player${i}`,
+        mid: `_player${i}`,
+        email: "",
+        scoreBoardIds: []
       })
     }
+    let id = '';
+    await db.collection("scores").add({
+      players: players,
+      rule: rule,
+      scores: [],
+      chips: [],
+      createdAt: new Date
+    } as ScoreBoard).then(doc => {
+      id = doc.id;
+      return dispatch("addPlayerScoreBoardId", { uid: user.uid, scoreBoardId: doc.id })
+    })
+    return id;
+  },
 
-    // ログイン状態で分岐
-    if (me.isLogin) {
-      players[0] = {
-        uid: me.uid,
-        name: me.name,
-        isLinked: true
-      }
-      db.collection("scores").add({
-        players: players,
-        rule: rule,
-        scores: {},
-        chips: [],
-        date: String(new Date())
-      }).then(doc => {
-        dispatch("addPlayerScoreBoardId", { playerId: me.uid, scoreBoardId: doc.id })
-        commit("changeId", doc.id)
-      })
-    } else commit("changeId", String(new Date()))
+  // プレイヤーの打った成績表のIDを記録
+  addPlayerScoreBoardId: ({ commit }: any, { uid, scoreBoardId }: { uid: string, scoreBoardId: string }) => {
+    return db.collection("users").doc(uid).update({
+      scoreBoardIds: firebase.firestore.FieldValue.arrayUnion(scoreBoardId)
+    })
+  },
 
-    commit("changePlayers", players)
-    commit("changeRule", rule)
+  startScoreBoardsListener: ({ rootGetters }: any) => {
+    const user: UserInfo = rootGetters['user/user'];
+    const scoreBoardIds: string[] = [];
+    console.log(user.uid)
+    unsubscribeScoreBoardIds = db.collection('users').doc(user.uid).onSnapshot((doc: any) => {
+      const scoreBoardIds: string[] = doc.data().scoreBoardIds;
+      unsubscribeScoreBoards = db.collection('scores').onSnapshot((snapshot) => {
+        const scoreBoards: ScoreBoard[] = [];
+        snapshot.docChanges().forEach((change: any) => {
+          if (scoreBoardIds.includes(change.doc.id)) [
+            scoreBoards.push(change.doc.data())
+          ]
+          // commit('setScores', change.doc.data())
+        });
+        console.log(scoreBoards)
+      });
+      console.log(doc.data())
+    })
   },
 
   deleteScoreBoard: ({ commit, state, rootGetters }: any) => {
@@ -137,13 +154,6 @@ const actions = {
     commit("resetScoreBoard")
   },
 
-  // プレイヤーの打った成績表のIDを記録
-  addPlayerScoreBoardId: ({ rootGetters }: any, { playerId, scoreBoardId }: any) => {
-    const me = rootGetters["User/user"]
-    if (me.isLogin) db.collection("users").doc(playerId).update({
-      scoreBoards: firebase.firestore.FieldValue.arrayUnion(scoreBoardId)
-    })
-  },
 
   deletePlayerScoreBoardId: ({ rootGetters }: any, { playerId, scoreBoardId }: any) => {
     const me = rootGetters["User/user"]
@@ -151,7 +161,7 @@ const actions = {
       scoreBoards: firebase.firestore.FieldValue.arrayRemove(scoreBoardId)
     })
   },
-  
+
   // ルール関連
   changeRule: ({ commit, state, rootGetters }: any, rule: any) => {
     const me = rootGetters["User/user"]
@@ -170,7 +180,7 @@ const actions = {
     })
     if (player.isLinked) dispatch("addPlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
   },
-  
+
   deletePlayer: ({ commit, state, dispatch, rootGetters }: any, { player, index }: any) => {
     const me = rootGetters["User/user"]
     commit("deletePlayer", index)
@@ -179,7 +189,7 @@ const actions = {
     })
     if (player.isLinked) dispatch("deletePlayerScoreBoardId", { playerId: player.uid, scoreBoardId: state.id })
   },
-  
+
   changePlayer: ({ commit, state, dispatch, rootGetters }: any, { player, index }: any) => {
     const me = rootGetters["User/user"]
     if (state.players[index].isLinked) dispatch("deletePlayerScoreBoardId", { playerId: state.players[index].uid, scoreBoardId: state.id })

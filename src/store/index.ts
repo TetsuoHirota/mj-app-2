@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import App from './modules/app';
 import User from './modules/user';
-import Loading from './modules/loading';
 import ScoreBoard from './modules/scoreBoard';
 
 Vue.use(Vuex);
@@ -10,7 +10,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   modules: {
     user: User,
-    loading: Loading,
+    app: App,
     scoreBoard: ScoreBoard
   }
 });
