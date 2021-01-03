@@ -5,6 +5,7 @@ import store from '../store';
 import Home from '../views/Home.vue';
 
 const Login = () => import('../views/Login.vue');
+const ScoreBoard = () => import('../views/ScoreBoard.vue')
 
 Vue.use(VueRouter);
 
@@ -19,7 +20,13 @@ const routes = [
     path: '/login',
     name: 'login',
     component: Login,
-  }
+  },
+  {
+    path: '/scoreboard/:id',
+    name: 'scoreBoard',
+    component: ScoreBoard,
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = new VueRouter({
@@ -39,7 +46,6 @@ router.beforeEach((to, from, next) => {
           store.dispatch('app/isLoading', false);
         })
         .catch(err => {
-          store.dispatch('app/error', err);
           next({ name: 'login' })
           store.dispatch('app/isLoading', false);
         })

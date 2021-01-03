@@ -198,7 +198,7 @@ export default class RuleAdd extends Vue {
     this.$emit("request-close");
   }
 
-  async start() {
+  start() {
     this.$store.dispatch("app/isLoading", true);
     const rule: Rule = {
       playerNumber: this.playerNumber,
@@ -211,17 +211,18 @@ export default class RuleAdd extends Vue {
       oka: this.oka,
     };
     if ((this.$refs.form as HTMLFormElement).validate()) {
-      await this.$store
+      this.close();
+      this.$store
         .dispatch("scoreBoard/createScoreBoard", rule)
         .then((id) => {
-          console.log(id);
+          this.$store.dispatch("app/isLoading", false);
+          this.$router.push({ name: "scoreBoard", params: { id: id } });
         })
         .catch((err) => {
           this.$store.dispatch("app/error", err);
         });
-      this.$store.dispatch("app/isLoading", false);
-      this.setRuleFor4();
     } else {
+      this.close();
       this.$store.dispatch("app/error", "入力に不備があります");
       this.$store.dispatch("app/isLoading", false);
     }

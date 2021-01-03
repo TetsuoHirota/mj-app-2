@@ -1,31 +1,26 @@
 <template>
   <div class="score">
-    <!-- ヘッダー -->
     <header>
       <div class="tr-head"></div>
       <div class="tr-body" v-for="player in players" :key="player.uid">
-        <v-btn
-          class="name-btn"
-          text
-          @click="openPlayersModal"
-          :color="player.isLinked ? 'teal' : ''"
-        >
+        <v-btn class="name-btn" text @click="openPlayersModal">
           {{ player.name }}
         </v-btn>
       </div>
     </header>
 
-    <!-- ボディ -->
     <body>
-      <div class="body__row" v-for="index in games" :key="index">
+      <div class="body__row" v-for="index in gameNumber" :key="index">
         <div class="tr-head">{{ index }}</div>
         <div
           class="tr-body"
           v-for="player in players"
           :key="player.uid"
-          :class="{ minus: getScore(index, player.uid) < 0 }"
+          :class="{
+            minus: getPtFromScores(index, player.uid).isMinus,
+          }"
         >
-          {{ getScore(index, player.uid) }}
+          {{ getPtFromScores(index, player.uid).pt }}
         </div>
         <v-btn
           absolute
@@ -40,8 +35,7 @@
       </div>
     </body>
 
-    <!-- フッター -->
-    <footer>
+    <!-- <footer>
       <div class="footer__row">
         <div class="tr-head">計</div>
         <div
@@ -82,7 +76,7 @@
           {{ getYen(player.uid) }}
         </div>
       </div>
-    </footer>
+    </footer> -->
 
     <!-- ボタン -->
     <v-btn
@@ -91,16 +85,16 @@
       fab
       dark
       color="pink"
-      @click="openPlayersModal"
+      @click.stop="openPlayersModal"
     >
-      <v-icon>{{ icons.mdiAccount }}</v-icon>
+      <v-icon>mdi-account</v-icon>
     </v-btn>
     <v-btn
       class="btn btn__chip"
       absolute
       fab
       color="orange"
-      @click="openChipsModal"
+      @click.stop="openChipsModal"
     >
       <img
         style="height: 20px;"
@@ -113,34 +107,74 @@
       absolute
       fab
       color="primary"
-      @click="openScoresModal"
+      @click.stop="openScoresModal"
     >
-      <v-icon>{{ icons.mdiPlus }}</v-icon>
+      <v-icon>mdi-plus</v-icon>
     </v-btn>
 
-    <!-- モーダル -->
     <ScoreChange ref="scoreChange" />
-    <PlayersChange ref="playersChange" />
-    <ChipsChange ref="chipsChange" />
+    <!-- <PlayersChange ref="playersChange" />
+    <ChipsChange ref="chipsChange" /> -->
   </div>
 </template>
 <script lang="ts">
-import { Component, Mixins } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import scoreClac from "@/mixins/scoreCalc";
 import Utilities from "@/mixins/utilities";
-import ScoreChange from "./ScoreChange.vue";
-import PlayersChange from "./PlayersChange.vue";
-import ChipsChange from "./ChipsChange.vue";
+import { ScoreBoard } from "@/models/scoreBoard";
+
+import ScoreChange from "@/components/scoreBoard/ScoreChange.vue";
+// import PlayersChange from "@/components/socreBoard/PlayersChange.vue";
+// import ChipsChange from "@/components/socreBoard/ChipsChange.vue";
 
 @Component({
   components: {
     ScoreChange,
-    PlayersChange,
-    ChipsChange,
+    // PlayersChange,
+    // ChipsChange,
   },
 })
-export default class Score extends Mixins(scoreClac, Utilities) {
-  games = 100;
+export default class Score extends Vue {
+  get scoreBoard(): ScoreBoard {
+    return this.$store.getters["scoreBoard/scoreBoard"];
+  }
+
+  get players() {
+    return this.scoreBoard.players || [];
+  }
+
+  get scoress() {
+    return this.scoreBoard.scoress || [];
+  }
+
+  gameNumber = 100;
+
+  getPtFromScores(
+    index: number,
+    uid: string
+  ): {
+    pt: number | null;
+    isMinus: boolean;
+  } {
+    let pt: number | null = null;
+    let isMinus = false;
+    const scores = this.scoress[index - 1];
+    if (scores) {
+      const score = scores.find((score: any) => {
+        return score.uid === uid;
+      });
+      if (score) {
+        pt = score.pt || null;
+        if (pt) {
+          isMinus = pt < 0;
+        }
+      }
+    }
+    return {
+      pt: pt,
+      isMinus: isMinus,
+    };
+  }
 
   changeScore(index: number) {
     (this.$refs as any).scoreChange.open(index);
@@ -155,8 +189,9 @@ export default class Score extends Mixins(scoreClac, Utilities) {
   }
 
   openScoresModal() {
-    const length = this.scores.length;
-    (this.$refs as any).scoreChange.open(length + 1);
+    const scoreBoard = this.$store.state.scoreBoard.scoreBoard;
+    const length = scoreBoard.scoress ? scoreBoard.scoress.length : 0;
+    (this.$refs.scoreChange as ScoreChange).open(length + 1);
   }
 }
 </script>

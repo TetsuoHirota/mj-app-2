@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <AppBar is-drawer-active></AppBar>
     <v-carousel
       v-model="nav"
       :continuous="false"
@@ -44,11 +45,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-
-import ScoreBoards from "@/pages/ScoreBoards.vue";
+import AppBar from "@/components/shared/AppBar.vue";
+import ScoreBoards from "@/views/home/ScoreBoards.vue";
 
 @Component({
   components: {
+    AppBar,
     ScoreBoards,
   },
 })
@@ -61,6 +63,12 @@ export default class Home extends Vue {
 .home {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.v-crousel {
+  flex: 1;
 }
 
 .v-btn:hover::before,

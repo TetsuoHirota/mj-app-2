@@ -1,135 +1,132 @@
 <template>
   <div class="scoreBoard">
-    <!-- ナビゲーション -->
-    <v-app-bar app color="indigo" dark>
-      <v-btn icon :to="{ name: 'Home' }">
-        <v-icon large>{{ icons.mdiChevronLeft }}</v-icon>
-      </v-btn>
-      <v-toolbar-title class="pl-1">成績表</v-toolbar-title>
-      <v-spacer></v-spacer>
-
-      <!-- メニュー -->
+    <v-overlay :value="showMenu"></v-overlay>
+    <AppBar title="成績表" is-back-active>
       <v-menu left bottom :close-on-content-click="false" v-model="showMenu">
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on">
-            <v-icon>{{ icons.mdiDotsVertical }}</v-icon>
+            <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
         </template>
-        <v-list
-          tile
-          flat
-          width="180px"
-          class="scoreBoard-menu-list pa-0"
-          min-height="0"
-        >
-          <v-list-item class="d-flex flex-column py-5">
-            ポイント入力
-            <v-row class="mt-2">
-              <v-switch
-                v-model="isPtMode"
-                hide-details
-                class="ma-0 pa-0"
-                :label="isPtMode ? 'ON' : 'OFF'"
-              ></v-switch>
-            </v-row>
+        <v-list tile flatclass="menu__list">
+          <v-list-item>
+            <v-list-item-title class="mr-5">
+              ポイント入力
+            </v-list-item-title>
+            <v-switch
+              dense
+              v-model="isPtMode"
+              inset
+              hide-details
+              class="ma-0 pa-0"
+            ></v-switch>
           </v-list-item>
-          <v-divider></v-divider>
-          <v-list-item @click="openPlayersModal" class="py-3">
-            <v-icon>{{ icons.mdiAccount }}</v-icon>
-            <div class="list-title">プレイヤー変更</div>
+          <v-list-item @click="openPlayersModal">
+            <v-list-item-title>
+              プレイヤー変更
+            </v-list-item-title>
           </v-list-item>
-          <v-divider></v-divider>
-          <v-list-item @click="deleteScoreBoard" class="py-3">
-            <v-icon>{{ icons.mdiDelete }}</v-icon>
-            <div class="list-title">削除</div>
+          <v-list-item @click="deleteScoreBoard">
+            <v-list-item-title>
+              削除
+            </v-list-item-title>
           </v-list-item>
-          <v-divider></v-divider>
-          <v-list-item @click="endScoreBoard" class="py-3">
-            <v-icon>{{ icons.mdiClose }}</v-icon>
-            <div class="list-title">終了</div>
+          <v-list-item @click="endScoreBoard">
+            <v-list-item-title>
+              終了
+            </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
-    </v-app-bar>
+    </AppBar>
 
     <!-- カルーセル -->
-    <v-content style="height: 100%">
-      <v-container fluid class="pa-0" style="height: 100%">
-        <v-carousel
-          light
-          v-model="nav"
-          :continuous="false"
-          :hide-delimiters="true"
-          :show-arrows="false"
-          height="100%"
-          touchless
-        >
-          <v-carousel-item>
-            <Score />
-          </v-carousel-item>
-          <v-carousel-item>
-            <Data />
-          </v-carousel-item>
-          <v-carousel-item>
-            <Graph />
-          </v-carousel-item>
-        </v-carousel>
-      </v-container>
-    </v-content>
+    <v-main>
+      <v-carousel
+        light
+        v-model="nav"
+        :continuous="false"
+        :hide-delimiters="true"
+        :show-arrows="false"
+        height="100%"
+        touchless
+      >
+        <v-carousel-item>
+          <Score></Score>
+        </v-carousel-item>
+        <v-carousel-item>
+          <!-- <Data /> -->
+        </v-carousel-item>
+        <v-carousel-item>
+          <!-- <Graph /> -->
+        </v-carousel-item>
+      </v-carousel>
+    </v-main>
+    <!-- <v-container fluid class="pa-0" style="height: 100%">
+    </v-container> -->
 
-    <!-- ナビゲーション -->
     <v-bottom-navigation v-model="nav" grow app color="teal">
       <v-btn>
         <span>成績表</span>
-        <v-icon>{{ icons.mdiFormatListNumbered }}</v-icon>
+        <v-icon>mdi-format-list-numbered</v-icon>
       </v-btn>
       <v-btn>
         <span>集計</span>
-        <v-icon>{{ icons.mdiChartBar }}</v-icon>
+        <v-icon>mdi-chart-bar</v-icon>
       </v-btn>
       <v-btn>
         <span>グラフ</span>
-        <v-icon>{{ icons.mdiChartTimelineVariant }}</v-icon>
+        <v-icon>mdi-chart-timeline-variant</v-icon>
       </v-btn>
     </v-bottom-navigation>
 
-    <!-- モーダル -->
-    <PlayersChange ref="playersChange" />
+    <!-- <PlayersChange ref="playersChange" /> -->
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import Score from "@/components/ScoreBoard/Score.vue";
-import Data from "@/components/ScoreBoard/Data.vue";
-import Graph from "@/components/ScoreBoard/Graph.vue";
-import PlayersChange from "@/components/ScoreBoard/PlayersChange.vue";
+import AppBar from "@/components/shared/AppBar.vue";
+import Score from "@/views/scoreBoard/Score.vue";
+// import Data from "@/components/ScoreBoard/Data.vue";
+// import Graph from "@/components/ScoreBoard/Graph.vue";
+// import PlayersChange from "@/components/ScoreBoard/PlayersChange.vue";
+
+import { ScoreBoard } from "@/models/scoreBoard";
 
 @Component({
   components: {
+    AppBar,
     Score,
-    Data,
-    Graph,
-    PlayersChange,
+    // Data,
+    // Graph,
+    // PlayersChange,
   },
 })
-export default class ScoreBoard extends Vue {
+export default class ScoreBoardPage extends Vue {
   showMenu = false;
   nav = 0;
 
-  // ポイント入力
-  isPtMode = this.$store.getters["ScoreBoard/isPtMode"];
+  isPtMode = this.$store.getters["scoreBoard/inputMode"] === "pt";
 
-  // ルール変更用
-  ruleChange = {};
+  // get scoreBoard() {
+  //   return this.$store.getters["scoreBoard/scoreBoard"];
+  // }
 
   @Watch("isPtMode")
   changeIsPtMode() {
-    this.$store.dispatch("ScoreBoard/changeIsPtMode", this.isPtMode);
+    this.$store.dispatch(
+      "scoreBoard/changeInputMode",
+      this.isPtMode ? "pt" : "score"
+    );
   }
 
-  get isLogin() {
-    return this.$store.getters["User/user"].isLogin;
+  created() {
+    this.$store
+      .dispatch("scoreBoard/startScoreBoardListener", this.$route.params.id)
+      .catch((err) => {
+        this.$store.dispatch("app/error", err);
+      });
   }
 
   openPlayersModal() {
@@ -149,36 +146,16 @@ export default class ScoreBoard extends Vue {
     this.$store.dispatch("ScoreBoard/endScoreBoard");
     this.$router.push({ name: "Home" });
   }
-
-  getEditedRule() {
-    this.$store.dispatch("ScoreBoard/changeRule", this.ruleChange);
-  }
 }
 </script>
 
 <style lang="scss" scoped>
 .scoreBoard {
   height: 100%;
+  width: 100%;
 }
-</style>
-<style lang="scss">
-.scoreBoard-menu-list {
+.menu__list {
   .v-list-item {
-    text-align: center;
-    display: flex;
-    .v-icon {
-      position: relative;
-      top: -1px;
-    }
-    .list-title {
-      margin-left: 10px;
-      flex: 1;
-    }
-    &--active {
-      .v-icon {
-        color: rgba(0, 0, 0, 0.54) !important;
-      }
-    }
     &:hover {
       background: rgba(0, 0, 0, 0.05);
       @include sp {
@@ -189,5 +166,9 @@ export default class ScoreBoard extends Vue {
       min-height: 0;
     }
   }
+}
+
+.v-main {
+  height: 100%;
 }
 </style>

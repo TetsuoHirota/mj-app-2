@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import { db } from '@/firebase';
 import firebase from 'firebase/app';
+import 'firebase/firestore';
 
-import { ScoreBoard, Rule } from '@/models/scoreBoard';
+import { ScoreBoard, Rule, InputMode } from '@/models/scoreBoard';
 import { UserInfo } from '@/models/user';
 
 // firestoreのための配列→オブジェクト変換
@@ -19,18 +20,32 @@ function formatNestedArray(arr: any) {
 
 let unsubscribeScoreBoardIds: any = null;
 let unsubscribeScoreBoards: any = null;
+let unsubscribeScoreBoard: any = null;
 
 interface State {
   scoreBoards: ScoreBoard[];
   scoreBoard: ScoreBoard;
+  inputMode: InputMode
 }
 
 const state = () => ({
   scoreBoards: [],
-  scoreBoard: []
+  scoreBoard: {},
+  inputMode: localStorage.getItem('inputMode') || 'pt'
 })
 
 const mutations = {
+  setScoreBoards: (state: State, scoreBoards: ScoreBoard[]) => {
+    state.scoreBoards = scoreBoards;
+  },
+
+  setScoreBoard: (state: State, scoreBoard: ScoreBoard) => {
+    state.scoreBoard = scoreBoard;
+  },
+
+  changeInputMode: (state: State, inputMode: InputMode) => {
+    state.inputMode = inputMode;
+  },
 
   resetScoreBoard: (state: any) => {
     state.id = ""
@@ -85,9 +100,6 @@ const mutations = {
     state.chips = chips
   },
 
-  changeIsPtMode: (state: any, isPtMode: boolean) => {
-    state.isPtMode = isPtMode
-  }
 }
 
 const actions = {
@@ -107,9 +119,9 @@ const actions = {
     await db.collection("scores").add({
       players: players,
       rule: rule,
-      scores: [],
+      scoress: [],
       chips: [],
-      createdAt: new Date
+      createdAt: firebase.firestore.Timestamp.fromDate(new Date())
     } as ScoreBoard).then(doc => {
       id = doc.id;
       return dispatch("addPlayerScoreBoardId", { uid: user.uid, scoreBoardId: doc.id })
@@ -124,24 +136,54 @@ const actions = {
     })
   },
 
-  startScoreBoardsListener: ({ rootGetters }: any) => {
+  startScoreBoardsListener: ({ rootGetters, commit }: any) => {
     const user: UserInfo = rootGetters['user/user'];
-    const scoreBoardIds: string[] = [];
-    console.log(user.uid)
     unsubscribeScoreBoardIds = db.collection('users').doc(user.uid).onSnapshot((doc: any) => {
       const scoreBoardIds: string[] = doc.data().scoreBoardIds;
+      const scoreBoards: ScoreBoard[] = [];
       unsubscribeScoreBoards = db.collection('scores').onSnapshot((snapshot) => {
-        const scoreBoards: ScoreBoard[] = [];
         snapshot.docChanges().forEach((change: any) => {
-          if (scoreBoardIds.includes(change.doc.id)) [
-            scoreBoards.push(change.doc.data())
+          const id = change.doc.id;
+          const data = change.doc.data();
+          if (scoreBoardIds.includes(id)) [
+            scoreBoards.push({
+              ...data,
+              createdAt: data.createdAt.toDate(),
+              id: id
+            })
           ]
-          // commit('setScores', change.doc.data())
         });
-        console.log(scoreBoards)
+        commit('setScoreBoards', scoreBoards)
       });
-      console.log(doc.data())
+
     })
+  },
+
+  startScoreBoardListener: ({ commit }: any, id: string) => {
+    return new Promise((resolve, reject) => {
+      unsubscribeScoreBoard = db.collection('scores').doc(id).onSnapshot(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (!data) {
+            reject('データが存在しません')
+          } else {
+            commit('setScoreBoard', {
+              ...data,
+              createdAt: data.createdAt.toDate(),
+              id: id
+            });
+            resolve(doc)
+          }
+        } else {
+          reject('成績表が見つかりません')
+        }
+      })
+    })
+  },
+
+  changeInputMode: ({ commit }: any, inputMode: InputMode) => {
+    localStorage.setItem('inputMode', inputMode);
+    commit('changeInputMode', inputMode);
   },
 
   deleteScoreBoard: ({ commit, state, rootGetters }: any) => {
@@ -201,11 +243,14 @@ const actions = {
   },
 
   // スコア関連
-  changeScores: ({ commit, state, rootGetters }: any, { index, scores }: any) => {
-    const me = rootGetters["User/user"]
-    commit("changeScores", { index: index, scores: scores })
-    if (me.isLogin) db.collection("scores").doc(state.id).update({
-      scores: formatNestedArray(state.scores)
+  saveScores: ({ commit, state, rootGetters }: any, { index, scores }: any) => {
+    // commit("changeScores", { index: index, scores: scores })
+    console.debug(state.scoreBoard);
+    const scoress = state.scoreBoard.scoress
+    scoress[index - 1] = scores
+
+    db.collection("scores").doc(state.scoreBoard.id).update({
+      scoress: formatNestedArray(scoress)
     })
   },
 
@@ -227,16 +272,21 @@ const actions = {
     })
   },
 
-  // 入力モード切り替え
-  changeIsPtMode: ({ commit }: any, isPtMode: boolean) => {
-    commit("changeIsPtMode", isPtMode)
-  }
 }
 
 const getters = {
   scoreBoards: (state: State) => {
     return state.scoreBoards
   },
+
+  scoreBoard: (state: State) => {
+    return state.scoreBoard
+  },
+
+  inputMode: (state: State) => {
+    return state.inputMode;
+  },
+
   state: (state: any) => {
     return state
   },
@@ -261,9 +311,6 @@ const getters = {
     return state.players
   },
 
-  isPtMode: (state: any) => {
-    return state.isPtMode
-  }
 }
 
 export default {

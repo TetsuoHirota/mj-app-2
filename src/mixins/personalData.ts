@@ -9,7 +9,7 @@ export default class PersonalData extends Vue {
 
   getRanks(scoreBoard: any) {
     const ranks: number[] = []
-    Object.values(scoreBoard.scores).forEach((data: any) => {
+    Object.values(scoreBoard.scoress).forEach((data: any) => {
       data.forEach((e: any) => {
         if (e.uid === this.me.uid) ranks.push(e.rank)
       })

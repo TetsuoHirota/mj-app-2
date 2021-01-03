@@ -1,11 +1,14 @@
 import { UserInfo } from './user';
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 
+export type Round = 'goshya' | 'sisya' | 'kirisute' | 'kiriage';
 export interface Rule {
   playerNumber: number;
   rate: number;
   chip: number;
   defaultScore: number;
-  round: 'goshya' | 'sisya' | 'kirisute' | 'kiriage';
+  round: Round,
   tobisyou: number;
   oka: number;
   uma4?: [number, number];
@@ -15,15 +18,18 @@ export interface Rule {
 
 export interface Score {
   uid: string,
-  pt: number,
-  score: number,
-  rank: number
+  pt: number | null,
+  score: number | null,
+  rank: number | null
 }
 
 export interface ScoreBoard {
   id?: string,
   players: UserInfo[];
-  scores: Score[][];
+  scoress: Score[][];
   rule: Rule;
-  createdAt: Date;
+  createdAt: Date | firebase.firestore.Timestamp;
 }
+
+export type InputMode = 'pt' | 'score'
+
