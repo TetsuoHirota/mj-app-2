@@ -16,9 +16,9 @@
             v-for="item in data"
             :key="item.uid"
           >
-            <v-button v-if="sameScore" icon class="handle handler">
+            <v-btn v-if="sameScore" icon class="handle handler">
               <v-icon>mdi-menu</v-icon>
-            </v-button>
+            </v-btn>
             <div class="item__name bosy-2">
               {{ item.name }}
             </div>
@@ -233,38 +233,34 @@ export default class ScoreChange extends Vue {
   }
 
   // scorePt変換
-  getPt() {
+  getPt(): (Score & UserInfo)[] {
     const { scoreBoard, data, isPtMode } = this;
     if (!scoreBoard) {
       this.$store.dispatch("app/error", "成績表が見つかりません");
-      return false;
+      return [];
     }
     const { rule } = scoreBoard;
-
     // 入力のあるitemのみの配列にへんかん
     const scores = data.filter((item: any) => {
       return isFinite(isPtMode ? item.pt : item.score);
     });
-
-    console.debug(scores);
-
     if (isPtMode) {
       return scores;
     }
-
     // スコアの高い順に並び替え
     scores.sort((a: any, b: any) => b.score - a.score);
     let firstBonus = 0; //一位に追加されるpt
-    let tobiBonus = 0; //飛ばした人に追加されるscore
-
+    let tobiBonus = scores.reduce(
+      (acc, cur) => acc + (cur.score && cur.score < 0 ? rule.tobisyou : 0),
+      0
+    );
     for (let i = 1; i < scores.length; i++) {
       const score = scores[i].score;
       if (score == null) {
         this.$store.dispatch("app/error", "計算でエラーが発生しました");
-        return;
+        return [];
       }
       let calculatedScore = score - rule.oka;
-
       // 飛ばし処理
       if (this.tobashiId && score < 0) {
         calculatedScore -= rule.tobisyou;
@@ -273,18 +269,14 @@ export default class ScoreChange extends Vue {
       if (this.tobashiId === scores[i].uid) {
         calculatedScore += tobiBonus;
       }
-
       let uma = 0;
-
       if (rule.playerNumber === 4) {
         uma =
-          i === 1 ? rule.uma[1] : i === 2 ? rule.uma[1] * -1 : rule.uma[0] * -1;
+          i === 1 ? rule.uma[0] : i === 2 ? rule.uma[0] * -1 : rule.uma[1] * -1;
       } else {
-        uma = i === 1 ? rule.uma[1] : rule.uma[0] * -1;
+        uma = i === 1 ? rule.uma[0] : rule.uma[1] * -1;
       }
-
       const pt = round(rule.round, calculatedScore) + uma;
-
       firstBonus -= pt;
       scores[i].rank = i + 1;
       scores[i].pt = pt;
@@ -292,13 +284,10 @@ export default class ScoreChange extends Vue {
 
     scores[0].rank = 1;
     scores[0].pt = firstBonus;
-
     return scores;
   }
 
   inputAuto(item: Score & UserInfo) {
-    console.debug("d");
-
     const { scoreBoard, data, isPtMode } = this;
     if (!scoreBoard) {
       return;
@@ -327,16 +316,15 @@ export default class ScoreChange extends Vue {
   saveScore() {
     const { data, isPtMode } = this;
     if (this.validate()) {
-      // 前データ削除
-      data.forEach((e: any) => {
-        e.rank = null;
-        if (this.isPtMode) {
-          e.score = null;
-        } else {
-          e.pt = null;
-        }
+      const scores: Score[] = this.getPt().map((e) => {
+        const score: Score = {
+          uid: e.uid,
+          pt: e.pt,
+          score: e.score,
+          rank: e.rank,
+        };
+        return score;
       });
-      const scores = this.getPt();
       this.$store.dispatch("scoreBoard/saveScores", {
         index: this.index,
         scores: scores,
@@ -347,10 +335,10 @@ export default class ScoreChange extends Vue {
 
   deleteScore() {
     const result = confirm("本当に削除しますか？");
-    // if (result) {
-    //   this.$store.dispatch("ScoreBoard/deleteScores", this.index);
-    //   this.close();
-    // }
+    if (result) {
+      this.$store.dispatch("scoreBoard/deleteScores", this.index);
+      this.close();
+    }
   }
 }
 </script>
@@ -413,8 +401,8 @@ export default class ScoreChange extends Vue {
 }
 
 .handler {
-  margin-left: -10px;
-  margin-right: 10px;
+  margin-left: -15px;
+  margin-right: 5px;
   animation: shake 2s infinite;
 }
 </style>
