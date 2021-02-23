@@ -2,7 +2,7 @@
   <div class="score">
     <header>
       <div class="tr-head"></div>
-      <div class="tr-body" v-for="player in players" :key="player.uid">
+      <div v-for="player in players" :key="player.uid" class="tr-body">
         <v-btn class="name-btn" text @click="openPlayersModal">
           {{ player.name }}
         </v-btn>
@@ -10,14 +10,14 @@
     </header>
 
     <body>
-      <div class="body__row" v-for="index in gameNumber" :key="index">
+      <div v-for="index in gameNumber" :key="index" class="body__row">
         <div class="tr-head">{{ index }}</div>
         <div
-          class="tr-body"
           v-for="player in players"
           :key="player.uid"
+          class="tr-body"
           :class="{
-            minus: getPtFromScores(index, player.uid).isMinus,
+            minus: getPtFromScores(index, player.uid).isMinus
           }"
         >
           {{ getPtFromScores(index, player.uid).pt }}
@@ -97,7 +97,7 @@
       @click.stop="openChipsModal"
     >
       <img
-        style="height: 20px;"
+        style="height: 20px"
         src="@/assets/svgs/casino-chip-white.svg"
         alt=""
       />
@@ -129,10 +129,10 @@ import ScoreChange from "@/components/scoreBoard/ScoreChange.vue";
 
 @Component({
   components: {
-    ScoreChange,
+    ScoreChange
     // PlayersChange,
     // ChipsChange,
-  },
+  }
 })
 export default class Score extends Vue {
   get scoreBoard(): ScoreBoard {
@@ -172,7 +172,7 @@ export default class Score extends Vue {
     }
     return {
       pt: pt,
-      isMinus: isMinus,
+      isMinus: isMinus
     };
   }
 
@@ -202,64 +202,64 @@ $tr-head: 30px;
 $tr-body: 75px;
 
 .score {
-  height: 100%;
-  overflow-x: auto;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  height: 100%;
+  overflow-x: auto;
   font-size: 0.9rem;
 }
 
 .tr-head {
-  flex: 0 0 $tr-head;
-  min-width: $tr-head;
   display: flex;
-  justify-content: center;
+  flex: 0 0 $tr-head;
   align-items: center;
+  justify-content: center;
+  min-width: $tr-head;
 }
 
 .tr-body {
-  flex: 1 0 $tr-body;
-  min-width: $tr-body;
   display: flex;
-  justify-content: center;
+  flex: 1 0 $tr-body;
   align-items: center;
+  justify-content: center;
+  min-width: $tr-body;
 }
 
 header {
+  display: flex;
   padding: $padding;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: 0px -1px 10px 0px rgba(0, 0, 0, 0.12);
-  display: flex;
   .tr-body {
     .v-btn {
+      width: calc(100% - 8px);
+      min-width: 0;
+      max-width: 200px;
       padding: 0 !important;
       margin: 0 4px;
-      font-size: 0.875rem;
       overflow: hidden;
+      font-size: 0.875rem;
       text-transform: none;
-      width: calc(100% - 8px);
-      max-width: 200px;
-      min-width: 0;
     }
   }
 }
 
 body {
+  display: flex;
+  flex-flow: column;
   height: 100%;
   padding: 0 $padding;
   overflow-y: auto;
-  display: flex;
-  flex-flow: column;
   &::-webkit-scrollbar {
     @media (min-width: $sp) {
       display: none;
     }
   }
   .body__row {
+    position: relative;
     display: flex;
     min-height: 30px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    position: relative;
     &:last-of-type {
       border: none;
     }
@@ -292,8 +292,8 @@ footer {
   $distance-lg: 80px;
 
   @include sp {
-    height: $size-sp;
     width: $size-sp;
+    height: $size-sp;
   }
   &__player {
     right: calc(#{$right-lg} + (#{$distance-lg} * 2));

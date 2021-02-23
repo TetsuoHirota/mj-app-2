@@ -10,11 +10,11 @@
           ghost-class="list__item--drag"
         >
           <v-row
+            v-for="item in data"
+            :key="item.uid"
             class="list__item py-5"
             no-gutters
             align="center"
-            v-for="item in data"
-            :key="item.uid"
           >
             <v-btn v-if="sameScore" icon class="handle handler">
               <v-icon>mdi-menu</v-icon>
@@ -26,7 +26,6 @@
               <v-text-field
                 hide-details
                 type="number"
-                @input="(value) => handleInput(item, value)"
                 :index="index"
                 :value="
                   isPtMode
@@ -35,6 +34,7 @@
                     ? item.score / 100
                     : item.score
                 "
+                @input="value => handleInput(item, value)"
               >
                 <template v-if="!isPtMode" slot="append">
                   <span class="zeros">00</span>
@@ -101,8 +101,8 @@ import draggable from "vuedraggable";
 
 @Component({
   components: {
-    draggable,
-  },
+    draggable
+  }
 })
 export default class ScoreChange extends Vue {
   scoreBoard?: ScoreBoard;
@@ -133,7 +133,7 @@ export default class ScoreChange extends Vue {
   get sameScore() {
     const scores: number[] = [];
     let result = false;
-    this.data.forEach((item) => {
+    this.data.forEach(item => {
       if (!this.isPtMode && item.score) {
         if (scores.includes(item.score)) {
           result = true;
@@ -167,11 +167,11 @@ export default class ScoreChange extends Vue {
         uid: player.uid,
         pt: null,
         score: null,
-        rank: null,
+        rank: null
       };
       this.data.push({
         ...player,
-        ...score,
+        ...score
       });
     });
   }
@@ -185,7 +185,7 @@ export default class ScoreChange extends Vue {
   }
 
   handleInput(item: Score & UserInfo, value: number) {
-    const target = this.data.find((d) => {
+    const target = this.data.find(d => {
       return d.uid === item.uid;
     });
     if (!target) {
@@ -206,7 +206,7 @@ export default class ScoreChange extends Vue {
     }
     const { id, players, scoress, rule, createdAt } = scoreBoard;
 
-    const inputNumber = data.filter((item) => {
+    const inputNumber = data.filter(item => {
       return Number.isFinite(isPtMode ? item.pt : item.score);
     }).length;
 
@@ -294,7 +294,7 @@ export default class ScoreChange extends Vue {
     }
     const { rule } = scoreBoard;
 
-    const playerData = data.find((d) => {
+    const playerData = data.find(d => {
       return d.uid === item.uid;
     });
     if (!playerData) {
@@ -316,18 +316,18 @@ export default class ScoreChange extends Vue {
   saveScore() {
     const { data, isPtMode } = this;
     if (this.validate()) {
-      const scores: Score[] = this.getPt().map((e) => {
+      const scores: Score[] = this.getPt().map(e => {
         const score: Score = {
           uid: e.uid,
           pt: e.pt,
           score: e.score,
-          rank: e.rank,
+          rank: e.rank
         };
         return score;
       });
       this.$store.dispatch("scoreBoard/saveScores", {
         index: this.index,
-        scores: scores,
+        scores: scores
       });
       this.close();
     }
@@ -356,8 +356,8 @@ export default class ScoreChange extends Vue {
   $sec: 0.3s;
   &-enter {
     &-active {
-      overflow: hidden;
       max-height: 0;
+      overflow: hidden;
       transition: all $sec linear;
     }
     &-to {
@@ -366,8 +366,8 @@ export default class ScoreChange extends Vue {
   }
   &-leave {
     &-active {
-      overflow: hidden;
       max-height: 100px;
+      overflow: hidden;
       transition: all $sec linear;
     }
     &-to {
@@ -401,8 +401,8 @@ export default class ScoreChange extends Vue {
 }
 
 .handler {
-  margin-left: -15px;
   margin-right: 5px;
+  margin-left: -15px;
   animation: shake 2s infinite;
 }
 </style>
@@ -418,8 +418,8 @@ export default class ScoreChange extends Vue {
       @include text-ellipsis;
     }
     .item__input {
-      flex: 0 0 auto;
       display: flex;
+      flex: 0 0 auto;
       justify-content: center;
       font-size: 20px;
       .v-input {
@@ -430,12 +430,12 @@ export default class ScoreChange extends Vue {
         }
       }
       .v-input__append-inner {
-        align-self: stretch;
         align-items: flex-end;
-        color: rgba(0, 0, 0, 0.6);
-        margin: 0;
+        align-self: stretch;
         padding: 4px 0;
+        margin: 0;
         font-size: 16px;
+        color: rgba(0, 0, 0, 0.6);
       }
       .input__append {
         display: flex;
@@ -444,18 +444,18 @@ export default class ScoreChange extends Vue {
         // color: rgba(0, 0, 0, 0.86);
       }
       .input__autoinput {
-        margin-left: 10px;
-        font-size: 10px;
-        padding: 0;
+        position: relative;
         display: flex;
         justify-content: center;
-        position: relative;
+        padding: 0;
+        margin-left: 10px;
+        font-size: 10px;
       }
     }
     &:first-of-type .input__autoinput::after {
-      content: "自動入力";
       position: absolute;
       bottom: 40px;
+      content: "自動入力";
     }
   }
 }

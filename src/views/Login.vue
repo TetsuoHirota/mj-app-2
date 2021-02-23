@@ -35,20 +35,20 @@ export default class Login extends Vue {
           email: user.email,
           mid: "",
           name: "",
-          scoreBoardIds: [],
+          scoreBoardIds: []
         };
         info.isNewUser ? this.signUp(userInfo) : this.login();
         return false;
       },
-      uiShown: () => console.debug("uishown"),
+      uiShown: () => console.debug("uishown")
     },
     signInOptions: [
       {
         provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-        requireDisplayName: false,
+        requireDisplayName: false
       },
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    ],
+      firebase.auth.GoogleAuthProvider.PROVIDER_ID
+    ]
   };
 
   mounted() {
@@ -61,7 +61,7 @@ export default class Login extends Vue {
       .then(() => {
         this.$router.push({ name: "home" });
       })
-      .catch((err) => {
+      .catch(err => {
         throw new Error(err);
       });
   }
@@ -74,7 +74,7 @@ export default class Login extends Vue {
         console.debug("logined");
         this.$router.push({ name: "home" });
       })
-      .catch((err) => {
+      .catch(err => {
         throw new Error(err);
       });
   }
@@ -85,20 +85,20 @@ export default class Login extends Vue {
 .firebaseui {
   align-self: center;
   ul {
-    list-style: none;
     padding: 0 !important;
+    list-style: none;
   }
 }
 </style>
 
 <style lang="scss" scoped>
 .login {
-  height: 100%;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   padding: 20px;
 }
 

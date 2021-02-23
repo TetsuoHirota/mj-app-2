@@ -75,7 +75,7 @@
         <v-btn
           v-if="mode == 'normal'"
           absolute
-          style="top: 0; left: 0; padding: 0;"
+          style="top: 0; left: 0; padding: 0"
           height="100%"
           width="100%"
           color="transparent"
@@ -101,7 +101,7 @@
             fab
             small
             absolute
-            style="top: -15px; right: -15px; z-index: 202;"
+            style="top: -15px; right: -15px; z-index: 202"
             color="green"
             @click="editRule(rule)"
           >
@@ -119,7 +119,7 @@
             fab
             small
             absolute
-            style="top: -15px; right: -15px; z-index: 202;"
+            style="top: -15px; right: -15px; z-index: 202"
             color="red"
             @click="deleteRule(rule.id)"
           >
@@ -138,7 +138,7 @@
       direction="top"
       transition="slide-y-reverse-transition"
     >
-      <template v-slot:activator>
+      <template #activator>
         <v-btn v-model="fab" color="blue darken-2" dark fab>
           <v-icon v-if="fab">{{ icons.mdiClose }}</v-icon>
           <v-icon v-else>{{ icons.mdiPlus }}</v-icon>
@@ -195,8 +195,8 @@ import RuleConfig from "@/mixins/ruleConfig";
 @Component({
   components: {
     RuleAdd,
-    RuleChange,
-  },
+    RuleChange
+  }
 })
 export default class Rules extends Mixins(RuleConfig) {
   // 表示関連
@@ -260,8 +260,8 @@ export default class Rules extends Mixins(RuleConfig) {
 .btn__previous-game {
   margin: 10px 20px;
   @include sp {
-    margin: 8px 0;
     height: 30px !important;
+    margin: 8px 0;
     font-size: 0.9rem;
   }
 }
@@ -269,8 +269,8 @@ export default class Rules extends Mixins(RuleConfig) {
 .cards {
   position: relative;
   display: grid;
-  justify-content: center;
   grid-template-columns: repeat(auto-fit, minmax(300px, 500px));
+  justify-content: center;
 }
 
 .card {
@@ -280,40 +280,40 @@ export default class Rules extends Mixins(RuleConfig) {
   }
   .v-card__text {
     display: grid;
-    grid-auto-flow: column;
     grid-template-rows: repeat(3, auto);
     grid-template-columns: repeat(2, 1fr);
+    grid-auto-flow: column;
   }
 }
 
 .fab-comment {
   position: absolute;
-  padding: 0 5px;
-  transform: translate(-50%, -50%);
   top: 50%;
   left: -22px;
+  padding: 0 5px;
   font-size: 14px;
   font-weight: 400;
   color: rgba(0, 0, 0, 0.9);
+  transform: translate(-50%, -50%);
   &::before {
-    content: "";
-    z-index: -1;
     position: absolute;
     top: 0;
     left: 0;
-    height: 100%;
+    z-index: -1;
     width: 100%;
-    border-radius: 5px;
+    height: 100%;
+    content: "";
     background: rgba(255, 255, 255, 0.8);
     filter: blur(2px);
+    border-radius: 5px;
   }
 }
 
 .btn {
   &-enter-active,
   &-leave-active {
-    transition: transform opacity;
     position: absolute;
+    transition: transform opacity;
   }
   &-enter,
   &-leave-to {
@@ -328,37 +328,37 @@ export default class Rules extends Mixins(RuleConfig) {
   .v-speed-dial__list {
     .speed-dial {
       &__add::after {
-        content: "追加";
         position: absolute;
         right: 48px;
-        color: rgba(0, 0, 0, 0.8);
-        font-size: 14px;
-        box-shadow: none;
-        border-radius: 5px;
-        background: rgba(255, 255, 255, 0.8);
         padding: 5px 10px;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.8);
+        content: "追加";
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 5px;
+        box-shadow: none;
       }
       &__edit::after {
-        content: "編集";
         position: absolute;
         right: 48px;
-        color: rgba(0, 0, 0, 0.8);
-        font-size: 14px;
-        box-shadow: none;
-        border-radius: 5px;
-        background: rgba(255, 255, 255, 0.8);
         padding: 5px 10px;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.8);
+        content: "編集";
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 5px;
+        box-shadow: none;
       }
       &__delete::after {
-        content: "削除";
         position: absolute;
         right: 48px;
-        color: rgba(0, 0, 0, 0.8);
-        font-size: 14px;
-        box-shadow: none;
-        border-radius: 5px;
-        background: rgba(255, 255, 255, 0.8);
         padding: 5px 10px;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.8);
+        content: "削除";
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 5px;
+        box-shadow: none;
       }
     }
   }

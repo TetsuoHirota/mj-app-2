@@ -45,8 +45,8 @@ import PersonalData from "@/mixins/personalData";
       const month = date.getMonth() + 1;
       const day = date.getDate();
       return `${year} / ${month} / ${day}`;
-    },
-  },
+    }
+  }
 })
 export default class History extends Mixins(PersonalData) {
   get isLogin() {

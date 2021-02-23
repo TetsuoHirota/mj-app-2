@@ -26,7 +26,7 @@
       </v-carousel-item>
     </v-carousel>
 
-    <v-bottom-navigation app v-model="nav" grow color="indigo">
+    <v-bottom-navigation v-model="nav" app grow color="indigo">
       <v-btn>
         <span>成績表</span>
         <v-icon>mdi-pencil</v-icon>
@@ -51,8 +51,8 @@ import ScoreBoards from "@/views/home/ScoreBoards.vue";
 @Component({
   components: {
     AppBar,
-    ScoreBoards,
-  },
+    ScoreBoards
+  }
 })
 export default class Home extends Vue {
   nav = 0;
@@ -61,10 +61,10 @@ export default class Home extends Vue {
 
 <style lang="scss" scoped>
 .home {
-  height: 100%;
-  width: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 
 .v-crousel {

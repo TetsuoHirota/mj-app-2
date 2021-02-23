@@ -1,15 +1,16 @@
 <template>
-<div class="graph">
-  <GraphChartJs
-    class="chartjs"
-    :chartData="chartData"
-    :chartOptions="chartOptions"/>
-</div>
+  <div class="graph">
+    <GraphChartJs
+      class="chartjs"
+      :chart-data="chartData"
+      :chart-options="chartOptions"
+    />
+  </div>
 </template>
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import GraphChartJs from './GraphChartJs.vue'
-import ScoreCalc from '@/mixins/scoreCalc'
+import { Component, Mixins } from "vue-property-decorator";
+import GraphChartJs from "./GraphChartJs.vue";
+import ScoreCalc from "@/mixins/scoreCalc";
 
 @Component({
   components: {
@@ -17,97 +18,91 @@ import ScoreCalc from '@/mixins/scoreCalc'
   }
 })
 export default class Graph extends Mixins(ScoreCalc) {
-  colors = [
-    "#F44336",
-    "#9C27B0",
-    "#2196F3",
-    "#4CAF50",
-    "#FF9800",
-    "#795548",
-  ]
+  colors = ["#F44336", "#9C27B0", "#2196F3", "#4CAF50", "#FF9800", "#795548"];
 
   get players() {
-    return this.$store.getters['ScoreBoard/players']
+    return this.$store.getters["ScoreBoard/players"];
   }
 
   get scores() {
-    return this.$store.getters['ScoreBoard/scores']
+    return this.$store.getters["ScoreBoard/scores"];
   }
 
   get datasets() {
-    const datasets: any[] = []
+    const datasets: any[] = [];
     this.players.forEach((player: any, index: number) => {
-      const label = player.name
-      let total = 0
-      const data: number[] = []
+      const label = player.name;
+      let total = 0;
+      const data: number[] = [];
       this.scores.forEach((score: any) => {
         const playerScore = score.find((e: any) => {
-          return e.uid == player.uid
-        })
+          return e.uid == player.uid;
+        });
         if (playerScore !== undefined) {
-          total += playerScore.pt
-          data.push(total)
+          total += playerScore.pt;
+          data.push(total);
         } else {
-          data.push(total)
+          data.push(total);
         }
-      })
-      const color = this.colors[index]
+      });
+      const color = this.colors[index];
       datasets.push({
         label: label,
         data: data,
         fill: false,
         borderColor: color,
         backgroundColor: color,
-        lineTension: 0,
-      })
-    })
-    return datasets
+        lineTension: 0
+      });
+    });
+    return datasets;
   }
 
   get labels() {
-    const labels: number[] = []
+    const labels: number[] = [];
     for (let i = 0; i < this.scores.length; i++) {
-      labels.push(i + 1)
+      labels.push(i + 1);
     }
-    return labels
+    return labels;
   }
 
   get chartData() {
     return {
       labels: this.labels,
-      datasets: this.datasets,
-    }
+      datasets: this.datasets
+    };
   }
 
   chartOptions = {
     legend: {
-      position: 'bottom',
+      position: "bottom",
       labels: {
         boxWidth: 13,
-        padding: 20,
+        padding: 20
       }
     },
     scales: {
-      yAxes: [{
-        scaleLabel: {
-        },
-        ticks: {
-        },
-        gridLines: {
-          zeroLineWidth: 2,
+      yAxes: [
+        {
+          scaleLabel: {},
+          ticks: {},
+          gridLines: {
+            zeroLineWidth: 2
+          }
         }
-      }],
-      xAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: '半荘',
-          padding: 0,
-        },
-        ticks: {
+      ],
+      xAxes: [
+        {
+          scaleLabel: {
+            display: true,
+            labelString: "半荘",
+            padding: 0
+          },
+          ticks: {}
         }
-      }],
+      ]
     }
-  }
+  };
 }
 </script>
 
@@ -116,16 +111,15 @@ export default class Graph extends Mixins(ScoreCalc) {
   height: 100%;
   padding: 20px;
   .chartjs {
-    height: 100%;
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 100%;
     canvas {
-    max-height: 100%;
-    max-width: 600px;
+      max-width: 600px;
+      max-height: 100%;
     }
   }
 }
-
 </style>

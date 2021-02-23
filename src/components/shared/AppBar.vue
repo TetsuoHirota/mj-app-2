@@ -23,8 +23,8 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import Drawer from "@/components/shared/Drawer.vue";
 @Component({
   components: {
-    Drawer,
-  },
+    Drawer
+  }
 })
 export default class AppBar extends Vue {
   @Prop({ type: String, default: "麻雀成績管理" })

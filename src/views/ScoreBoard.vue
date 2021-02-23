@@ -2,39 +2,31 @@
   <div class="scoreBoard">
     <v-overlay :value="showMenu"></v-overlay>
     <AppBar title="成績表" is-back-active>
-      <v-menu left bottom :close-on-content-click="false" v-model="showMenu">
-        <template v-slot:activator="{ on }">
+      <v-menu v-model="showMenu" left bottom :close-on-content-click="false">
+        <template #activator="{ on }">
           <v-btn icon v-on="on">
             <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
         </template>
         <v-list tile flatclass="menu__list">
           <v-list-item>
-            <v-list-item-title class="mr-5">
-              ポイント入力
-            </v-list-item-title>
+            <v-list-item-title class="mr-5"> ポイント入力 </v-list-item-title>
             <v-switch
-              dense
               v-model="isPtMode"
+              dense
               inset
               hide-details
               class="ma-0 pa-0"
             ></v-switch>
           </v-list-item>
           <v-list-item @click="openPlayersModal">
-            <v-list-item-title>
-              プレイヤー変更
-            </v-list-item-title>
+            <v-list-item-title> プレイヤー変更 </v-list-item-title>
           </v-list-item>
           <v-list-item @click="deleteScoreBoard">
-            <v-list-item-title>
-              削除
-            </v-list-item-title>
+            <v-list-item-title> 削除 </v-list-item-title>
           </v-list-item>
           <v-list-item @click="endScoreBoard">
-            <v-list-item-title>
-              終了
-            </v-list-item-title>
+            <v-list-item-title> 終了 </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -43,8 +35,8 @@
     <!-- カルーセル -->
     <v-main>
       <v-carousel
-        light
         v-model="nav"
+        light
         :continuous="false"
         :hide-delimiters="true"
         :show-arrows="false"
@@ -97,11 +89,11 @@ import { ScoreBoard } from "@/models/scoreBoard";
 @Component({
   components: {
     AppBar,
-    Score,
+    Score
     // Data,
     // Graph,
     // PlayersChange,
-  },
+  }
 })
 export default class ScoreBoardPage extends Vue {
   showMenu = false;
@@ -124,7 +116,7 @@ export default class ScoreBoardPage extends Vue {
   created() {
     this.$store
       .dispatch("scoreBoard/startScoreBoardListener", this.$route.params.id)
-      .catch((err) => {
+      .catch(err => {
         this.$store.dispatch("app/error", err);
       });
   }
@@ -151,8 +143,8 @@ export default class ScoreBoardPage extends Vue {
 
 <style lang="scss" scoped>
 .scoreBoard {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 .menu__list {
   .v-list-item {

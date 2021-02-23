@@ -14,8 +14,8 @@
             </v-list-item-avatar>
             <v-list-item-content class="ma-0 pa-0">
               <v-list-item-title
-                v-text="friend.name"
                 class="font-weight-medium"
+                v-text="friend.name"
               ></v-list-item-title>
               <v-list-item-subtitle
                 v-text="'ID: ' + friend.mid"
@@ -53,8 +53,8 @@ import FriendDelete from "@/components/Friends/FriendDelete.vue";
 @Component({
   components: {
     FriendAdd,
-    FriendDelete,
-  },
+    FriendDelete
+  }
 })
 export default class Friends extends Vue {
   showFriendsAdd = false;
@@ -75,15 +75,15 @@ export default class Friends extends Vue {
 
 <style lang="scss" scoped>
 .friends {
-  height: 100%;
   display: grid;
   grid-template-rows: auto auto 1fr 100px;
+  height: 100%;
 }
 
 .v-list {
+  justify-self: center;
   width: 100%;
   overflow-y: auto;
-  justify-self: center;
   .v-list-item {
     &:hover {
       background: rgba(0, 0, 0, 0.05);

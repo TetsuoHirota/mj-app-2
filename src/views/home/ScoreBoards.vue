@@ -47,8 +47,8 @@
     </v-col>
     <v-fab-transition>
       <v-btn
-        class="add-button"
         v-show="showAddButton"
+        class="add-button"
         color="pink"
         dark
         fab
@@ -73,8 +73,8 @@ import scoreBoard from "@/store/modules/scoreBoard";
 
 @Component({
   components: {
-    RuleAddCard,
-  },
+    RuleAddCard
+  }
 })
 export default class ScoreBoards extends Vue {
   showAddButton = false;
@@ -114,8 +114,8 @@ export default class ScoreBoards extends Vue {
 
 <style lang="scss" scoped>
 .scoreboards {
-  height: 100%;
   position: relative;
+  height: 100%;
 }
 
 .list {
@@ -125,8 +125,8 @@ export default class ScoreBoards extends Vue {
 
 .add-button {
   position: absolute;
-  bottom: 25px;
   right: 25px;
+  bottom: 25px;
 }
 
 .cardinfo {
@@ -139,7 +139,7 @@ export default class ScoreBoards extends Vue {
 
 .cardinfo__text {
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

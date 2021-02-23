@@ -1,29 +1,26 @@
-import { ScoreBoard, Score, Rule, Round } from '@/models/scoreBoard';
-import { UserInfo } from '@/models/user';
+import { ScoreBoard, Score, Rule, Round } from "@/models/scoreBoard";
+import { UserInfo } from "@/models/user";
 
 export function getPlayerResults(scoreBoard: ScoreBoard) {
   const results: {
     [uid: string]: {
-      ranks: { index: number, rank: number }[]
-      avarageRank: number
-    }
+      ranks: { index: number; rank: number }[];
+      avarageRank: number;
+    };
   } = {};
   const players = scoreBoard.players;
-  return 3
+  return 3;
 }
-
 
 interface ScoreBoardResult extends ScoreBoard {
   table: {
-    uid: string,
-    pt: number | null,
-    score: number | null,
-    rank: number | null,
-    isMinus: boolean,
-  }[][],
-
+    uid: string;
+    pt: number | null;
+    score: number | null;
+    rank: number | null;
+    isMinus: boolean;
+  }[][];
 }
-
 
 function gosya(score: number) {
   const int = Math.floor(score / 1000);
@@ -105,16 +102,16 @@ function kirisute(score: number) {
 export function round(round: Round, score: number) {
   let rounded = 0;
   switch (round) {
-    case 'goshya':
+    case "goshya":
       rounded = gosya(score);
       break;
-    case 'sisya':
+    case "sisya":
       rounded = sisya(score);
       break;
-    case 'kirisute':
+    case "kirisute":
       rounded = kirisute(score);
       break;
-    case 'kiriage':
+    case "kiriage":
       rounded = kiriage(score);
       break;
   }

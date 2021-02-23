@@ -11,7 +11,7 @@
           <span class="display-2 font-weight-medium mr-2">{{ email }}</span
           >さん
         </p>
-        <v-subheader style="text-align: start; width: fit-content;">
+        <v-subheader style="width: fit-content; text-align: start">
           あなたのプロフィールを完成させてください。名前は後から変更できます。
         </v-subheader>
 
@@ -20,29 +20,27 @@
           <v-form ref="form" @submit.prevent>
             <v-col>
               <v-text-field
-                label="ID"
                 v-model="id"
-                @keyup.enter="validate"
+                label="ID"
                 type="text"
                 :rules="formRules.id"
                 :prepend-icon="icons.mdiCardAccountDetails"
+                @keyup.enter="validate"
               >
               </v-text-field>
               <v-text-field
-                label="名前"
                 v-model="name"
-                @keyup.enter="validate"
+                label="名前"
                 type="text"
                 :rules="formRules.name"
                 :prepend-icon="icons.mdiAccount"
                 hint="成績表に表示される名前です"
+                @keyup.enter="validate"
               >
               </v-text-field>
               <v-row>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="validate">
-                  決定
-                </v-btn>
+                <v-btn color="primary" @click="validate"> 決定 </v-btn>
               </v-row>
             </v-col>
           </v-form>
@@ -57,7 +55,7 @@
             </v-card-title>
             <v-card-text
               class="px-10 font-weight-medium"
-              style="color: rgba(0,0,0,.87)"
+              style="color: rgba(0, 0, 0, 0.87)"
             >
               <p>ID: {{ id }}</p>
               <p>名前: {{ name }}</p>
@@ -68,9 +66,7 @@
                 キャンセル
               </v-btn>
 
-              <v-btn color="primary" text @click="save">
-                保存
-              </v-btn>
+              <v-btn color="primary" text @click="save"> 保存 </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -85,7 +81,7 @@ import { db } from "@/firebase";
 import Utilities from "@/mixins/utilities.ts";
 
 @Component({
-  components: {},
+  components: {}
 })
 export default class Profile extends Mixins(Utilities) {
   dialog = false;
@@ -114,19 +110,19 @@ export default class Profile extends Mixins(Utilities) {
         (v: string) => (v && v.length < 20) || "長すぎます",
         (v: string) => (v && v.length > 4) || "短すぎます",
         (v: string) =>
-          (v && this.usedIds.indexOf(v) == -1) || "そのIDは既に存在しています",
+          (v && this.usedIds.indexOf(v) == -1) || "そのIDは既に存在しています"
       ],
       name: [
         (v: string) => !!v || "名前を入力してください",
-        (v: string) => (v && this.getLength(v) < 11) || "長すぎます",
-      ],
+        (v: string) => (v && this.getLength(v) < 11) || "長すぎます"
+      ]
     };
   }
 
   mounted() {
-    this.unsubscribe = db.collection("users").onSnapshot((querySnapshot) => {
+    this.unsubscribe = db.collection("users").onSnapshot(querySnapshot => {
       const ids: any = [];
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach(doc => {
         ids.push(doc.data().mid);
       });
       this.usedIds = ids;
@@ -146,7 +142,7 @@ export default class Profile extends Mixins(Utilities) {
   save() {
     this.$store.dispatch("User/changeProfile", {
       mid: this.id,
-      name: this.name,
+      name: this.name
     });
     this.$router.push({ name: "Home" });
   }
@@ -155,8 +151,8 @@ export default class Profile extends Mixins(Utilities) {
 
 <style lang="scss" scoped>
 .profile {
-  height: 100%;
   display: grid;
   grid-auto-rows: max-content 1fr;
+  height: 100%;
 }
 </style>

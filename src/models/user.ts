@@ -3,5 +3,5 @@ export interface UserInfo {
   email: string;
   mid: string;
   name: string;
-  scoreBoardIds: string[]
+  scoreBoardIds: string[];
 }

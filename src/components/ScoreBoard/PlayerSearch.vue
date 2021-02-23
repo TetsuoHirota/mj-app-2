@@ -25,8 +25,8 @@
             </v-list-item-avatar>
             <v-list-item-content class="ma-0 pa-0">
               <v-list-item-title
-                v-text="friend.name"
                 class="font-weight-medium"
+                v-text="friend.name"
               ></v-list-item-title>
               <v-list-item-subtitle
                 v-text="'ID: ' + friend.mid"
@@ -40,17 +40,15 @@
           <v-form ref="form">
             <v-text-field
               v-model="name"
-              @keyup.enter="saveNewName"
               type="text"
               :rules="rule"
               :prepend-icon="icons.mdiAccount"
               label="名前"
               class="mx-3"
+              @keyup.enter="saveNewName"
             ></v-text-field>
           </v-form>
-          <v-btn @click="saveNewName" color="primary">
-            決定
-          </v-btn>
+          <v-btn color="primary" @click="saveNewName"> 決定 </v-btn>
         </v-row>
       </v-card-text>
     </v-card>
@@ -61,7 +59,7 @@ import { Component, Mixins, Watch } from "vue-property-decorator";
 import Utilities from "@/mixins/utilities";
 
 @Component({
-  components: {},
+  components: {}
 })
 export default class PlayerSearch extends Mixins(Utilities) {
   show = false;
@@ -74,7 +72,7 @@ export default class PlayerSearch extends Mixins(Utilities) {
   name = "";
   rule = [
     (v: string) => !!v || "名前を入力してください",
-    (v: string) => (v && this.getLength(v) < 11) || "長すぎます",
+    (v: string) => (v && this.getLength(v) < 11) || "長すぎます"
   ];
 
   get friends() {
@@ -107,7 +105,7 @@ export default class PlayerSearch extends Mixins(Utilities) {
     const player = {
       uid: friend.uid,
       name: friend.name,
-      isLinked: true,
+      isLinked: true
     };
     this.save(player);
   }
@@ -120,7 +118,7 @@ export default class PlayerSearch extends Mixins(Utilities) {
         const player = {
           uid: this.name,
           name: this.name,
-          isLinked: false,
+          isLinked: false
         };
         this.save(player);
       }
@@ -136,7 +134,7 @@ export default class PlayerSearch extends Mixins(Utilities) {
     } else {
       this.$store.dispatch("ScoreBoard/changePlayer", {
         player: player,
-        index: this.index,
+        index: this.index
       });
     }
     this.show = false;
@@ -147,8 +145,8 @@ export default class PlayerSearch extends Mixins(Utilities) {
 <style lang="scss" scoped>
 .friend-list {
   overflow-y: auto;
-  box-shadow: 0 0 3px 1px teal inset;
   border-radius: 10px;
+  box-shadow: 0 0 3px 1px teal inset;
   .v-list-item {
     &:not(:last-of-type) {
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);

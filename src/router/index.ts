@@ -1,32 +1,32 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import store from '../store';
+import Vue from "vue";
+import VueRouter from "vue-router";
+import store from "../store";
 
-import Home from '../views/Home.vue';
+import Home from "../views/Home.vue";
 
-const Login = () => import('../views/Login.vue');
-const ScoreBoard = () => import('../views/ScoreBoard.vue')
+const Login = () => import("../views/Login.vue");
+const ScoreBoard = () => import("../views/ScoreBoard.vue");
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
+    path: "/",
+    name: "home",
     component: Home,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true }
   },
   {
-    path: '/login',
-    name: 'login',
-    component: Login,
+    path: "/login",
+    name: "login",
+    component: Login
   },
   {
-    path: '/scoreboard/:id',
-    name: 'scoreBoard',
+    path: "/scoreboard/:id",
+    name: "scoreBoard",
     component: ScoreBoard,
-    meta: { requiresAuth: true },
-  },
+    meta: { requiresAuth: true }
+  }
 ];
 
 const router = new VueRouter({
@@ -39,22 +39,23 @@ router.beforeEach((to, from, next) => {
     // このルートはログインされているかどうか認証が必要です。
     // もしされていないならば、ログインページにリダイレクトします。
     if (!isLoggedIn) {
-      store.dispatch('app/isLoading', true);
-      store.dispatch('user/login')
+      store.dispatch("app/isLoading", true);
+      store
+        .dispatch("user/login")
         .then(() => {
           next();
-          store.dispatch('app/isLoading', false);
+          store.dispatch("app/isLoading", false);
         })
         .catch(err => {
-          next({ name: 'login' })
-          store.dispatch('app/isLoading', false);
-        })
+          next({ name: "login" });
+          store.dispatch("app/isLoading", false);
+        });
     } else {
-      next()
+      next();
     }
   } else {
-    next() // next() を常に呼び出すようにしてください!
+    next(); // next() を常に呼び出すようにしてください!
   }
-})
+});
 
 export default router;

@@ -1,0 +1,24 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/recommended",
+    "plugin:prettier/recommended",
+    "@vue/typescript/recommended",
+    "prettier"
+  ],
+  "plugins": [
+    "vue",
+    "prettier"
+  ],
+  "env": {
+    "jest": true,
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "globals": {},
+  "rules": {
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/member-delimiter-style": "off"
+  }
+}

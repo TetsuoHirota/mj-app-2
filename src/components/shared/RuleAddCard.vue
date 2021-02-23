@@ -1,24 +1,21 @@
 <template>
   <v-card class="py-3">
-    <v-card-title>
-      ルール設定
-    </v-card-title>
-
+    <v-card-title>ルール設定</v-card-title>
     <v-card-text class="px-6 py-3">
       <v-form ref="form">
         <v-row dense align="center">
           <v-col cols="5">ゲームモード</v-col>
           <v-col align="center">
             <v-btn-toggle
-              mandatory
               v-model="playerNumber"
+              mandatory
               dense
               color="primary"
             >
               <v-btn
                 v-for="(playerNumber, index) in ruleConfig.playerNumber"
-                :value="playerNumber.value"
                 :key="index"
+                :value="playerNumber.value"
                 >{{ playerNumber.label }}</v-btn
               >
             </v-btn-toggle>
@@ -28,8 +25,8 @@
           <v-col cols="5">レート</v-col>
           <v-col>
             <v-select
-              hide-details="auto"
               v-model="rate"
+              hide-details="auto"
               :items="ruleConfig.rate"
               item-text="label"
               item-value="value"
@@ -42,8 +39,8 @@
           <v-col cols="5">チップ</v-col>
           <v-col>
             <v-select
-              hide-details="auto"
               v-model="chip"
+              hide-details="auto"
               :items="ruleConfig.chip"
               item-text="label"
               item-value="value"
@@ -56,8 +53,8 @@
           <v-col cols="5">ウマ</v-col>
           <v-col>
             <v-select
-              hide-details="auto"
               v-model="uma"
+              hide-details="auto"
               :items="playerNumber === 4 ? ruleConfig.uma4 : ruleConfig.uma3"
               item-text="label"
               item-value="value"
@@ -70,8 +67,8 @@
           <v-col cols="5">飛び賞</v-col>
           <v-col>
             <v-select
-              hide-details="auto"
               v-model="tobisyou"
+              hide-details="auto"
               :items="ruleConfig.tobisyou"
               item-text="label"
               item-value="value"
@@ -91,8 +88,8 @@
                   <v-col cols="5">清算方法</v-col>
                   <v-col>
                     <v-select
-                      hide-details="auto"
                       v-model="round"
+                      hide-details="auto"
                       :items="ruleConfig.round"
                       item-text="label"
                       item-value="value"
@@ -105,8 +102,8 @@
                   <v-col cols="5">持ち点</v-col>
                   <v-col>
                     <v-select
-                      hide-details="auto"
                       v-model="defaultScore"
+                      hide-details="auto"
                       :items="ruleConfig.defaultScore"
                       item-text="label"
                       item-value="value"
@@ -119,8 +116,8 @@
                   <v-col cols="5">オカ</v-col>
                   <v-col>
                     <v-select
-                      hide-details="auto"
                       v-model="oka"
+                      hide-details="auto"
                       :items="ruleConfig.oka"
                       item-text="label"
                       item-value="value"
@@ -150,7 +147,7 @@ import { ruleConfig } from "@/config/rule";
 import { Rule } from "@/models/scoreBoard";
 
 @Component({
-  components: {},
+  components: {}
 })
 export default class RuleAdd extends Vue {
   ruleConfig = ruleConfig;
@@ -208,17 +205,17 @@ export default class RuleAdd extends Vue {
       tobisyou: this.tobisyou,
       round: this.round,
       defaultScore: this.defaultScore,
-      oka: this.oka,
+      oka: this.oka
     };
     if ((this.$refs.form as HTMLFormElement).validate()) {
       this.close();
       this.$store
         .dispatch("scoreBoard/createScoreBoard", rule)
-        .then((id) => {
+        .then(id => {
           this.$store.dispatch("app/isLoading", false);
           this.$router.push({ name: "scoreBoard", params: { id: id } });
         })
-        .catch((err) => {
+        .catch(err => {
           this.$store.dispatch("app/error", err);
         });
     } else {
@@ -227,15 +224,14 @@ export default class RuleAdd extends Vue {
       this.$store.dispatch("app/isLoading", false);
     }
   }
-
   save() {}
 }
 </script>
 
 <style lang="scss">
 .v-text-field {
-  margin-top: 0 !important;
   padding-top: 0 !important;
+  margin-top: 0 !important;
 }
 
 .v-expansion-panel {
@@ -243,8 +239,8 @@ export default class RuleAdd extends Vue {
 }
 
 .v-expansion-panel-header {
-  font-size: 14px !important;
   justify-content: flex-end !important;
+  font-size: 14px !important;
 }
 
 .v-expansion-panel-header__icon {

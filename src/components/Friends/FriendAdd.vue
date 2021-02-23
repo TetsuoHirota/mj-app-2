@@ -11,13 +11,13 @@
         <v-col cols="10" class="pa-0">
           <v-text-field
             v-model="filter"
-            @keyup.enter="search"
             dense
             color="#2196F3"
             outlined
             clearable
             hide-details
             placeholder="idもしくは名前を入力"
+            @keyup.enter="search"
           >
           </v-text-field>
         </v-col>
@@ -29,7 +29,7 @@
       </v-row>
 
       <!-- 検索結果リスト -->
-      <v-list class="mx-4 text-center" height="230px" style="overflow: auto;">
+      <v-list class="mx-4 text-center" height="230px" style="overflow: auto">
         <!-- ローダー -->
         <v-progress-circular
           id="loader"
@@ -39,7 +39,7 @@
         ></v-progress-circular>
 
         <!-- 該当ユーザーなし -->
-        <v-subheader style="display: none" id="noUser">
+        <v-subheader id="noUser" style="display: none">
           該当するユーザーが<br />見つかりませんでした。
         </v-subheader>
 
@@ -54,13 +54,13 @@
               <v-icon>mdi-account-circle</v-icon>
             </v-avatar>
             <h3 class="headline font-weight-bold">{{ user.name }}</h3>
-            <p style="color: rgba(0,0,0,.5)">{{ user.mid }}</p>
+            <p style="color: rgba(0, 0, 0, 0.5)">{{ user.mid }}</p>
             <v-btn
-              @click="addFriend(user)"
               color="blue darken-2"
               dark
               height="30px"
               width="140px"
+              @click="addFriend(user)"
             >
               追加
             </v-btn>
@@ -71,9 +71,7 @@
       <!-- button -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-2" text @click="close">
-          閉じる
-        </v-btn>
+        <v-btn color="blue darken-2" text @click="close"> 閉じる </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -84,7 +82,7 @@ import { Component, Vue } from "vue-property-decorator";
 import { db } from "@/firebase";
 
 @Component({
-  components: {},
+  components: {}
 })
 export default class FriendsAdd extends Vue {
   show = false;
@@ -97,9 +95,9 @@ export default class FriendsAdd extends Vue {
   searchedUsers: any = [];
 
   mounted() {
-    this.unsubscribe = db.collection("users").onSnapshot((querySnapShot) => {
+    this.unsubscribe = db.collection("users").onSnapshot(querySnapShot => {
       const users: any = [];
-      querySnapShot.forEach((doc) => {
+      querySnapShot.forEach(doc => {
         users.push(doc.data());
       });
       this.users = users;
@@ -119,7 +117,7 @@ export default class FriendsAdd extends Vue {
     });
 
     // 不適切ユーザーの除外
-    this.searchedUsers = this.users.filter((user) => {
+    this.searchedUsers = this.users.filter(user => {
       return (
         (user.mid === this.filter || user.name === this.filter) && //全ユーザーの中に存在
         friendMids.indexOf(user.mid) < 0 && //フレンドにいない
@@ -148,7 +146,7 @@ export default class FriendsAdd extends Vue {
       uid: user.uid,
       mid: user.mid,
       email: user.email,
-      name: user.name,
+      name: user.name
     };
     this.$store.dispatch("Friends/addFriend", userInfo);
     this.close();

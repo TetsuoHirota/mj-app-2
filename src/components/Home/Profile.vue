@@ -7,22 +7,18 @@
       <v-row>
         <v-text-field
           v-model="name"
-          @keyup.enter="save"
           type="text"
           :rules="rule"
           :prepend-icon="'mdi-icon'"
           label="名前"
           hint="成績表に表示される名前です"
+          @keyup.enter="save"
         >
         </v-text-field>
       </v-row>
       <v-row justify="center" class="mt-3">
-        <v-btn text color="primary" @click.stop="close">
-          キャンセル
-        </v-btn>
-        <v-btn text color="primary" @click.stop="save">
-          決定
-        </v-btn>
+        <v-btn text color="primary" @click.stop="close"> キャンセル </v-btn>
+        <v-btn text color="primary" @click.stop="save"> 決定 </v-btn>
       </v-row>
     </v-form>
   </v-card>
@@ -33,13 +29,13 @@ import { Component, Mixins } from "vue-property-decorator";
 import Utilities from "@/mixins/utilities";
 
 @Component({
-  components: {},
+  components: {}
 })
 export default class Profile extends Mixins(Utilities) {
   name = "";
   rule = [
     (v: string) => !!v || "名前を入力してください",
-    (v: string) => (v && this.getLength(v) < 11) || "長すぎます",
+    (v: string) => (v && this.getLength(v) < 11) || "長すぎます"
   ];
 
   save() {

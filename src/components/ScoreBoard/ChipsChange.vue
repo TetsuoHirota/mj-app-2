@@ -19,9 +19,9 @@
           <v-text-field
             type="number"
             :value="chip.chip"
-            @input="(value) => changeInput(index, value)"
             class="mx-2"
             suffix="枚"
+            @input="value => changeInput(index, value)"
           >
           </v-text-field>
           <v-btn icon color="indigo" @click="inputAuto(index)">
@@ -30,7 +30,7 @@
         </v-row>
 
         <transition name="error">
-          <v-alert type="error" class="py-2 mt-6 mb-0" v-if="errorMessage">
+          <v-alert v-if="errorMessage" type="error" class="py-2 mt-6 mb-0">
             {{ errorMessage }}
           </v-alert>
         </transition>
@@ -50,7 +50,7 @@
 import { Component, Vue, Watch } from "vue-property-decorator";
 
 @Component({
-  components: {},
+  components: {}
 })
 export default class ChipsChange extends Vue {
   show = false;
@@ -82,12 +82,12 @@ export default class ChipsChange extends Vue {
       if (chip) {
         newChips.push({
           uid: chip.uid,
-          chip: chip.chip,
+          chip: chip.chip
         });
       } else {
         newChips.push({
           uid: this.players[i].uid,
-          chip: null,
+          chip: null
         });
       }
     }
@@ -123,10 +123,10 @@ export default class ChipsChange extends Vue {
 }
 
 .autoInput-nav {
-  height: 0;
-  font-size: 10px;
   position: relative;
   left: 16px;
+  height: 0;
+  font-size: 10px;
 }
 .error {
   &-enter-active,

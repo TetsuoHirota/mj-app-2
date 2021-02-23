@@ -1,12 +1,12 @@
 interface State {
-  isLoading: boolean,
-  errorMessage: string
+  isLoading: boolean;
+  errorMessage: string;
 }
 
 const state = (): State => ({
   isLoading: false,
-  errorMessage: ''
-})
+  errorMessage: ""
+});
 
 const mutations = {
   changeIsLoading: (state: State, isLoading: boolean) => {
@@ -16,27 +16,27 @@ const mutations = {
   changeErrorMessage: (state: State, errorMessage: string) => {
     state.errorMessage = errorMessage;
   }
-}
+};
 
 const actions = {
   isLoading: ({ commit }: any, isLoading: boolean) => {
-    commit('changeIsLoading', isLoading)
+    commit("changeIsLoading", isLoading);
   },
 
   error: ({ commit }: any, errorMessage: string) => {
-    commit('changeErrorMessage', errorMessage)
+    commit("changeErrorMessage", errorMessage);
   }
-}
+};
 
 const getters = {
   isLoading: (state: State) => {
-    return state.isLoading
+    return state.isLoading;
   },
 
   error: (state: State) => {
-    return state.errorMessage
+    return state.errorMessage;
   }
-}
+};
 
 export default {
   namespaced: true,
@@ -44,4 +44,4 @@ export default {
   mutations,
   actions,
   getters
-}
+};

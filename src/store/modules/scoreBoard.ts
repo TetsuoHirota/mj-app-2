@@ -31,7 +31,7 @@ interface State {
 const state = () => ({
   scoreBoards: [],
   scoreBoard: {},
-  inputMode: localStorage.getItem("inputMode") || "pt",
+  inputMode: localStorage.getItem("inputMode") || "pt"
 });
 
 const mutations = {
@@ -98,7 +98,7 @@ const mutations = {
 
   changeChips: (state: any, chips: any) => {
     state.chips = chips;
-  },
+  }
 };
 
 const actions = {
@@ -111,7 +111,7 @@ const actions = {
         name: `player${i}`,
         mid: `_player${i}`,
         email: "",
-        scoreBoardIds: [],
+        scoreBoardIds: []
       });
     }
     let id = "";
@@ -122,13 +122,13 @@ const actions = {
         rule: rule,
         scoress: {},
         chips: [],
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       })
-      .then((doc) => {
+      .then(doc => {
         id = doc.id;
         return dispatch("addPlayerScoreBoardId", {
           uid: user.uid,
-          scoreBoardId: doc.id,
+          scoreBoardId: doc.id
         });
       });
     return id;
@@ -143,7 +143,7 @@ const actions = {
       .collection("users")
       .doc(uid)
       .update({
-        scoreBoardIds: firebase.firestore.FieldValue.arrayUnion(scoreBoardId),
+        scoreBoardIds: firebase.firestore.FieldValue.arrayUnion(scoreBoardId)
       });
   },
 
@@ -157,7 +157,7 @@ const actions = {
         const scoreBoards: ScoreBoard[] = [];
         unsubscribeScoreBoards = db
           .collection("scores")
-          .onSnapshot((snapshot) => {
+          .onSnapshot(snapshot => {
             snapshot.docChanges().forEach((change: any) => {
               const id = change.doc.id;
               const data = change.doc.data();
@@ -166,8 +166,8 @@ const actions = {
                   scoreBoards.push({
                     ...data,
                     createdAt: data.createdAt.toDate(),
-                    id: id,
-                  }),
+                    id: id
+                  })
                 ];
             });
             commit("setScoreBoards", scoreBoards);
@@ -180,7 +180,7 @@ const actions = {
       unsubscribeScoreBoard = db
         .collection("scores")
         .doc(id)
-        .onSnapshot((doc) => {
+        .onSnapshot(doc => {
           if (doc.exists) {
             const data = doc.data();
             if (!data) {
@@ -190,7 +190,7 @@ const actions = {
                 ...data,
                 createdAt: data.createdAt.toDate(),
                 id: id,
-                scoress: Object.values(data.scoress),
+                scoress: Object.values(data.scoress)
               });
               resolve(doc);
             }
@@ -208,10 +208,7 @@ const actions = {
 
   deleteScoreBoard: ({ commit, state, rootGetters }: any) => {
     const me = rootGetters["User/user"];
-    if (me.isLogin)
-      db.collection("scores")
-        .doc(state.id)
-        .delete();
+    if (me.isLogin) db.collection("scores").doc(state.id).delete();
     commit("resetScoreBoard");
   },
 
@@ -228,7 +225,7 @@ const actions = {
       db.collection("users")
         .doc(playerId)
         .update({
-          scoreBoards: firebase.firestore.FieldValue.arrayRemove(scoreBoardId),
+          scoreBoards: firebase.firestore.FieldValue.arrayRemove(scoreBoardId)
         });
   },
 
@@ -237,11 +234,9 @@ const actions = {
     const me = rootGetters["User/user"];
     commit("changeRule", rule);
     if (me.isLogin)
-      db.collection("scores")
-        .doc(state.id)
-        .update({
-          rule: rule,
-        });
+      db.collection("scores").doc(state.id).update({
+        rule: rule
+      });
   },
 
   //プレイヤー関連
@@ -249,15 +244,13 @@ const actions = {
     const me = rootGetters["User/user"];
     commit("addPlayer", player);
     if (me.isLogin)
-      db.collection("scores")
-        .doc(state.id)
-        .update({
-          players: state.players,
-        });
+      db.collection("scores").doc(state.id).update({
+        players: state.players
+      });
     if (player.isLinked)
       dispatch("addPlayerScoreBoardId", {
         playerId: player.uid,
-        scoreBoardId: state.id,
+        scoreBoardId: state.id
       });
   },
 
@@ -268,15 +261,13 @@ const actions = {
     const me = rootGetters["User/user"];
     commit("deletePlayer", index);
     if (me.isLogin)
-      db.collection("scores")
-        .doc(state.id)
-        .update({
-          players: state.players,
-        });
+      db.collection("scores").doc(state.id).update({
+        players: state.players
+      });
     if (player.isLinked)
       dispatch("deletePlayerScoreBoardId", {
         playerId: player.uid,
-        scoreBoardId: state.id,
+        scoreBoardId: state.id
       });
   },
 
@@ -288,20 +279,18 @@ const actions = {
     if (state.players[index].isLinked)
       dispatch("deletePlayerScoreBoardId", {
         playerId: state.players[index].uid,
-        scoreBoardId: state.id,
+        scoreBoardId: state.id
       });
     if (player.isLinked)
       dispatch("addPlayerScoreBoardId", {
         playerId: player.uid,
-        scoreBoardId: state.id,
+        scoreBoardId: state.id
       });
     commit("changePlayer", { player: player, index: index });
     if (me.isLogin)
-      db.collection("scores")
-        .doc(state.id)
-        .update({
-          players: state.players,
-        });
+      db.collection("scores").doc(state.id).update({
+        players: state.players
+      });
   },
 
   // スコア関連
@@ -314,7 +303,7 @@ const actions = {
     db.collection("scores")
       .doc(state.scoreBoard.id)
       .update({
-        scoress: formatNestedArray(scoress),
+        scoress: formatNestedArray(scoress)
       });
   },
 
@@ -327,7 +316,7 @@ const actions = {
     db.collection("scores")
       .doc(state.scoreBoard.id)
       .update({
-        scoress: formatNestedArray(scoress),
+        scoress: formatNestedArray(scoress)
       });
   },
 
@@ -336,12 +325,10 @@ const actions = {
     const me = rootGetters["User/user"];
     commit("changeChips", chips);
     if (me.isLogin)
-      db.collection("scores")
-        .doc(state.id)
-        .update({
-          chips: chips,
-        });
-  },
+      db.collection("scores").doc(state.id).update({
+        chips: chips
+      });
+  }
 };
 
 const getters = {
@@ -379,7 +366,7 @@ const getters = {
 
   players: (state: any) => {
     return state.players;
-  },
+  }
 };
 
 export default {
@@ -387,5 +374,5 @@ export default {
   state,
   mutations,
   actions,
-  getters,
+  getters
 };

@@ -22,7 +22,7 @@
         </v-row>
 
         <transition name="error">
-          <v-alert type="error" class="py-2 mt-6 mb-0" v-if="errorMessage">
+          <v-alert v-if="errorMessage" type="error" class="py-2 mt-6 mb-0">
             {{ errorMessage }}
           </v-alert>
         </transition>
@@ -48,8 +48,8 @@ import PlayerSearch from "./PlayerSearch.vue";
 
 @Component({
   components: {
-    PlayerSearch,
-  },
+    PlayerSearch
+  }
 })
 export default class PlayersChange extends Vue {
   show = false;
@@ -84,7 +84,7 @@ export default class PlayersChange extends Vue {
       if (result)
         this.$store.dispatch("ScoreBoard/deletePlayer", {
           player: player,
-          index: index,
+          index: index
         });
     }
   }
