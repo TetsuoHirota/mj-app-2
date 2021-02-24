@@ -1,5 +1,4 @@
 import { UserInfo } from "./user";
-import firebase from "firebase/app";
 import "firebase/firestore";
 
 export type Round = "goshya" | "sisya" | "kirisute" | "kiriage";
@@ -28,7 +27,7 @@ export interface ScoreBoard {
   players: UserInfo[];
   scoress: Score[][];
   rule: Rule;
-  createdAt: Date | firebase.firestore.Timestamp;
+  createdAt: Date
 }
 
 export type InputMode = "pt" | "score";

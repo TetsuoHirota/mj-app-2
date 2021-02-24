@@ -1,6 +1,10 @@
 <template>
   <div class="appbar">
     <v-app-bar color="indigo" dark>
+      <v-app-bar-nav-icon
+        v-if="isDrawerActive"
+        @click.stop="handleClickNavIcon"
+      ></v-app-bar-nav-icon>
       <v-btn v-if="isBackActive" icon @click="handleClickBack">
         <v-icon large>mdi-chevron-left</v-icon>
       </v-btn>
@@ -8,10 +12,6 @@
         {{ title }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-app-bar-nav-icon
-        v-if="isDrawerActive"
-        @click.stop="handleClickNavIcon"
-      ></v-app-bar-nav-icon>
       <slot></slot>
     </v-app-bar>
     <Drawer v-if="isDrawerActive" v-model="isDrawerOpened"></Drawer>
@@ -47,5 +47,3 @@ export default class AppBar extends Vue {
   }
 }
 </script>
-
-<style></style>

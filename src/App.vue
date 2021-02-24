@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class App extends Vue {
@@ -34,10 +34,10 @@ export default class App extends Vue {
 #app {
   height: 100%;
 }
+
 .v-application {
   height: 100%;
   min-height: 0;
-  // font-family: "Noto Sans CJK JP Subset", Roboto, sans-serif;
 }
 
 .v-app-bar {

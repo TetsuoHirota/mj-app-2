@@ -1,15 +1,16 @@
 {
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "extends": [
     "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "plugin:vue/recommended",
-    "plugin:prettier/recommended",
     "@vue/typescript/recommended",
     "prettier"
   ],
-  "plugins": [
-    "vue",
-    "prettier"
-  ],
+  "plugins": ["@typescript-eslint", "vue"],
   "env": {
     "jest": true,
     "browser": true,
@@ -18,6 +19,7 @@
   },
   "globals": {},
   "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/member-delimiter-style": "off"
   }

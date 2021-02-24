@@ -148,31 +148,34 @@ const actions = {
   },
 
   startScoreBoardsListener: ({ rootGetters, commit }: any) => {
-    const user: UserInfo = rootGetters["user/user"];
-    unsubscribeScoreBoardIds = db
-      .collection("users")
-      .doc(user.uid)
-      .onSnapshot((doc: any) => {
-        const scoreBoardIds: string[] = doc.data().scoreBoardIds;
-        const scoreBoards: ScoreBoard[] = [];
-        unsubscribeScoreBoards = db
-          .collection("scores")
-          .onSnapshot(snapshot => {
-            snapshot.docChanges().forEach((change: any) => {
-              const id = change.doc.id;
-              const data = change.doc.data();
-              if (scoreBoardIds.includes(id))
-                [
-                  scoreBoards.push({
-                    ...data,
-                    createdAt: data.createdAt.toDate(),
-                    id: id
-                  })
-                ];
+    return new Promise((resolve, reject) => {
+      const user: UserInfo = rootGetters["user/user"];
+      unsubscribeScoreBoardIds = db
+        .collection("users")
+        .doc(user.uid)
+        .onSnapshot((doc: any) => {
+          const scoreBoardIds: string[] = doc.data().scoreBoardIds;
+          const scoreBoards: ScoreBoard[] = [];
+          unsubscribeScoreBoards = db
+            .collection("scores")
+            .onSnapshot(snapshot => {
+              snapshot.docChanges().forEach((change: any) => {
+                const id = change.doc.id;
+                const data = change.doc.data();
+                if (scoreBoardIds.includes(id))
+                  [
+                    scoreBoards.push({
+                      ...data,
+                      createdAt: data.createdAt.toDate(),
+                      id: id
+                    })
+                  ];
+              });
+              resolve(scoreBoards);
+              commit("setScoreBoards", scoreBoards);
             });
-            commit("setScoreBoards", scoreBoards);
-          });
-      });
+        });
+    });
   },
 
   startScoreBoardListener: ({ commit }: any, id: string) => {

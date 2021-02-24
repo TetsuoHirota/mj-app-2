@@ -1,49 +1,63 @@
 <template>
   <div class="scoreboards">
-    <v-col class="pa-5 list">
-      <transition-group name="tr-card">
-        <v-card
-          v-for="scoreBoard in scoreBoards"
-          :key="scoreBoard.id"
-          :color="'teal darken-1'"
-          class="my-2"
-          dark
-        >
-          <v-card-title class="headline font-weight-medium py-2">
-            <v-icon class="mr-2">mdi-text-box-outline</v-icon>
-            <span>{{ scoreBoard.createdAt.getFullYear() }}</span>
-            <span>/</span>
-            <span>{{ scoreBoard.createdAt.getMonth() + 1 }}</span>
-            <span>/</span>
-            <span>{{ scoreBoard.createdAt.getDate() }}</span>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="py-0">
-            <v-col>
-              <v-row class="cardinfo">
-                <div class="cardinfo__title">メンバー :</div>
-                <div class="cardinfo__text">
-                  <span
-                    v-for="(player, index) in scoreBoard.players"
-                    :key="index"
-                    class="ml-1"
-                  >
-                    {{ player.name }}
-                  </span>
-                </div>
-              </v-row>
-              <v-row class="cardinfo">
-                <div class="cardinfo__title">平均順位</div>
-                <div class="cardinfo__text">
-                  {{ getRankAvarage(scoreBoard) }}
-                </div>
-              </v-row>
-            </v-col>
-          </v-card-text>
-          <!-- {{ getRank(getRanks(item)).rank }}
+    <v-col class="px-5 py-3 list">
+      <template v-if="scoreBoards.length !== 0">
+        <transition-group name="tr-card">
+          <v-card
+            v-for="scoreBoard in scoreBoards"
+            :key="scoreBoard.id"
+            :color="'teal darken-1'"
+            class="my-2"
+            dark
+            @click="toScoreBoard(scoreBoard.id)"
+          >
+            <v-card-title class="text-h6 font-weight-medium py-2">
+              <v-icon class="mr-2">mdi-text-box-outline</v-icon>
+              <span>{{ scoreBoard.createdAt.getFullYear() }}</span>
+              <span>/</span>
+              <span>{{ scoreBoard.createdAt.getMonth() + 1 }}</span>
+              <span>/</span>
+              <span>{{ scoreBoard.createdAt.getDate() }}</span>
+              <v-spacer></v-spacer>
+              <div class="text-subtitle-2">
+                {{ scoreBoard.scoress.length }} 半荘
+              </div>
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text>
+              <v-col>
+                <v-row class="cardinfo">
+                  <div class="cardinfo__title">メンバー</div>
+                  <div class="cardinfo__colon">:</div>
+                  <div class="cardinfo__text">
+                    <span
+                      v-for="(player, index) in scoreBoard.players"
+                      :key="index"
+                      class="mr-1"
+                    >
+                      {{ player.name }}
+                    </span>
+                  </div>
+                </v-row>
+                <v-row class="cardinfo">
+                  <div class="cardinfo__title">平均順位</div>
+                  <div class="cardinfo__colon">:</div>
+                  <div class="cardinfo__text">
+                    {{ getRankAvarage(scoreBoard) }}
+                  </div>
+                </v-row>
+              </v-col>
+            </v-card-text>
+            <!-- {{ getRank(getRanks(item)).rank }}
           {{ getRank(getRanks(item)).average }} -->
-        </v-card>
-      </transition-group>
+          </v-card>
+        </transition-group>
+      </template>
+      <template v-else>
+        <div class="grey--text pa-4">
+          まだ成績表がありません。右下のアイコンからゲームを開始してください。
+        </div>
+      </template>
     </v-col>
     <v-fab-transition>
       <v-btn
@@ -69,7 +83,6 @@ import { Component, Vue } from "vue-property-decorator";
 import { ScoreBoard, Score } from "@/models/scoreBoard";
 import RuleAddCard from "@/components/shared/RuleAddCard.vue";
 import { getPlayerResults } from "@/utils/scoreBoard";
-import scoreBoard from "@/store/modules/scoreBoard";
 
 @Component({
   components: {
@@ -109,6 +122,16 @@ export default class ScoreBoards extends Vue {
   getRankAvarage(scoreBoard: ScoreBoard) {
     return getPlayerResults(scoreBoard);
   }
+
+  toScoreBoard(id: string | undefined) {
+    if (!id) {
+      return;
+    }
+    this.$router.push({
+      name: "scoreBoard",
+      params: { id }
+    });
+  }
 }
 </script>
 
@@ -134,7 +157,12 @@ export default class ScoreBoards extends Vue {
 }
 
 .cardinfo__title {
-  flex: 0 0 auto;
+  flex: 0 0 60px;
+}
+
+.cardinfo__colon {
+  margin-right: 5px;
+  margin-left: 3px;
 }
 
 .cardinfo__text {
