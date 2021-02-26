@@ -1,6 +1,6 @@
 <template>
   <div class="appbar">
-    <v-app-bar color="indigo" dark>
+    <v-app-bar flat>
       <v-app-bar-nav-icon
         v-if="isDrawerActive"
         @click.stop="handleClickNavIcon"

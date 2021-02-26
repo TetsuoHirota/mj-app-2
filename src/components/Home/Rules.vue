@@ -6,7 +6,6 @@
     <v-alert
       v-if="rules.length == 0"
       color="#2A3B4D"
-      dark
       :icon="icons.mdiPencil"
       dense
       class="ma-3"
@@ -19,7 +18,6 @@
       absolute
       top
       right
-      dark
       class="btn__previous-game"
       color="blue-grey"
       :to="{ name: 'ScoreBoard' }"
@@ -34,7 +32,6 @@
         v-for="rule in rules"
         :key="rule.id"
         color="teal darken-2"
-        dark
         class="card ma-1 ma-sm-2"
       >
         <v-card-title class="py-3 px-4">
@@ -91,8 +88,7 @@
           width="100%"
           color="rgba(0,0,0,.3)"
           @click="editRule(rule)"
-        >
-        </v-btn>
+        ></v-btn>
 
         <!-- 編集ボタン  -->
         <transition name="btn">
@@ -110,7 +106,7 @@
         </transition>
 
         <!-- 削除モード用オーバーレイボタン -->
-        <v-overlay v-if="mode == 'delete'" absolute> </v-overlay>
+        <v-overlay v-if="mode == 'delete'" absolute></v-overlay>
 
         <!-- 削除ボタン  -->
         <transition name="btn">
@@ -147,7 +143,6 @@
       <v-btn
         class="speed-dial__add"
         fab
-        dark
         small
         color="indigo"
         @click="openRuleAdd()"
@@ -157,7 +152,6 @@
       <v-btn
         class="speed-dial__edit"
         fab
-        dark
         small
         color="green"
         @click.stop="(mode = 'edit'), (fab = false)"
@@ -167,7 +161,6 @@
       <v-btn
         class="speed-dial__delete"
         fab
-        dark
         small
         color="red"
         @click.stop="(mode = 'delete'), (fab = false)"

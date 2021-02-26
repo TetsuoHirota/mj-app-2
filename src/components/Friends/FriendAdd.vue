@@ -18,8 +18,7 @@
             hide-details
             placeholder="idもしくは名前を入力"
             @keyup.enter="search"
-          >
-          </v-text-field>
+          ></v-text-field>
         </v-col>
         <v-col cols="2" class="pa-0 px-3">
           <v-btn icon @click="search">
@@ -40,7 +39,9 @@
 
         <!-- 該当ユーザーなし -->
         <v-subheader id="noUser" style="display: none">
-          該当するユーザーが<br />見つかりませんでした。
+          該当するユーザーが
+          <br />
+          見つかりませんでした。
         </v-subheader>
 
         <!-- リストアイテム -->
@@ -57,7 +58,6 @@
             <p style="color: rgba(0, 0, 0, 0.5)">{{ user.mid }}</p>
             <v-btn
               color="blue darken-2"
-              dark
               height="30px"
               width="140px"
               @click="addFriend(user)"
@@ -71,7 +71,7 @@
       <!-- button -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-2" text @click="close"> 閉じる </v-btn>
+        <v-btn color="blue darken-2" text @click="close">閉じる</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

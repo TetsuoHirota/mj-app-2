@@ -1,5 +1,10 @@
 {
-  "extends": ["stylelint-config-recommended-scss", "stylelint-config-recess-order", "stylelint-prettier/recommended"],
+  "extends": [
+    "stylelint-config-recommended-scss",
+    "stylelint-config-recess-order",
+    "stylelint-prettier/recommended",
+    "stylelint-config-prettier"
+  ],
   "ignoreFiles": ["**/node_modules/**"],
   "rules": {
     "selector-type-no-unknown": null

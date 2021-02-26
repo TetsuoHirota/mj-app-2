@@ -16,8 +16,9 @@
                 v-for="(playerNumber, index) in ruleConfig.playerNumber"
                 :key="index"
                 :value="playerNumber.value"
-                >{{ playerNumber.label }}</v-btn
               >
+                {{ playerNumber.label }}
+              </v-btn>
             </v-btn-toggle>
           </v-col>
         </v-row>
@@ -31,8 +32,7 @@
               item-text="label"
               item-value="value"
               required
-            >
-            </v-select>
+            ></v-select>
           </v-col>
         </v-row>
         <v-row align="center">
@@ -45,8 +45,7 @@
               item-text="label"
               item-value="value"
               required
-            >
-            </v-select>
+            ></v-select>
           </v-col>
         </v-row>
         <v-row align="center">
@@ -59,8 +58,7 @@
               item-text="label"
               item-value="value"
               required
-            >
-            </v-select>
+            ></v-select>
           </v-col>
         </v-row>
         <v-row align="center">
@@ -73,16 +71,15 @@
               item-text="label"
               item-value="value"
               required
-            >
-            </v-select>
+            ></v-select>
           </v-col>
         </v-row>
         <v-row dense align="center" justify="center">
           <v-expansion-panels flat tile class="mt-2">
             <v-expansion-panel>
-              <v-expansion-panel-header class="pa-0"
-                >詳細設定</v-expansion-panel-header
-              >
+              <v-expansion-panel-header class="pa-0">
+                詳細設定
+              </v-expansion-panel-header>
               <v-expansion-panel-content>
                 <v-row align="center">
                   <v-col cols="5">清算方法</v-col>
@@ -94,8 +91,7 @@
                       item-text="label"
                       item-value="value"
                       required
-                    >
-                    </v-select>
+                    ></v-select>
                   </v-col>
                 </v-row>
                 <v-row align="center">
@@ -108,8 +104,7 @@
                       item-text="label"
                       item-value="value"
                       required
-                    >
-                    </v-select>
+                    ></v-select>
                   </v-col>
                 </v-row>
                 <v-row align="center">
@@ -122,8 +117,7 @@
                       item-text="label"
                       item-value="value"
                       required
-                    >
-                    </v-select>
+                    ></v-select>
                   </v-col>
                 </v-row>
               </v-expansion-panel-content>
@@ -136,7 +130,7 @@
     <v-card-actions>
       <v-btn color="blue darken-1" text @click="close">キャンセル</v-btn>
       <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" dark @click="start">開始</v-btn>
+      <v-btn color="blue darken-1" @click="start">開始</v-btn>
     </v-card-actions>
   </v-card>
 </template>

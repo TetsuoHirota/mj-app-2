@@ -6,37 +6,25 @@
       :continuous="false"
       hide-delimiters
       :show-arrows="false"
-      light
       height="100%"
     >
       <v-carousel-item>
         <ScoreBoards></ScoreBoards>
       </v-carousel-item>
       <v-carousel-item>
-        b
-        <!-- <Free /> -->
+        <Friends></Friends>
       </v-carousel-item>
-      <v-carousel-item>
-        c
-        <!-- <History /> -->
-      </v-carousel-item>
-      <v-carousel-item>
-        d
-        <!-- <Data /> -->
-      </v-carousel-item>
+      <v-carousel-item>c</v-carousel-item>
     </v-carousel>
 
-    <v-bottom-navigation v-model="nav" app grow color="indigo">
+    <v-bottom-navigation v-model="nav" app grow color="primary">
       <v-btn>
-        <span>成績表</span>
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
       <v-btn>
-        <span>フレンド</span>
         <v-icon>mdi-account-multiple</v-icon>
       </v-btn>
       <v-btn>
-        <span>戦績</span>
         <v-icon>mdi-chart-bar</v-icon>
       </v-btn>
     </v-bottom-navigation>
@@ -47,11 +35,13 @@
 import { Component, Vue } from "vue-property-decorator";
 import AppBar from "@/components/shared/AppBar.vue";
 import ScoreBoards from "@/views/home/ScoreBoards.vue";
+import Friends from "@/views/home/Friends.vue";
 
 @Component({
   components: {
     AppBar,
-    ScoreBoards
+    ScoreBoards,
+    Friends
   }
 })
 export default class Home extends Vue {

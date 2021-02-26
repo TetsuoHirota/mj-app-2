@@ -1,6 +1,6 @@
 <template>
   <div class="profile">
-    <v-app-bar color="indigo" dark>
+    <v-app-bar color="indigo">
       <v-toolbar-title class="pl-2">麻雀成績管理</v-toolbar-title>
     </v-app-bar>
 
@@ -8,8 +8,8 @@
       <v-col class="px-8" align="center">
         <!-- 情報 -->
         <p>
-          <span class="display-2 font-weight-medium mr-2">{{ email }}</span
-          >さん
+          <span class="display-2 font-weight-medium mr-2">{{ email }}</span>
+          さん
         </p>
         <v-subheader style="width: fit-content; text-align: start">
           あなたのプロフィールを完成させてください。名前は後から変更できます。
@@ -26,8 +26,7 @@
                 :rules="formRules.id"
                 :prepend-icon="icons.mdiCardAccountDetails"
                 @keyup.enter="validate"
-              >
-              </v-text-field>
+              ></v-text-field>
               <v-text-field
                 v-model="name"
                 label="名前"
@@ -36,11 +35,10 @@
                 :prepend-icon="icons.mdiAccount"
                 hint="成績表に表示される名前です"
                 @keyup.enter="validate"
-              >
-              </v-text-field>
+              ></v-text-field>
               <v-row>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="validate"> 決定 </v-btn>
+                <v-btn color="primary" @click="validate">決定</v-btn>
               </v-row>
             </v-col>
           </v-form>
@@ -66,7 +64,7 @@
                 キャンセル
               </v-btn>
 
-              <v-btn color="primary" text @click="save"> 保存 </v-btn>
+              <v-btn color="primary" text @click="save">保存</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>

@@ -12,7 +12,6 @@
             <v-subheader>プレイ人数を選択してください</v-subheader>
             <v-row justify="space-around">
               <v-btn
-                dark
                 color="indigo"
                 width="40%"
                 x-large
@@ -21,7 +20,6 @@
                 三麻
               </v-btn>
               <v-btn
-                dark
                 color="indigo"
                 width="40%"
                 x-large
@@ -33,7 +31,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="close"> 閉じる </v-btn>
+            <v-btn color="blue darken-1" text @click="close">閉じる</v-btn>
           </v-card-actions>
         </div>
 
@@ -49,8 +47,7 @@
                 item-value="value"
                 :rules="[v => !!v || v == 0 || 'レートを選択してください']"
                 required
-              >
-              </v-select>
+              ></v-select>
               <v-select
                 v-model="newRule.chip"
                 label="チップ"
@@ -59,8 +56,7 @@
                 item-value="value"
                 :rules="[v => !!v || v == 0 || 'チップを選択してください']"
                 required
-              >
-              </v-select>
+              ></v-select>
               <v-select
                 v-model="newRule.uma"
                 label="ウマ"
@@ -69,8 +65,7 @@
                 item-value="value"
                 :rules="[v => !!v || v == 0 || 'ウマを選択してください']"
                 required
-              >
-              </v-select>
+              ></v-select>
               <v-select
                 v-model="newRule.tobisyou"
                 label="飛び賞"
@@ -79,8 +74,7 @@
                 item-value="value"
                 :rules="[v => !!v || v == 0 || '飛び賞を選択してください']"
                 required
-              >
-              </v-select>
+              ></v-select>
               <v-select
                 v-model="newRule.round"
                 label="清算方法"
@@ -89,8 +83,7 @@
                 item-value="value"
                 :rules="[v => !!v || v == 0 || '清算方法を選択してください']"
                 required
-              >
-              </v-select>
+              ></v-select>
               <v-select
                 v-model="newRule.defaultScore"
                 label="持ち点"
@@ -100,8 +93,7 @@
                 suffix="持ち"
                 :rules="[v => !!v || v == 0 || '持ち点を選択してください']"
                 required
-              >
-              </v-select>
+              ></v-select>
               <v-select
                 v-model="newRule.oka"
                 label="オカ"
@@ -111,8 +103,7 @@
                 suffix="返し"
                 :rules="[v => !!v || v == 0 || 'オカを選択してください']"
                 required
-              >
-              </v-select>
+              ></v-select>
             </v-col>
           </v-card-text>
           <v-card-actions>

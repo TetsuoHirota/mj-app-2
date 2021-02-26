@@ -2,8 +2,8 @@
   <div class="score">
     <header>
       <div class="tr-head"></div>
-      <div v-for="player in players" :key="player.uid" class="tr-body">
-        <v-btn class="name-btn" text @click="openPlayersModal">
+      <div v-for="(player, idx) in players" :key="player.uid" class="tr-body">
+        <v-btn class="name-btn" text @click="onPlayerClick(idx)">
           {{ player.name }}
         </v-btn>
       </div>
@@ -30,8 +30,7 @@
           height="100%"
           width="100%"
           @click="changeScore(index)"
-        >
-        </v-btn>
+        ></v-btn>
       </div>
     </body>
 
@@ -56,7 +55,6 @@
           <v-chip
             v-if="getChip(player.uid) || getChip(player.uid) === 0"
             color="orange"
-            dark
             small
             class="px-2"
           >
@@ -83,7 +81,6 @@
       class="btn btn__player"
       absolute
       fab
-      dark
       color="pink"
       @click.stop="openPlayersModal"
     >
@@ -178,6 +175,10 @@ export default class Score extends Vue {
 
   changeScore(index: number) {
     (this.$refs as any).scoreChange.open(index);
+  }
+
+  onPlayerClick(idx: number) {
+    this.$emit("request-player-change", idx);
   }
 
   openPlayersModal() {

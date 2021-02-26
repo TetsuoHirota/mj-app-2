@@ -1,7 +1,5 @@
 <template>
-  <div class="friends pa-4">
-    <h2>フレンド</h2>
-
+  <div class="friends">
     <v-subheader>フレンド一覧</v-subheader>
 
     <v-list class="px-3" max-width="500px" flat>
@@ -10,7 +8,7 @@
         <div v-for="friend in friends" :key="friend.mid">
           <v-list-item @click="openFriendDelete(friend)">
             <v-list-item-avatar>
-              <v-icon>{{ icons.mdiAccount }}</v-icon>
+              <v-icon>mdi-account</v-icon>
             </v-list-item-avatar>
             <v-list-item-content class="ma-0 pa-0">
               <v-list-item-title
@@ -28,13 +26,8 @@
     </v-list>
 
     <v-row justify="center" align="center">
-      <v-btn
-        dark
-        color="deep-purple accent-4"
-        height="45px"
-        @click="openFriendAdd"
-      >
-        <v-icon class="mr-3">{{ icons.mdiAccountPlus }}</v-icon>
+      <v-btn color="deep-purple accent-4" height="45px" @click="openFriendAdd">
+        <v-icon class="mr-3">mdi-account-plus</v-icon>
         フレンド追加
       </v-btn>
 

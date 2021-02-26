@@ -10,7 +10,7 @@
         </template>
         <v-list tile flatclass="menu__list">
           <v-list-item>
-            <v-list-item-title class="mr-5"> ポイント入力 </v-list-item-title>
+            <v-list-item-title class="mr-5">ポイント入力</v-list-item-title>
             <v-switch
               v-model="isPtMode"
               dense
@@ -19,14 +19,14 @@
               class="ma-0 pa-0"
             ></v-switch>
           </v-list-item>
-          <v-list-item @click="openPlayersModal">
-            <v-list-item-title> プレイヤー変更 </v-list-item-title>
+          <v-list-item @click="openPlayersChangeModal()">
+            <v-list-item-title>プレイヤー変更</v-list-item-title>
           </v-list-item>
           <v-list-item @click="deleteScoreBoard">
-            <v-list-item-title> 削除 </v-list-item-title>
+            <v-list-item-title>削除</v-list-item-title>
           </v-list-item>
           <v-list-item @click="endScoreBoard">
-            <v-list-item-title> 終了 </v-list-item-title>
+            <v-list-item-title>終了</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -36,7 +36,6 @@
     <v-main>
       <v-carousel
         v-model="nav"
-        light
         :continuous="false"
         :hide-delimiters="true"
         :show-arrows="false"
@@ -44,7 +43,7 @@
         touchless
       >
         <v-carousel-item>
-          <Score></Score>
+          <Score @request-player-change="openPlayerChangeModal($event)"></Score>
         </v-carousel-item>
         <v-carousel-item>
           <!-- <Data /> -->
@@ -54,8 +53,6 @@
         </v-carousel-item>
       </v-carousel>
     </v-main>
-    <!-- <v-container fluid class="pa-0" style="height: 100%">
-    </v-container> -->
 
     <v-bottom-navigation v-model="nav" grow app color="teal">
       <v-btn>
@@ -72,7 +69,7 @@
       </v-btn>
     </v-bottom-navigation>
 
-    <!-- <PlayersChange ref="playersChange" /> -->
+    <PlayersChange ref="playersChange" />
   </div>
 </template>
 
@@ -82,20 +79,21 @@ import AppBar from "@/components/shared/AppBar.vue";
 import Score from "@/views/scoreBoard/Score.vue";
 // import Data from "@/components/ScoreBoard/Data.vue";
 // import Graph from "@/components/ScoreBoard/Graph.vue";
-// import PlayersChange from "@/components/ScoreBoard/PlayersChange.vue";
-
-import { ScoreBoard } from "@/models/scoreBoard";
+import PlayersChange from "@/components/scoreBoard/PlayersChange.vue";
 
 @Component({
   components: {
     AppBar,
-    Score
+    Score,
     // Data,
     // Graph,
-    // PlayersChange,
+    PlayersChange
   }
 })
 export default class ScoreBoardPage extends Vue {
+  $refs!: {
+    playersChange: PlayersChange;
+  };
   showMenu = false;
   nav = 0;
 
@@ -121,9 +119,13 @@ export default class ScoreBoardPage extends Vue {
       });
   }
 
-  openPlayersModal() {
-    (this.$refs as any).playersChange.open();
+  openPlayersChangeModal() {
+    this.$refs.playersChange.open();
     this.showMenu = false;
+  }
+
+  openPlayerChangeModal(e: any) {
+    console.debug(e);
   }
 
   deleteScoreBoard() {

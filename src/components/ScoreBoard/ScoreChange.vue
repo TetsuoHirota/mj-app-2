@@ -207,7 +207,7 @@ export default class ScoreChange extends Vue {
     const { id, players, scoress, rule, createdAt } = scoreBoard;
 
     const inputNumber = data.filter(item => {
-      return Number.isFinite(isPtMode ? item.pt : item.score);
+      return Number.isFinite(isPtMode ? item.pt! : item.score!);
     }).length;
 
     if (inputNumber !== rule.playerNumber) {

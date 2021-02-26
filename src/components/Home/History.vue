@@ -10,7 +10,6 @@
             :key="item.date"
             :color="item.parlor ? 'purple darken-1' : 'teal darken-1'"
             class="my-2"
-            dark
           >
             <v-card-title class="headline font-weight-medium py-2">
               <v-icon class="mr-2">mdi-account-multiple</v-icon>

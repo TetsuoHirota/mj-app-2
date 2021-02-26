@@ -109,7 +109,7 @@ const actions = {
       players.push({
         uid: `_player${i}`,
         name: `player${i}`,
-        mid: `_player${i}`,
+        mid: "",
         email: "",
         scoreBoardIds: []
       });
@@ -153,29 +153,42 @@ const actions = {
       unsubscribeScoreBoardIds = db
         .collection("users")
         .doc(user.uid)
-        .onSnapshot((doc: any) => {
-          const scoreBoardIds: string[] = doc.data().scoreBoardIds;
-          const scoreBoards: ScoreBoard[] = [];
-          unsubscribeScoreBoards = db
-            .collection("scores")
-            .onSnapshot(snapshot => {
-              snapshot.docChanges().forEach((change: any) => {
-                const id = change.doc.id;
-                const data = change.doc.data();
-                if (scoreBoardIds.includes(id))
-                  [
-                    scoreBoards.push({
-                      ...data,
-                      createdAt: data.createdAt.toDate(),
-                      id: id
-                    })
-                  ];
-              });
-              resolve(scoreBoards);
-              commit("setScoreBoards", scoreBoards);
-            });
-        });
+        .onSnapshot(
+          (doc: any) => {
+            const scoreBoardIds: string[] = doc.data().scoreBoardIds;
+            const scoreBoards: ScoreBoard[] = [];
+            unsubscribeScoreBoards = db.collection("scores").onSnapshot(
+              snapshot => {
+                snapshot.docChanges().forEach((change: any) => {
+                  const id = change.doc.id;
+                  const data = change.doc.data();
+                  if (scoreBoardIds.includes(id))
+                    [
+                      scoreBoards.push({
+                        ...data,
+                        createdAt: data.createdAt.toDate(),
+                        id: id
+                      })
+                    ];
+                });
+                resolve(scoreBoards);
+                commit("setScoreBoards", scoreBoards);
+              },
+              error => {
+                reject(error);
+              }
+            );
+          },
+          error => {
+            reject(error);
+          }
+        );
     });
+  },
+
+  stopScoreBoardsListener: () => {
+    unsubscribeScoreBoards();
+    unsubscribeScoreBoardIds();
   },
 
   startScoreBoardListener: ({ commit }: any, id: string) => {

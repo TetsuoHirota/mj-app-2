@@ -8,7 +8,7 @@
       width="100%"
     >
       <v-card-title class="pa-2 pb-0">
-        <v-chip small dark color="indigo">{{ player.name }}</v-chip>
+        <v-chip small color="indigo">{{ player.name }}</v-chip>
       </v-card-title>
 
       <v-card-text class="body-2 pb-0">
@@ -25,14 +25,14 @@
           </v-row>
           <v-row class="rank">
             <div v-for="index in rule.players" :key="index" class="rank__value">
-              <span>{{ getRank(player.uid).rank[index - 1] }}</span
-              >回
+              <span>{{ getRank(player.uid).rank[index - 1] }}</span>
+              回
             </div>
           </v-row>
           <v-row class="rank">
             <div v-for="index in rule.players" :key="index" class="rank__value">
-              <span>{{ getRank(player.uid).percent[index - 1] }}</span
-              >%
+              <span>{{ getRank(player.uid).percent[index - 1] }}</span>
+              %
             </div>
           </v-row>
         </v-col>
