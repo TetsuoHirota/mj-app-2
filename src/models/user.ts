@@ -1,7 +1,8 @@
 export interface UserInfo {
-  uid: string;
-  email: string;
+  email?: string;
+  friendIds?: string[];
   mid: string;
   name: string;
-  scoreBoardIds: string[];
+  scoreBoardIds?: string[];
+  uid: string;
 }

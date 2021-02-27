@@ -8,7 +8,7 @@ Vue.use(Vuetify);
 export default new Vuetify({
   /* vuetifyのオプション */
   theme: {
-    dark: false,
+    dark: true,
     themes: {
       dark: {
         "line-primary": colors.grey.lighten1

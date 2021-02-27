@@ -21,7 +21,8 @@ const state = (): State => ({
   email: "",
   mid: "",
   name: "",
-  scoreBoardIds: []
+  scoreBoardIds: [],
+  friendIds: []
 });
 
 const mutations = {
@@ -32,6 +33,7 @@ const mutations = {
     state.mid = userInfo.mid;
     state.name = userInfo.name;
     state.scoreBoardIds = userInfo.scoreBoardIds;
+    state.friendIds = userInfo.friendIds;
   },
 
   logout: (state: State) => {
@@ -83,7 +85,8 @@ const actions = {
                   email: data.email,
                   mid: data.mid,
                   name: data.name,
-                  scoreBoardIds: data.scoreBoardIds
+                  scoreBoardIds: data.scoreBoardIds,
+                  friendIds: data.friendIds
                 } as UserInfo);
                 resolve("");
               } else {
@@ -119,7 +122,8 @@ const getters = {
       mid: state.mid,
       email: state.email,
       name: state.name,
-      scoreBoardIds: state.scoreBoardIds
+      scoreBoardIds: state.scoreBoardIds,
+      friendIds: state.friendIds
     };
     return user;
   }

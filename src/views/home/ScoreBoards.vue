@@ -2,44 +2,44 @@
   <div class="scoreboards">
     <div class="list">
       <template v-if="skeleton">
-        <v-skeleton-loader type="card" tile></v-skeleton-loader>
+        <v-skeleton-loader
+          v-for="n of 3"
+          :key="n"
+          type="card"
+          tile
+          class="ma-3"
+        ></v-skeleton-loader>
       </template>
       <template v-else>
         <template v-if="scoreBoards.length !== 0">
           <transition-group name="tr-card">
             <div v-for="scoreBoard in scoreBoards" :key="scoreBoard.id">
-              <v-card
-                flat
-                class="ma-2 mt-12"
-                @click="toScoreBoard(scoreBoard.id)"
+              <v-lazy
+                :options="{
+                  threshold: 0.5
+                }"
+                min-height="200"
               >
-                <v-sheet
-                  class="v-sheet--offset mx-auto"
-                  color="cyan"
-                  elevation="12"
-                  max-width="calc(100% - 32px)"
-                >
-                  <v-sparkline
-                    :labels="labels"
-                    :value="value"
-                    :gradient="['#f72047', '#ffd200', '#1feaea']"
-                    line-width="2"
-                    padding="16"
-                    auto-draw
-                  ></v-sparkline>
-                </v-sheet>
-                <v-card-text class="pt-0">
-                  <div class="date text-subtitle-2">
-                    <span>{{ scoreBoard.createdAt.getFullYear() }}</span>
-                    <span>/</span>
-                    <span>{{ scoreBoard.createdAt.getMonth() + 1 }}</span>
-                    <span>/</span>
-                    <span>{{ scoreBoard.createdAt.getDate() }}</span>
-                  </div>
-                  <v-col>
-                    <v-row class="cardinfo">
-                      <div class="cardinfo__title">メンバー</div>
-                      <div class="cardinfo__colon">:</div>
+                <v-card class="ma-3" @click="toScoreBoard(scoreBoard.id)">
+                  <v-sheet color="cyan">
+                    <v-sparkline
+                      :value="value"
+                      :gradient="['#f72047', '#ffd200', '#1feaea']"
+                      line-width="2"
+                      padding="16"
+                      auto-draw
+                    ></v-sparkline>
+                  </v-sheet>
+                  <v-card-text class="pb-0">
+                    <div class="date">
+                      <span>{{ scoreBoard.createdAt.getFullYear() }}</span>
+                      <span>/</span>
+                      <span>{{ scoreBoard.createdAt.getMonth() + 1 }}</span>
+                      <span>/</span>
+                      <span>{{ scoreBoard.createdAt.getDate() }}</span>
+                    </div>
+                    <v-divider class="my-2"></v-divider>
+                    <v-row class="cardinfo" no-gutters align="center">
                       <div class="cardinfo__text">
                         <span
                           v-for="(player, index) in scoreBoard.players"
@@ -50,17 +50,16 @@
                         </span>
                       </div>
                     </v-row>
-                    <v-row class="cardinfo">
-                      <div class="cardinfo__title">平均順位</div>
-                      <div class="cardinfo__colon">:</div>
-                      <div class="cardinfo__text">
-                        {{ getRankAvarage(scoreBoard) }}
-                      </div>
-                    </v-row>
-                  </v-col>
-                </v-card-text>
-              </v-card>
-              <!-- <v-divider></v-divider> -->
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="cyan" text>
+                      成績表を見る
+                      <v-icon>mdi-chevron-right</v-icon>
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-lazy>
             </div>
           </transition-group>
         </template>
@@ -74,10 +73,11 @@
     <v-fab-transition>
       <v-btn
         v-show="showAddButton"
-        class="add-button"
+        class="o-button-add"
         color="pink"
         fab
         large
+        dark
         @click="openAddRule"
       >
         <v-icon>mdi-plus</v-icon>
@@ -101,9 +101,8 @@ import { getPlayerResults } from "@/utils/scoreBoard";
   }
 })
 export default class ScoreBoards extends Vue {
-  labels = ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"];
   value = [200, 675, 410, 390, 310, 460, 250, 240];
-  skeleton = false;
+  skeleton = true;
   showAddButton = false;
   showRuleAddModal = false;
 
@@ -172,15 +171,9 @@ export default class ScoreBoards extends Vue {
   overflow: auto;
 }
 
-.add-button {
-  position: absolute;
-  right: 25px;
-  bottom: 25px;
-}
-
 .v-sheet--offset {
   position: relative;
-  top: -24px;
+  top: -20px;
 }
 
 .cardinfo {

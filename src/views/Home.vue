@@ -1,12 +1,14 @@
 <template>
   <div class="home">
-    <AppBar is-drawer-active></AppBar>
+    <AppBar is-drawer-active :title="titles[nav]"></AppBar>
     <v-carousel
       v-model="nav"
       :continuous="false"
       hide-delimiters
       :show-arrows="false"
       height="100%"
+      :dark="$vuetify.theme.dark"
+      :light="!$vuetify.theme.dark"
     >
       <v-carousel-item>
         <ScoreBoards></ScoreBoards>
@@ -45,7 +47,8 @@ import Friends from "@/views/home/Friends.vue";
   }
 })
 export default class Home extends Vue {
-  nav = 0;
+  nav = 1;
+  titles = ["成績表", "フレンド", "データ"];
 }
 </script>
 

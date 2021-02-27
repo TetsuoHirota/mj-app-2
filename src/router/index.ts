@@ -6,6 +6,7 @@ import Home from "../views/Home.vue";
 
 const Login = () => import("../views/Login.vue");
 const ScoreBoard = () => import("../views/ScoreBoard.vue");
+const Friend = () => import("../views/Friend.vue");
 
 Vue.use(VueRouter);
 
@@ -25,6 +26,12 @@ const routes = [
     path: "/scoreboard/:id",
     name: "scoreBoard",
     component: ScoreBoard,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/friend",
+    name: "friend",
+    component: Friend,
     meta: { requiresAuth: true }
   }
 ];

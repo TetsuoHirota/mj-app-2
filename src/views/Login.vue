@@ -5,9 +5,9 @@
     <div class="firebaseui">
       <div id="firebaseui-auth-container"></div>
     </div>
-    <v-subheader class="my-9 mx-3"
-      >アカウントを作成する場合は、「メールでログイン」を選択後、登録したいアドレスを入力してください。</v-subheader
-    >
+    <v-subheader class="my-9 mx-3">
+      アカウントを作成する場合は、「メールでログイン」を選択後、登録したいアドレスを入力してください。
+    </v-subheader>
   </div>
 </template>
 
@@ -35,7 +35,8 @@ export default class Login extends Vue {
           email: user.email,
           mid: "",
           name: "",
-          scoreBoardIds: []
+          scoreBoardIds: [],
+          friendIds: []
         };
         info.isNewUser ? this.signUp(userInfo) : this.login();
         return false;

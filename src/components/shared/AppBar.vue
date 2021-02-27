@@ -1,10 +1,10 @@
 <template>
   <div class="appbar">
     <v-app-bar flat>
-      <v-app-bar-nav-icon
+      <!-- <v-app-bar-nav-icon
         v-if="isDrawerActive"
         @click.stop="handleClickNavIcon"
-      ></v-app-bar-nav-icon>
+      ></v-app-bar-nav-icon> -->
       <v-btn v-if="isBackActive" icon @click="handleClickBack">
         <v-icon large>mdi-chevron-left</v-icon>
       </v-btn>
@@ -12,6 +12,7 @@
         {{ title }}
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-switch v-model="$vuetify.theme.dark"></v-switch>
       <slot></slot>
     </v-app-bar>
     <Drawer v-if="isDrawerActive" v-model="isDrawerOpened"></Drawer>
