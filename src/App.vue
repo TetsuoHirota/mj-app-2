@@ -16,10 +16,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 
 @Component
-export default class App extends Vue {
+export default class App extends BaseComponent {
   get isLoading() {
     return this.$store.getters["app/isLoading"];
   }

@@ -90,7 +90,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 import { ScoreBoard } from "@/models/scoreBoard";
 import RuleAddCard from "@/components/shared/RuleAddCard.vue";
 import { getPlayerResults } from "@/utils/scoreBoard";
@@ -100,7 +101,7 @@ import { getPlayerResults } from "@/utils/scoreBoard";
     RuleAddCard
   }
 })
-export default class ScoreBoards extends Vue {
+export default class ScoreBoards extends BaseComponent {
   value = [200, 675, 410, 390, 310, 460, 250, 240];
   skeleton = true;
   showAddButton = false;

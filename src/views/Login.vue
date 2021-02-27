@@ -12,14 +12,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 import firebase from "firebase/app";
 import firebaseui from "firebaseui-ja";
 import "firebaseui-ja/dist/firebaseui.css";
 import { UserInfo } from "@/models/user";
 
 @Component
-export default class Login extends Vue {
+export default class Login extends BaseComponent {
   ui =
     firebaseui.auth.AuthUI.getInstance() ||
     new firebaseui.auth.AuthUI(firebase.auth());

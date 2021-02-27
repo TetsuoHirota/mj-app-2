@@ -91,13 +91,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 import { UserInfo } from "@/models/user";
 
 @Component({
   components: {}
 })
-export default class Friends extends Vue {
+export default class Friends extends BaseComponent {
   skeleton = true;
   showFriendsAdd = false;
   showAddButton = false;

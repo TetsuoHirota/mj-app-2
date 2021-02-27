@@ -34,7 +34,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 import AppBar from "@/components/shared/AppBar.vue";
 import ScoreBoards from "@/views/home/ScoreBoards.vue";
 import Friends from "@/views/home/Friends.vue";
@@ -46,7 +47,7 @@ import Friends from "@/views/home/Friends.vue";
     Friends
   }
 })
-export default class Home extends Vue {
+export default class Home extends BaseComponent {
   nav = 1;
   titles = ["成績表", "フレンド", "データ"];
 }

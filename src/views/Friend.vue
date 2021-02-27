@@ -38,10 +38,6 @@ export default class Friend extends BaseComponent {
   mid = "";
   user: UserInfo | null = null;
 
-  mounted() {
-    this._error("y");
-  }
-
   search() {
     console.debug("d");
     this.$store

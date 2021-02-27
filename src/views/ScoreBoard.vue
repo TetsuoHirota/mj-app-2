@@ -74,7 +74,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 import AppBar from "@/components/shared/AppBar.vue";
 import Score from "@/views/scoreBoard/Score.vue";
 // import Data from "@/components/ScoreBoard/Data.vue";
@@ -90,7 +91,7 @@ import PlayersChange from "@/components/scoreBoard/PlayersChange.vue";
     PlayersChange
   }
 })
-export default class ScoreBoardPage extends Vue {
+export default class ScoreBoardPage extends BaseComponent {
   $refs!: {
     playersChange: PlayersChange;
   };
