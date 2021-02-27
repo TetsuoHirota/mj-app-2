@@ -40,7 +40,7 @@ export default class AppBar extends Vue {
   isDrawerOpened = false;
 
   handleClickBack() {
-    this.$router.push({ name: "home" });
+    this.$router.go(-1);
   }
 
   handleClickNavIcon() {

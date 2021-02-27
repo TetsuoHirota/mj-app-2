@@ -18,8 +18,6 @@ const mutations = {
 
 const actions = {
   get: ({ commit, rootGetters }: any) => {
-    console.debug("get");
-
     return new Promise((resolve, reject) => {
       const me: UserInfo = rootGetters["user/user"];
       const friendIds = me.friendIds || [];

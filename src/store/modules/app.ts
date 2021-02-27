@@ -21,6 +21,13 @@ const mutations = {
 
   changeSuccessMessage: (state: State, successMessage: string) => {
     state.successMessage = successMessage;
+  },
+
+  resetMessages: (state: State) => {
+    console.debug("reset");
+
+    state.errorMessage = "";
+    state.successMessage = "";
   }
 };
 
@@ -35,6 +42,10 @@ const actions = {
 
   success: ({ commit }: any, successMessage: string) => {
     commit("changeSuccessMessage", successMessage);
+  },
+
+  resetMessages: ({ commit }: any) => {
+    commit("resetMessages");
   }
 };
 

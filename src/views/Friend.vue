@@ -16,20 +16,32 @@
           @change="search()"
         ></v-text-field>
       </v-row>
-      <div v-if="user" class="user my-10">
-        <v-avatar class="mb-3" color="grey" size="80">
-          <v-icon dark size="60">mdi-account</v-icon>
-        </v-avatar>
-        <div class="mb-3 font-weight-bold">{{ user ? user.name : "" }}</div>
-        <template
-          v-if="me.friendIds && user && me.friendIds.includes(user.uid)"
-        >
-          <div>このユーザーは既にフレンドです</div>
-        </template>
-        <template v-else>
-          <v-btn color="primary" width="120" @click="addFriend()">追加</v-btn>
-        </template>
-      </div>
+      <template v-if="showResult">
+        <div class="user my-10">
+          <template v-if="user">
+            <v-avatar class="mb-3" color="grey" size="80">
+              <v-icon dark size="60">mdi-account</v-icon>
+            </v-avatar>
+            <div class="mb-3 font-weight-bold">{{ user ? user.name : "" }}</div>
+            <template
+              v-if="me.friendIds && user && me.friendIds.includes(user.uid)"
+            >
+              <div>このユーザーは既にフレンドです</div>
+            </template>
+            <template v-else>
+              <v-btn
+                color="primary"
+                width="120"
+                elevation="0"
+                @click="addFriend()"
+              >
+                追加
+              </v-btn>
+            </template>
+          </template>
+          <template v-else>該当するユーザーがいません。</template>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -46,6 +58,7 @@ import { UserInfo } from "@/models/user";
   }
 })
 export default class Friend extends BaseComponent {
+  showResult = false;
   mid = "";
   user: UserInfo | null = null;
 
@@ -58,6 +71,7 @@ export default class Friend extends BaseComponent {
       .dispatch("friends/search", this.mid)
       .then(result => {
         this.user = result;
+        this.showResult = true;
       })
       .catch(err => {
         this._error(err);
