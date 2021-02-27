@@ -17,7 +17,9 @@ const mutations = {
 };
 
 const actions = {
-  getFriends: ({ commit, rootGetters }: any) => {
+  get: ({ commit, rootGetters }: any) => {
+    console.debug("get");
+
     return new Promise((resolve, reject) => {
       const me: UserInfo = rootGetters["user/user"];
       const friendIds = me.friendIds || [];
@@ -49,20 +51,31 @@ const actions = {
     });
   },
 
-  addFriend: ({ dispatch, rootGetters }: any, user: any) => {
-    const me = rootGetters["User/user"];
-    db.collection("users").doc(me.uid).collection("friends").doc(user.uid).set({
-      uid: user.uid,
-      mid: user.mid
+  add: ({ rootGetters }: any, uid: string) => {
+    return new Promise((resolve, reject) => {
+      const me = rootGetters["user/user"];
+      Promise.all([
+        db
+          .collection("users")
+          .doc(me.uid)
+          .update({
+            friendIds: firebase.firestore.FieldValue.arrayUnion(uid)
+          }),
+        db
+          .collection("users")
+          .doc(uid)
+          .update({
+            friendIds: firebase.firestore.FieldValue.arrayUnion(me.uid)
+          })
+      ])
+        .then(() => {
+          resolve("");
+        })
+        .catch(err => reject(err));
     });
-    db.collection("users").doc(user.uid).collection("friends").doc(me.uid).set({
-      uid: me.uid,
-      mid: me.mid
-    });
-    dispatch("getFriends");
   },
 
-  deleteFriend: ({ dispatch, rootGetters }: any, uid: string) => {
+  delete: ({ rootGetters }: any, uid: string) => {
     return new Promise((resolve, reject) => {
       const me = rootGetters["user/user"];
       Promise.all([
@@ -80,7 +93,6 @@ const actions = {
           })
       ])
         .then(() => {
-          dispatch("getFriends");
           resolve("");
         })
         .catch(err => reject(err));

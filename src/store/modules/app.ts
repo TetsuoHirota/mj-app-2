@@ -1,11 +1,13 @@
 interface State {
   isLoading: boolean;
   errorMessage: string;
+  successMessage: string;
 }
 
 const state = (): State => ({
   isLoading: false,
-  errorMessage: ""
+  errorMessage: "",
+  successMessage: ""
 });
 
 const mutations = {
@@ -15,6 +17,10 @@ const mutations = {
 
   changeErrorMessage: (state: State, errorMessage: string) => {
     state.errorMessage = errorMessage;
+  },
+
+  changeSuccessMessage: (state: State, successMessage: string) => {
+    state.successMessage = successMessage;
   }
 };
 
@@ -25,6 +31,10 @@ const actions = {
 
   error: ({ commit }: any, errorMessage: string) => {
     commit("changeErrorMessage", errorMessage);
+  },
+
+  success: ({ commit }: any, successMessage: string) => {
+    commit("changeSuccessMessage", successMessage);
   }
 };
 
@@ -35,6 +45,10 @@ const getters = {
 
   error: (state: State) => {
     return state.errorMessage;
+  },
+
+  success: (state: State) => {
+    return state.successMessage;
   }
 };
 

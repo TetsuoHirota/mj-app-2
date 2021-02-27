@@ -126,7 +126,7 @@ export default class ScoreBoards extends BaseComponent {
         this.skeleton = false;
       })
       .catch(err => {
-        this.$store.dispatch("app/error", err);
+        this._error(err);
         this.skeleton = false;
       });
   }

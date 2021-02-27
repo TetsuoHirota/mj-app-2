@@ -7,9 +7,15 @@
       </v-container>
     </v-main>
     <v-snackbar app color="error" :value="errorMessage" :timeout="4000">
-      <v-row dense class="flex-nowrap">
+      <v-row dense class="flex-nowrap" align="center">
         <v-icon class="mr-4">mdi-alert</v-icon>
         {{ errorMessage }}
+      </v-row>
+    </v-snackbar>
+    <v-snackbar app color="success" :value="successMessage" :timeout="4000">
+      <v-row dense class="flex-nowrap" align="center">
+        <v-icon class="mr-4">mdi-check-circle</v-icon>
+        {{ successMessage }}
       </v-row>
     </v-snackbar>
   </v-app>
@@ -27,6 +33,10 @@ export default class App extends BaseComponent {
 
   get errorMessage() {
     return this.$store.getters["app/error"];
+  }
+
+  get successMessage() {
+    return this.$store.getters["app/success"];
   }
 }
 </script>

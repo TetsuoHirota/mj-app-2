@@ -36,10 +36,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 
 @Component
-export default class Drawer extends Vue {
+export default class Drawer extends BaseComponent {
   @Prop()
   value = false;
 
@@ -60,9 +61,9 @@ export default class Drawer extends Vue {
   }
 
   async logout() {
-    this.$store.dispatch("app/isLoading", true);
+    this._loading(true);
     await this.$store.dispatch("user/logout");
-    this.$store.dispatch("app/isLoading", false);
+    this._loading(false);
     this.$router.push({ name: "login" });
   }
 

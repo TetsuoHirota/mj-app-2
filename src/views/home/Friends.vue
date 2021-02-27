@@ -115,12 +115,12 @@ export default class Friends extends BaseComponent {
 
   created() {
     this.$store
-      .dispatch("friends/getFriends")
+      .dispatch("friends/get")
       .then(() => {
         this.skeleton = false;
       })
       .catch(err => {
-        this.$store.dispatch("app/error", err);
+        this._error(err);
         this.skeleton = false;
       });
   }
@@ -149,13 +149,24 @@ export default class Friends extends BaseComponent {
 
   onDeleteFriendClick() {
     if (!this.selectedFriend) {
-      this.$store.dispatch("app/error", "エラーが発生しました");
+      this._error("エラーが発生しました");
+      return;
+    }
+    const result = confirm("本当に削除しますか？");
+    if (!result) {
       return;
     }
     this.$store
-      .dispatch("friends/deleteFriend", this.selectedFriend.uid)
+      .dispatch("friends/delete", this.selectedFriend.uid)
+      .then(() => {
+        this.selectedFriend = null;
+        this.showDrawer = false;
+        this.$store.dispatch("user/get").then(() => {
+          this.$store.dispatch("friends/get");
+        });
+      })
       .catch(err => {
-        this.$store.dispatch("app/error", err);
+        this._error(err);
       });
   }
 }

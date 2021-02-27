@@ -64,14 +64,13 @@
               item-value="uid"
               class="mx-2"
               clearable
-            >
-            </v-select>
+            ></v-select>
           </v-row>
         </transition>
         <transition name="tr-accordion">
-          <v-subheader v-if="sameScore" class="caption pa-0 my-5"
-            >※同点の場合、上に名前のある人が高い順位になります。</v-subheader
-          >
+          <v-subheader v-if="sameScore" class="caption pa-0 my-5">
+            ※同点の場合、上に名前のある人が高い順位になります。
+          </v-subheader>
         </transition>
         <transition name="tr-accordion">
           <div v-if="errorMessage">
@@ -92,7 +91,8 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 import RuleConfig from "@/mixins/ruleConfig";
 import { ScoreBoard, Score } from "@/models/scoreBoard";
 import { UserInfo } from "@/models/user";
@@ -104,7 +104,7 @@ import draggable from "vuedraggable";
     draggable
   }
 })
-export default class ScoreChange extends Vue {
+export default class ScoreChange extends BaseComponent {
   scoreBoard?: ScoreBoard;
   data: (Score & UserInfo)[] = [];
 
@@ -151,7 +151,7 @@ export default class ScoreChange extends Vue {
     const scoreBoard: ScoreBoard = this.$store.state.scoreBoard.scoreBoard;
     this.scoreBoard = scoreBoard;
     if (!scoreBoard) {
-      this.$store.dispatch("app/error", "エラーが発生しました");
+      this._error("エラーが発生しました");
       return;
     }
     const scoress = scoreBoard.scoress;
@@ -201,7 +201,7 @@ export default class ScoreChange extends Vue {
   validate() {
     const { scoreBoard, data, isPtMode } = this;
     if (!scoreBoard) {
-      this.$store.dispatch("app/error", "成績表が見つかりません");
+      this._error("成績表が見つかりません");
       return false;
     }
     const { id, players, scoress, rule, createdAt } = scoreBoard;
@@ -236,7 +236,7 @@ export default class ScoreChange extends Vue {
   getPt(): (Score & UserInfo)[] {
     const { scoreBoard, data, isPtMode } = this;
     if (!scoreBoard) {
-      this.$store.dispatch("app/error", "成績表が見つかりません");
+      this._error("成績表が見つかりません");
       return [];
     }
     const { rule } = scoreBoard;
@@ -257,7 +257,7 @@ export default class ScoreChange extends Vue {
     for (let i = 1; i < scores.length; i++) {
       const score = scores[i].score;
       if (score == null) {
-        this.$store.dispatch("app/error", "計算でエラーが発生しました");
+        this._error("計算でエラーが発生しました");
         return [];
       }
       let calculatedScore = score - rule.oka;

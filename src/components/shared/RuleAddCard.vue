@@ -136,14 +136,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 import { ruleConfig } from "@/config/rule";
 import { Rule } from "@/models/scoreBoard";
 
 @Component({
   components: {}
 })
-export default class RuleAdd extends Vue {
+export default class RuleAdd extends BaseComponent {
   ruleConfig = ruleConfig;
 
   playerNumber = ruleConfig.playerNumber[0].value;
@@ -190,7 +191,7 @@ export default class RuleAdd extends Vue {
   }
 
   start() {
-    this.$store.dispatch("app/isLoading", true);
+    this._loading(true);
     const rule: Rule = {
       playerNumber: this.playerNumber,
       rate: this.rate,
@@ -206,16 +207,16 @@ export default class RuleAdd extends Vue {
       this.$store
         .dispatch("scoreBoard/createScoreBoard", rule)
         .then(id => {
-          this.$store.dispatch("app/isLoading", false);
+          this._loading(false);
           this.$router.push({ name: "scoreBoard", params: { id: id } });
         })
         .catch(err => {
-          this.$store.dispatch("app/error", err);
+          this._error(err);
         });
     } else {
       this.close();
-      this.$store.dispatch("app/error", "入力に不備があります");
-      this.$store.dispatch("app/isLoading", false);
+      this._error("入力に不備があります");
+      this._loading(false);
     }
   }
   save() {}

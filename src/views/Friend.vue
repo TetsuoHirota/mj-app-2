@@ -2,7 +2,9 @@
   <div class="friend">
     <AppBar is-back-active title="フレンド追加"></AppBar>
     <div class="px-5">
-      <v-subheader class="px-0">検索にはフレンドのIDが必要です。</v-subheader>
+      <v-subheader class="px-0 my-2">
+        検索にはフレンドのIDが必要です。
+      </v-subheader>
       <v-row class="flex-grow-0" no-gutters>
         <v-text-field
           v-model="mid"
@@ -14,10 +16,19 @@
           @change="search()"
         ></v-text-field>
       </v-row>
-      <div>
-        <v-avatar color="grey" size="80">
+      <div v-if="user" class="user my-10">
+        <v-avatar class="mb-3" color="grey" size="80">
           <v-icon dark size="60">mdi-account</v-icon>
         </v-avatar>
+        <div class="mb-3 font-weight-bold">{{ user ? user.name : "" }}</div>
+        <template
+          v-if="me.friendIds && user && me.friendIds.includes(user.uid)"
+        >
+          <div>このユーザーは既にフレンドです</div>
+        </template>
+        <template v-else>
+          <v-btn color="primary" width="120" @click="addFriend()">追加</v-btn>
+        </template>
       </div>
     </div>
   </div>
@@ -38,54 +49,38 @@ export default class Friend extends BaseComponent {
   mid = "";
   user: UserInfo | null = null;
 
+  get me(): UserInfo {
+    return this.$store.getters["user/user"];
+  }
+
   search() {
-    console.debug("d");
     this.$store
       .dispatch("friends/search", this.mid)
       .then(result => {
         this.user = result;
       })
-      .catch(e => console.debug(e));
-
-    // const me = this.$store.getters["User/user"];
-    // const friends = this.$store.getters["Friends/friends"];
-    // const friendMids = friends.map((friend: any) => {
-    //   return friend.mid;
-    // });
-
-    // // 不適切ユーザーの除外
-    // this.searchedUsers = this.users.filter(user => {
-    //   return (
-    //     (user.mid === this.filter || user.name === this.filter) && //全ユーザーの中に存在
-    //     friendMids.indexOf(user.mid) < 0 && //フレンドにいない
-    //     user.mid !== me.mid
-    //   ); //自分ではない
-    // });
-
-    // const loader = document.getElementById("loader") as HTMLElement;
-    // const noUser = document.getElementById("noUser") as HTMLElement;
-
-    // // ローダー、該当なしの表示切り替え
-    // if (this.searchedUsers.length > 0) {
-    //   noUser.style.display = "none";
-    // } else {
-    //   noUser.style.display = "none";
-    //   loader.style.display = "inline-block";
-    //   setTimeout(() => {
-    //     noUser.style.display = "block";
-    //     loader.style.display = "none";
-    //   }, 200);
-    // }
+      .catch(err => {
+        this._error(err);
+      });
   }
 
-  addFriend(user: any) {
-    // const userInfo = {
-    //   mid: user.mid,
-    //   mid: user.mid,
-    //   email: user.email,
-    //   name: user.name
-    // };
-    // this.$store.dispatch("Friends/addFriend", userInfo);
+  addFriend() {
+    if (!this.user) {
+      this._error("選択されたユーザーがいません");
+      return;
+    }
+    this.$store
+      .dispatch("friends/add", this.user.uid)
+      .then(() => {
+        this._success("フレンドを追加しました");
+        this.$router.go(-1);
+        this.$store.dispatch("user/get").then(() => {
+          this.$store.dispatch("friends/get");
+        });
+      })
+      .catch(err => {
+        this._error(err);
+      });
   }
 }
 </script>
@@ -96,5 +91,11 @@ export default class Friend extends BaseComponent {
   flex-direction: column;
   width: 100%;
   height: 100%;
+}
+
+.user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>

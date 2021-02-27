@@ -116,7 +116,7 @@ export default class ScoreBoardPage extends BaseComponent {
     this.$store
       .dispatch("scoreBoard/startScoreBoardListener", this.$route.params.id)
       .catch(err => {
-        this.$store.dispatch("app/error", err);
+        this._error(err);
       });
   }
 

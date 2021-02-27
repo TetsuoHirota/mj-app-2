@@ -26,6 +26,15 @@ const state = (): State => ({
 });
 
 const mutations = {
+  changeUserInfo: (state: State, userInfo: UserInfo) => {
+    state.uid = userInfo.uid;
+    state.email = userInfo.email;
+    state.mid = userInfo.mid;
+    state.name = userInfo.name;
+    state.scoreBoardIds = userInfo.scoreBoardIds;
+    state.friendIds = userInfo.friendIds;
+  },
+
   login: (state: State, userInfo: UserInfo) => {
     state.isLoggedIn = true;
     state.uid = userInfo.uid;
@@ -43,6 +52,42 @@ const mutations = {
 };
 
 const actions = {
+  get: ({ commit }: any) => {
+    return new Promise((resolve, reject) => {
+      auth.onAuthStateChanged(user => {
+        if (!user) {
+          reject("ユーザーがいません");
+          return;
+        }
+        db.collection("users")
+          .doc(user.uid)
+          .get()
+          .then(doc => {
+            if (doc.exists) {
+              const data = doc.data();
+              if (!data) {
+                reject("error");
+                return;
+              }
+              commit("changeUserInfo", {
+                uid: data.uid,
+                email: data.email,
+                mid: data.mid,
+                name: data.name,
+                scoreBoardIds: data.scoreBoardIds,
+                friendIds: data.friendIds
+              } as UserInfo);
+              resolve("");
+            } else {
+              reject("データベースにユーザーが存在していません");
+            }
+          })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    });
+  },
   signUp: async ({ commit }: any, userInfo: UserInfo) => {
     const mids: string[] = [];
     await db
