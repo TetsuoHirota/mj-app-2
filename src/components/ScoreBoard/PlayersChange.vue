@@ -9,40 +9,42 @@
       <v-btn icon absolute top right @click="close()">
         <v-icon>mdi-close</v-icon>
       </v-btn>
-      <v-card-title>プレイヤー変更</v-card-title>
+      <v-card-title>プレイヤー設定</v-card-title>
       <v-card-text>
         <v-col>
           <v-list>
-            <v-list-item
+            <v-card
               v-for="(player, idx) in players"
               :key="player.uid"
-              two-line
+              elevation="0"
               class="item"
-              :class="{ 'item--delete': isDeleteMode }"
+              color="rgba(128,128,128,0.05)"
               @click="onClickPlayer(idx)"
             >
-              <div>
-                <v-list-item-title class="primary--text">
-                  {{ player.name }}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ player.mid ? `@${player.mid}` : "" }}
-                </v-list-item-subtitle>
-              </div>
-              <v-spacer></v-spacer>
-              <v-icon>mdi-pencil</v-icon>
-              <v-btn
-                v-if="isDeleteMode"
-                class="delete"
-                icon
-                @click="deletePlayer(idx)"
-              >
-                <v-icon color="error">mdi-delete</v-icon>
-              </v-btn>
-            </v-list-item>
+              <v-list-item two-line :class="{ 'item--delete': isDeleteMode }">
+                <div>
+                  <v-list-item-title class="primary--text">
+                    {{ player.name }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ player.mid ? `@${player.mid}` : "" }}
+                  </v-list-item-subtitle>
+                </div>
+                <v-spacer></v-spacer>
+                <v-icon>mdi-pencil</v-icon>
+                <v-btn
+                  v-if="isDeleteMode"
+                  class="delete"
+                  icon
+                  @click="deletePlayer(idx)"
+                >
+                  <v-icon color="error">mdi-delete</v-icon>
+                </v-btn>
+              </v-list-item>
+            </v-card>
           </v-list>
           <v-row class="controls my-5" no-gutters>
-            <v-btn class="mr-3" outlined color="primary" @click="addPlayer">
+            <v-btn class="mr-3" outlined color="primary" @click="addPlayer()">
               <v-icon class="mr-2">mdi-account-plus</v-icon>
               追加
             </v-btn>
@@ -50,7 +52,7 @@
               elevation="0"
               :outlined="!isDeleteMode"
               color="error"
-              @click="isDeleteMode = !isDeleteMode"
+              @click="onClickDeleteModeButton()"
             >
               <v-icon class="mr-2">mdi-account-minus</v-icon>
               削除
@@ -69,39 +71,71 @@
 
       <v-expand-transition>
         <v-card
-          v-if="reveal"
-          class="transition-fast-in-fast-out player-input d-flex flex-column"
+          v-if="showPlayerInput"
+          class="player-input transition-fast-in-fast-out"
         >
-          <v-card-text style="flex: 1">
-            <v-col class="d-flex flex-column" style="height: 100%">
+          <v-card-text class="player-input__content">
+            <div
+              class="player-input__item"
+              :class="{ 'player-input__item--active': selectedInput === 0 }"
+              @click="onPlayerInputClick(0)"
+            >
+              <v-radio-group v-model="selectedInput" class="mt-0">
+                <v-radio :value="0" label="プレイヤー名入力"></v-radio>
+              </v-radio-group>
               <v-form ref="form">
                 <v-text-field
+                  v-model="selectedPlayerName"
                   outlined
                   type="text"
                   label="プレイヤー名"
-                  hide-details
+                  class="flex-grow-0"
+                  required
+                  :rules="nameRules"
                 ></v-text-field>
               </v-form>
-              <v-subheader>フレンドから選ぶ</v-subheader>
-              <v-list class="list">
-                <v-list-item v-for="friend in friends" :key="friend.uid">
-                  <v-list-item-avatar>
-                    <v-icon>mdi-account</v-icon>
-                  </v-list-item-avatar>
-                  <v-list-item-content class="ma-0 pa-0">
-                    <v-list-item-title
-                      class="font-weight-medium"
-                    ></v-list-item-title>
-                    <v-list-item-subtitle></v-list-item-subtitle>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
+            </div>
+            <div
+              class="player-input__item player-input__item--friend"
+              :class="{ 'player-input__item--active': selectedInput === 1 }"
+              @click="onPlayerInputClick(1)"
+            >
+              <v-radio-group v-model="selectedInput" class="mt-0">
+                <v-radio :value="1" label="フレンドから選ぶ"></v-radio>
+              </v-radio-group>
+              <v-sheet class="rounded" outlined>
+                <v-list>
+                  <v-list-item-group v-model="selectedFriendIdx">
+                    <v-list-item
+                      v-for="friend in friends"
+                      :key="friend.uid"
+                      two-line
+                    >
+                      <v-list-item-avatar>
+                        <v-avatar color="grey">
+                          <v-icon dark>mdi-account</v-icon>
+                        </v-avatar>
+                      </v-list-item-avatar>
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ friend.name }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                          {{ friend.mid }}
+                        </v-list-item-subtitle>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
+              </v-sheet>
+            </div>
           </v-card-text>
           <v-card-actions class="pa-5">
-            <v-btn color="primary" text @click="reveal = false">戻る</v-btn>
+            <v-btn color="primary" text @click="onClickBackButton()">
+              戻る
+            </v-btn>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="reveal = false">決定</v-btn>
+            <v-btn color="primary" @click="onClickSaveButton()">決定</v-btn>
           </v-card-actions>
         </v-card>
       </v-expand-transition>
@@ -110,7 +144,9 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { ScoreBoard } from "@/models/scoreBoard";
+import { ScoreBoard, UserInfo } from "@/models";
+import { userConfig } from "@/config/user";
+import { charCount } from "@/utils";
 
 @Component({
   components: {}
@@ -119,8 +155,36 @@ export default class PlayersChange extends Vue {
   isDeleteMode = false;
   errorMessage = "";
   show = true;
-  reveal = false;
-  friends: { uid: string }[] = [];
+
+  selectedPlayerIdx: number | null = 1;
+  selectedPlayerName = "";
+  selectedFriendIdx: number | null = null;
+  selectedInput = 0;
+
+  nameRules = [
+    (v: string) => !!v || "名前を入力してください",
+    (v: string) =>
+      (v && charCount(v) <= userConfig.maxPlayerNameLength) ||
+      "名前が長すぎます",
+    (v: string) =>
+      (v && !this.players.map(p => p.uid).includes(v)) ||
+      "IDが重複するため使えません"
+  ];
+
+  get showPlayerInput(): boolean {
+    if (this.selectedPlayerIdx === null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  set showPlayerInput(value: boolean) {
+    if (!value) {
+      this.selectedPlayerIdx = null;
+      this.selectedPlayerName = "";
+    }
+  }
 
   get scoreBoard(): ScoreBoard {
     return this.$store.getters["scoreBoard/scoreBoard"];
@@ -128,6 +192,10 @@ export default class PlayersChange extends Vue {
 
   get players() {
     return this.scoreBoard.players || [];
+  }
+
+  get friends(): UserInfo {
+    return this.$store.getters["friends/friends"];
   }
 
   open() {
@@ -141,8 +209,15 @@ export default class PlayersChange extends Vue {
   }
 
   onClickPlayer(idx: number) {
-    // this.$refs.playerChange.open(false, idx);
-    this.reveal = true;
+    this.selectedPlayerIdx = idx;
+    this.selectedPlayerName = this.players[idx].name;
+  }
+
+  addPlayer() {
+    //reset
+    this.errorMessage = "";
+
+    this.selectedPlayerIdx = 0;
   }
 
   deletePlayer(idx: number) {
@@ -161,24 +236,33 @@ export default class PlayersChange extends Vue {
     // }
   }
 
-  changePlayer(idx: number) {
-    this.errorMessage = "";
-    (this.$refs as any).playerSearch.open(false, idx);
+  onClickDeleteModeButton() {
+    this.isDeleteMode = !this.isDeleteMode;
   }
 
-  addPlayer() {
-    this.errorMessage = "";
-    (this.$refs as any).playerSearch.open(true, -1);
+  onClickBackButton() {
+    this.showPlayerInput = false;
+  }
+
+  onClickSaveButton() {
+    console.debug(this.players.map(p => p.uid));
+
+    console.debug("s");
+
+    (this.$refs as any).form.validate();
+  }
+
+  onPlayerInputClick(idx: number) {
+    this.selectedInput = idx;
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
 .player-select {
   .item {
     position: relative;
     margin-bottom: 10px;
-    background-color: #f5f5f5;
     border-radius: 5px;
     transition: margin-right 300ms;
   }
@@ -220,13 +304,38 @@ export default class PlayersChange extends Vue {
 .player-input {
   position: absolute;
   bottom: 0;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 
-  .list {
-    flex-grow: 1;
-    overflow-y: auto;
-    background-color: #f5f5f5;
+  &__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+    opacity: 0.5;
+    * {
+      pointer-events: none;
+    }
+    &--active {
+      * {
+        pointer-events: auto;
+      }
+      opacity: 1;
+    }
+  }
+
+  &__item--friend {
+    flex: 1;
+    .v-sheet {
+      flex: 1;
+    }
   }
 }
 </style>

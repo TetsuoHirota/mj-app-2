@@ -27,7 +27,7 @@ export interface ScoreBoard {
   players: UserInfo[];
   scoress: Score[][];
   rule: Rule;
-  createdAt: Date
+  createdAt: Date;
 }
 
 export type InputMode = "pt" | "score";

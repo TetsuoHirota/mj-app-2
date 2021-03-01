@@ -17,7 +17,7 @@ import BaseComponent from "@/components/shared/Base";
 import firebase from "firebase/app";
 import firebaseui from "firebaseui-ja";
 import "firebaseui-ja/dist/firebaseui.css";
-import { UserInfo } from "@/models/user";
+import { UserInfo } from "@/models";
 
 @Component
 export default class Login extends BaseComponent {

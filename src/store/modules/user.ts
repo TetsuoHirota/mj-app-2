@@ -1,5 +1,5 @@
 import { auth, db } from "@/firebase";
-import { UserInfo } from "@/models/user";
+import { UserInfo } from "@/models";
 
 const generateId = () => {
   const chars = "abcdefghijkmnopqrstuvwxyz0123456789";

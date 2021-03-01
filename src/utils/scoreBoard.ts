@@ -1,5 +1,4 @@
-import { ScoreBoard, Score, Rule, Round } from "@/models/scoreBoard";
-import { UserInfo } from "@/models/user";
+import { ScoreBoard, Score, Rule, Round, UserInfo } from "@/models";
 
 export function getPlayerResults(scoreBoard: ScoreBoard) {
   const results: {

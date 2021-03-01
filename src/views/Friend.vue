@@ -50,7 +50,7 @@
 import { Component } from "vue-property-decorator";
 import BaseComponent from "@/components/shared/Base";
 import AppBar from "@/components/shared/AppBar.vue";
-import { UserInfo } from "@/models/user";
+import { UserInfo } from "@/models";
 
 @Component({
   components: {

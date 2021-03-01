@@ -93,7 +93,7 @@
 <script lang="ts">
 import { Component, Watch } from "vue-property-decorator";
 import BaseComponent from "@/components/shared/Base";
-import { UserInfo } from "@/models/user";
+import { UserInfo } from "@/models";
 
 @Component({
   components: {}

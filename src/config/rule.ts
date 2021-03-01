@@ -1,4 +1,4 @@
-import { Rule } from "@/models/scoreBoard";
+import { Rule } from "@/models";
 
 type RuleConfig = {
   [P in keyof Rule]: {

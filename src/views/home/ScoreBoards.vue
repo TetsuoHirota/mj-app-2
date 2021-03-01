@@ -1,75 +1,65 @@
 <template>
   <div class="scoreboards">
-    <div class="list">
-      <template v-if="skeleton">
-        <v-skeleton-loader
-          v-for="n of 3"
-          :key="n"
-          type="card"
-          tile
-          class="ma-3"
-        ></v-skeleton-loader>
+    <template v-if="skeleton">
+      <v-skeleton-loader type="card" class="ma-3"></v-skeleton-loader>
+    </template>
+    <template v-else>
+      <template v-if="scoreBoards.length !== 0">
+        <transition-group name="tr-card">
+          <v-lazy
+            v-for="scoreBoard in scoreBoards"
+            :key="scoreBoard.id"
+            min-height="200"
+          >
+            <v-card class="ma-3" @click="toScoreBoard(scoreBoard.id)">
+              <v-sheet color="cyan">
+                <v-sparkline
+                  :value="value"
+                  color="white"
+                  line-width="2"
+                  padding="16"
+                  auto-draw
+                  :auto-draw-duration="3000"
+                ></v-sparkline>
+              </v-sheet>
+              <v-card-text class="pb-0">
+                <div class="date">
+                  <span>{{ scoreBoard.createdAt.getFullYear() }}</span>
+                  <span>/</span>
+                  <span>{{ scoreBoard.createdAt.getMonth() + 1 }}</span>
+                  <span>/</span>
+                  <span>{{ scoreBoard.createdAt.getDate() }}</span>
+                </div>
+                <v-divider class="my-2"></v-divider>
+                <v-row class="cardinfo" no-gutters align="center">
+                  <div class="cardinfo__text">
+                    <span
+                      v-for="(player, index) in scoreBoard.players"
+                      :key="index"
+                      class="mr-1"
+                    >
+                      {{ player.name }}
+                    </span>
+                  </div>
+                </v-row>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="cyan" text>
+                  成績表を見る
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-lazy>
+        </transition-group>
       </template>
       <template v-else>
-        <template v-if="scoreBoards.length !== 0">
-          <transition-group name="tr-card">
-            <div v-for="scoreBoard in scoreBoards" :key="scoreBoard.id">
-              <v-lazy
-                :options="{
-                  threshold: 0.5
-                }"
-                min-height="200"
-              >
-                <v-card class="ma-3" @click="toScoreBoard(scoreBoard.id)">
-                  <v-sheet color="cyan">
-                    <v-sparkline
-                      :value="value"
-                      :gradient="['#f72047', '#ffd200', '#1feaea']"
-                      line-width="2"
-                      padding="16"
-                      auto-draw
-                    ></v-sparkline>
-                  </v-sheet>
-                  <v-card-text class="pb-0">
-                    <div class="date">
-                      <span>{{ scoreBoard.createdAt.getFullYear() }}</span>
-                      <span>/</span>
-                      <span>{{ scoreBoard.createdAt.getMonth() + 1 }}</span>
-                      <span>/</span>
-                      <span>{{ scoreBoard.createdAt.getDate() }}</span>
-                    </div>
-                    <v-divider class="my-2"></v-divider>
-                    <v-row class="cardinfo" no-gutters align="center">
-                      <div class="cardinfo__text">
-                        <span
-                          v-for="(player, index) in scoreBoard.players"
-                          :key="index"
-                          class="mr-1"
-                        >
-                          {{ player.name }}
-                        </span>
-                      </div>
-                    </v-row>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="cyan" text>
-                      成績表を見る
-                      <v-icon>mdi-chevron-right</v-icon>
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-lazy>
-            </div>
-          </transition-group>
-        </template>
-        <template v-else>
-          <div class="grey--text pa-4">
-            まだ成績表がありません。右下のアイコンからゲームを開始してください。
-          </div>
-        </template>
+        <div class="grey--text pa-4">
+          まだ成績表がありません。右下のアイコンからゲームを開始してください。
+        </div>
       </template>
-    </div>
+    </template>
     <v-fab-transition>
       <v-btn
         v-show="showAddButton"
@@ -78,34 +68,34 @@
         fab
         large
         dark
-        @click="openAddRule"
+        @click="openRuleSet()"
       >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-fab-transition>
-    <v-dialog v-model="showRuleAddModal" max-width="600px">
-      <RuleAddCard @request-close="showRuleAddModal = false"></RuleAddCard>
-    </v-dialog>
+    <RuleSet ref="ruleSet"></RuleSet>
   </div>
 </template>
 
 <script lang="ts">
 import { Component } from "vue-property-decorator";
 import BaseComponent from "@/components/shared/Base";
-import { ScoreBoard } from "@/models/scoreBoard";
-import RuleAddCard from "@/components/shared/RuleAddCard.vue";
+import { ScoreBoard } from "@/models";
+import RuleSet from "@/components/scoreBoard/RuleSet.vue";
 import { getPlayerResults } from "@/utils/scoreBoard";
 
 @Component({
   components: {
-    RuleAddCard
+    RuleSet
   }
 })
 export default class ScoreBoards extends BaseComponent {
+  $refs!: {
+    ruleSet: RuleSet;
+  };
   value = [200, 675, 410, 390, 310, 460, 250, 240];
   skeleton = true;
   showAddButton = false;
-  showRuleAddModal = false;
 
   get scoreBoards(): ScoreBoard[] {
     return this.$store.getters["scoreBoard/scoreBoards"].sort(
@@ -141,8 +131,8 @@ export default class ScoreBoards extends BaseComponent {
     this.$store.dispatch("scoreBoard/stopScoreBoardsListener");
   }
 
-  openAddRule() {
-    this.showRuleAddModal = true;
+  openRuleSet() {
+    this.$refs.ruleSet.open();
   }
 
   getRankAvarage(scoreBoard: ScoreBoard) {
@@ -165,11 +155,7 @@ export default class ScoreBoards extends BaseComponent {
 .scoreboards {
   position: relative;
   height: 100%;
-}
-
-.list {
-  height: 100%;
-  overflow: auto;
+  overflow-y: auto;
 }
 
 .v-sheet--offset {

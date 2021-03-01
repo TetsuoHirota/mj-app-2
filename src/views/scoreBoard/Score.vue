@@ -118,7 +118,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import scoreClac from "@/mixins/scoreCalc";
 import Utilities from "@/mixins/utilities";
-import { ScoreBoard } from "@/models/scoreBoard";
+import { ScoreBoard } from "@/models";
 
 import ScoreChange from "@/components/scoreBoard/ScoreChange.vue";
 // import PlayersChange from "@/components/socreBoard/PlayersChange.vue";

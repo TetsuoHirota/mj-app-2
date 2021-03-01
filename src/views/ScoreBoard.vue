@@ -22,10 +22,10 @@
           <v-list-item @click="openPlayersChangeModal()">
             <v-list-item-title>プレイヤー変更</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="deleteScoreBoard">
+          <v-list-item @click="deleteScoreBoard()">
             <v-list-item-title>削除</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="endScoreBoard">
+          <v-list-item @click="finishScoreBoard()">
             <v-list-item-title>終了</v-list-item-title>
           </v-list-item>
         </v-list>
@@ -54,7 +54,7 @@
       </v-carousel>
     </v-main>
 
-    <v-bottom-navigation v-model="nav" grow app color="teal">
+    <v-bottom-navigation v-model="nav" grow app color="primary" shift>
       <v-btn>
         <span>成績表</span>
         <v-icon>mdi-format-list-numbered</v-icon>
@@ -125,19 +125,15 @@ export default class ScoreBoardPage extends BaseComponent {
     this.showMenu = false;
   }
 
-  openPlayerChangeModal(e: any) {
-    console.debug(e);
-  }
-
   deleteScoreBoard() {
     const result = confirm("本当に削除しますか？");
     if (result) {
-      this.$store.dispatch("ScoreBoard/deleteScoreBoard");
+      this.$store.dispatch("scoreBoard/delete");
       this.$router.push({ name: "Home" });
     }
   }
 
-  endScoreBoard() {
+  finishScoreBoard() {
     this.$store.dispatch("ScoreBoard/endScoreBoard");
     this.$router.push({ name: "Home" });
   }
@@ -165,5 +161,15 @@ export default class ScoreBoardPage extends BaseComponent {
 
 .v-main {
   height: 100%;
+}
+
+.v-bottom-navigation {
+  .v-btn:hover::before,
+  .v-btn:focus-within::before,
+  .v-btn:focus::before {
+    @include sp {
+      background-color: transparent;
+    }
+  }
 }
 </style>

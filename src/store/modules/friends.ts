@@ -1,5 +1,5 @@
 import { db } from "@/firebase";
-import { UserInfo } from "@/models/user";
+import { UserInfo } from "@/models";
 import firebase from "firebase/app";
 
 interface State {

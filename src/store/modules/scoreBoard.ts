@@ -3,8 +3,7 @@ import { db } from "@/firebase";
 import firebase from "firebase/app";
 import "firebase/firestore";
 
-import { Score, ScoreBoard, Rule, InputMode } from "@/models/scoreBoard";
-import { UserInfo } from "@/models/user";
+import { Score, ScoreBoard, Rule, InputMode, UserInfo } from "@/models";
 
 // firestoreのための配列→オブジェクト変換
 function formatNestedArray(arr: any) {
@@ -102,12 +101,12 @@ const mutations = {
 };
 
 const actions = {
-  createScoreBoard: async ({ rootGetters, dispatch }: any, rule: Rule) => {
+  create: async ({ rootGetters, dispatch }: any, rule: Rule) => {
     const user: UserInfo = rootGetters["user/user"];
     const players: UserInfo[] = [user];
     for (let i = 1; i < rule.playerNumber; i++) {
       players.push({
-        uid: `_player${i}`,
+        uid: `player${i}`,
         name: `player${i}`,
         mid: "",
         email: "",
