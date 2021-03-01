@@ -3,5 +3,5 @@ interface UserConfig {
 }
 
 export const userConfig: UserConfig = {
-  maxPlayerNameLength: 11
+  maxPlayerNameLength: 10
 };

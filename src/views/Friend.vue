@@ -29,12 +29,7 @@
               <div>このユーザーは既にフレンドです</div>
             </template>
             <template v-else>
-              <v-btn
-                color="primary"
-                width="120"
-                elevation="0"
-                @click="addFriend()"
-              >
+              <v-btn depressed color="primary" width="120" @click="addFriend()">
                 追加
               </v-btn>
             </template>

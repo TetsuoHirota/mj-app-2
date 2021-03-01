@@ -44,59 +44,6 @@ const mutations = {
 
   changeInputMode: (state: State, inputMode: InputMode) => {
     state.inputMode = inputMode;
-  },
-
-  resetScoreBoard: (state: any) => {
-    state.id = "";
-    state.players = [];
-    state.rule = {};
-    state.scores = [];
-    state.chips = [];
-  },
-
-  setScoreBoardId: (state: any, id: string) => {
-    state.scoreboard.id = id;
-  },
-
-  changePlayers: (state: any, players: any) => {
-    state.players = players;
-  },
-
-  changePlayer: (state: any, { player, index }: any) => {
-    Vue.set(state.players, index, player);
-  },
-
-  addPlayer: (state: any, player: any) => {
-    state.players.push(player);
-  },
-
-  deletePlayer: (state: any, index: number) => {
-    state.players.splice(index, 1);
-  },
-
-  changeRule: (state: any, rule: any) => {
-    state.rule = rule;
-  },
-
-  changeAllScores: (state: any, scores: any) => {
-    state.scores = scores;
-  },
-
-  // changeScores: (state: State, scores: Score[]) => {
-  //   const length = state.scores.length
-  //   if (length < data.index) {
-  //     state.scores.push(data.scores)
-  //   } else {
-  //     Vue.set(state.scores, data.index - 1, data.scores)
-  //   }
-  // },
-
-  deleteScores: (state: any, index: number) => {
-    state.scores.splice(index - 1, 1);
-  },
-
-  changeChips: (state: any, chips: any) => {
-    state.chips = chips;
   }
 };
 
@@ -216,9 +163,51 @@ const actions = {
     });
   },
 
+  stopScoreBoardListener: () => {
+    unsubscribeScoreBoard();
+  },
+
   changeInputMode: ({ commit }: any, inputMode: InputMode) => {
     localStorage.setItem("inputMode", inputMode);
     commit("changeInputMode", inputMode);
+  },
+
+  //プレイヤー関連
+  addPlayer: async ({ state }: { state: State }, player: UserInfo) => {
+    return db
+      .collection("scores")
+      .doc(state.scoreBoard.id)
+      .update({
+        players: firebase.firestore.FieldValue.arrayUnion(player)
+      });
+  },
+
+  deletePlayer: ({ state }: { state: State }, idx: number) => {
+    const players = state.scoreBoard.players;
+    players.splice(idx, 1);
+    db.collection("scores").doc(state.scoreBoard.id).update({ players });
+  },
+
+  changePlayer: (
+    { commit, state, dispatch, rootGetters }: any,
+    { player, index }: any
+  ) => {
+    const me = rootGetters["User/user"];
+    if (state.players[index].isLinked)
+      dispatch("deletePlayerScoreBoardId", {
+        playerId: state.players[index].uid,
+        scoreBoardId: state.id
+      });
+    if (player.isLinked)
+      dispatch("addPlayerScoreBoardId", {
+        playerId: player.uid,
+        scoreBoardId: state.id
+      });
+    commit("changePlayer", { player: player, index: index });
+    if (me.isLogin)
+      db.collection("scores").doc(state.id).update({
+        players: state.players
+      });
   },
 
   deleteScoreBoard: ({ commit, state, rootGetters }: any) => {
@@ -251,60 +240,6 @@ const actions = {
     if (me.isLogin)
       db.collection("scores").doc(state.id).update({
         rule: rule
-      });
-  },
-
-  //プレイヤー関連
-  addPlayer: ({ commit, state, dispatch, rootGetters }: any, player: any) => {
-    const me = rootGetters["User/user"];
-    commit("addPlayer", player);
-    if (me.isLogin)
-      db.collection("scores").doc(state.id).update({
-        players: state.players
-      });
-    if (player.isLinked)
-      dispatch("addPlayerScoreBoardId", {
-        playerId: player.uid,
-        scoreBoardId: state.id
-      });
-  },
-
-  deletePlayer: (
-    { commit, state, dispatch, rootGetters }: any,
-    { player, index }: any
-  ) => {
-    const me = rootGetters["User/user"];
-    commit("deletePlayer", index);
-    if (me.isLogin)
-      db.collection("scores").doc(state.id).update({
-        players: state.players
-      });
-    if (player.isLinked)
-      dispatch("deletePlayerScoreBoardId", {
-        playerId: player.uid,
-        scoreBoardId: state.id
-      });
-  },
-
-  changePlayer: (
-    { commit, state, dispatch, rootGetters }: any,
-    { player, index }: any
-  ) => {
-    const me = rootGetters["User/user"];
-    if (state.players[index].isLinked)
-      dispatch("deletePlayerScoreBoardId", {
-        playerId: state.players[index].uid,
-        scoreBoardId: state.id
-      });
-    if (player.isLinked)
-      dispatch("addPlayerScoreBoardId", {
-        playerId: player.uid,
-        scoreBoardId: state.id
-      });
-    commit("changePlayer", { player: player, index: index });
-    if (me.isLogin)
-      db.collection("scores").doc(state.id).update({
-        players: state.players
       });
   },
 

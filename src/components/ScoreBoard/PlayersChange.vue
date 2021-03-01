@@ -5,68 +5,65 @@
     persistent
     @click:outside="close()"
   >
-    <v-card class="player-select">
+    <v-card class="player-select" min-height="500px">
       <v-btn icon absolute top right @click="close()">
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <v-card-title>プレイヤー設定</v-card-title>
-      <v-card-text>
-        <v-col>
-          <v-list>
-            <v-card
-              v-for="(player, idx) in players"
-              :key="player.uid"
-              elevation="0"
-              class="item"
-              color="rgba(128,128,128,0.05)"
-              @click="onClickPlayer(idx)"
-            >
-              <v-list-item two-line :class="{ 'item--delete': isDeleteMode }">
-                <div>
-                  <v-list-item-title class="primary--text">
-                    {{ player.name }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ player.mid ? `@${player.mid}` : "" }}
-                  </v-list-item-subtitle>
-                </div>
-                <v-spacer></v-spacer>
-                <v-icon>mdi-pencil</v-icon>
+      <v-card-text class="py-5">
+        <transition-group name="tr-list">
+          <v-card
+            v-for="(player, idx) in players"
+            :key="player.uid"
+            class="item"
+            color="rgba(128,128,128,0.05)"
+            elevation="0"
+            @click="onClickPlayer(idx)"
+          >
+            <v-list-item two-line>
+              <div>
+                <v-list-item-title class="primary--text">
+                  {{ player.name }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ player.mid ? `@${player.mid}` : "" }}
+                </v-list-item-subtitle>
+              </div>
+              <v-spacer></v-spacer>
+              <transition name="tr-fade">
+                <v-btn v-if="!isDeleteMode" class="icon" icon disabled>
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
                 <v-btn
                   v-if="isDeleteMode"
-                  class="delete"
+                  class="icon"
                   icon
-                  @click="deletePlayer(idx)"
+                  @click="deletePlayer($event, idx)"
                 >
                   <v-icon color="error">mdi-delete</v-icon>
                 </v-btn>
-              </v-list-item>
-            </v-card>
-          </v-list>
-          <v-row class="controls my-5" no-gutters>
-            <v-btn class="mr-3" outlined color="primary" @click="addPlayer()">
-              <v-icon class="mr-2">mdi-account-plus</v-icon>
-              追加
-            </v-btn>
-            <v-btn
-              elevation="0"
-              :outlined="!isDeleteMode"
-              color="error"
-              @click="onClickDeleteModeButton()"
-            >
-              <v-icon class="mr-2">mdi-account-minus</v-icon>
-              削除
-            </v-btn>
-          </v-row>
-          <transition name="error">
-            <v-alert v-if="errorMessage" type="error" class="py-2 mt-6 mb-0">
-              {{ errorMessage }}
-            </v-alert>
-          </transition>
-          <v-subheader class="caption">
-            プレイヤーを変更、削除すると元のプレイヤーのデータは失われます。
-          </v-subheader>
-        </v-col>
+              </transition>
+            </v-list-item>
+          </v-card>
+        </transition-group>
+        <v-row class="controls my-5" no-gutters>
+          <v-btn class="mr-3" outlined color="primary" @click="addPlayer()">
+            <v-icon class="mr-2">mdi-account-plus</v-icon>
+            追加
+          </v-btn>
+          <v-btn
+            depressed
+            :outlined="!isDeleteMode"
+            color="error"
+            @click="onClickDeleteModeButton()"
+          >
+            <v-icon class="mr-2">mdi-account-minus</v-icon>
+            削除
+          </v-btn>
+        </v-row>
+        <v-subheader class="caption">
+          プレイヤーを変更、削除すると元のプレイヤーのデータは失われます。
+        </v-subheader>
       </v-card-text>
 
       <v-expand-transition>
@@ -143,7 +140,8 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
 import { ScoreBoard, UserInfo } from "@/models";
 import { userConfig } from "@/config";
 import { charCount } from "@/utils";
@@ -151,12 +149,14 @@ import { charCount } from "@/utils";
 @Component({
   components: {}
 })
-export default class PlayersChange extends Vue {
-  isDeleteMode = false;
-  errorMessage = "";
+export default class PlayersChange extends BaseComponent {
+  $refs!: {
+    form: any;
+  };
   show = true;
+  isDeleteMode = false;
 
-  selectedPlayerIdx: number | null = 1;
+  selectedPlayerIdx: number | null = null;
   selectedPlayerName = "";
   selectedFriendIdx: number | null = null;
   selectedInput = 0;
@@ -198,6 +198,10 @@ export default class PlayersChange extends Vue {
     return this.$store.getters["friends/friends"];
   }
 
+  created() {
+    this.$store.dispatch("friends/get");
+  }
+
   open() {
     this.show = true;
   }
@@ -205,35 +209,32 @@ export default class PlayersChange extends Vue {
   close() {
     this.show = false;
     this.isDeleteMode = false;
-    this.errorMessage = "";
   }
 
   onClickPlayer(idx: number) {
-    this.selectedPlayerIdx = idx;
-    this.selectedPlayerName = this.players[idx].name;
+    if (!this.isDeleteMode) {
+      this.selectedPlayerIdx = idx;
+      this.selectedPlayerName = this.players[idx].name;
+    }
   }
 
   addPlayer() {
-    //reset
-    this.errorMessage = "";
-
-    this.selectedPlayerIdx = 0;
+    this.isDeleteMode = false;
+    this.selectedPlayerIdx = -1;
   }
 
-  deletePlayer(idx: number) {
-    // const playersLength = this.players.length;
-    // const playersRule = this.rule.playerNumber;
-    // if (playersLength <= playersRule)
-    //   this.errorMessage = `${playersRule}人以下にはできません`;
-    // else {
-    //   this.errorMessage = "";
-    //   const result = confirm("本当に削除しますか？");
-    //   if (result)
-    //     this.$store.dispatch("ScoreBoard/deletePlayer", {
-    //       player: player,
-    //       idx: idx
-    //     });
-    // }
+  deletePlayer(e: Event, idx: number) {
+    e.stopImmediatePropagation();
+    const playersLength = this.players.length;
+    const minPlayerNumber = this.scoreBoard.rule.playerNumber;
+    if (playersLength <= minPlayerNumber) {
+      this._error(`${minPlayerNumber}人以下にはできません`);
+    } else {
+      const result = confirm("本当に削除しますか？");
+      if (result) {
+        this.$store.dispatch("scoreBoard/deletePlayer", idx);
+      }
+    }
   }
 
   onClickDeleteModeButton() {
@@ -245,15 +246,40 @@ export default class PlayersChange extends Vue {
   }
 
   onClickSaveButton() {
-    console.debug(this.players.map(p => p.uid));
-
-    console.debug("s");
-
-    (this.$refs as any).form.validate();
+    if (this.selectedInput === 0) {
+      if (this.$refs.form.validate()) {
+        this.savePlayerAsTextInput();
+      }
+    } else if (this.selectedInput === 1) {
+      this.savePlayerAsFriend();
+    }
   }
+
+  savePlayerAsTextInput() {
+    const player: UserInfo = {
+      mid: "",
+      name: this.selectedPlayerName,
+      uid: this.selectedPlayerName
+    };
+    if (this.selectedPlayerIdx === -1) {
+      this.$store
+        .dispatch("scoreBoard/addPlayer", player)
+        .then(() => {})
+        .catch(err => this._error(err));
+      this.showPlayerInput = false;
+    } else {
+      // this.$store.dispatch("scoreBoard/changePlayer", {
+      //   idx: this.selectedPlayerIdx,
+      //   player
+      // });
+    }
+  }
+
+  savePlayerAsFriend() {}
 
   onPlayerInputClick(idx: number) {
     this.selectedInput = idx;
+    this.$refs.form.resetValidation();
   }
 }
 </script>
@@ -261,24 +287,16 @@ export default class PlayersChange extends Vue {
 <style lang="scss" >
 .player-select {
   .item {
-    position: relative;
     margin-bottom: 10px;
-    border-radius: 5px;
-    transition: margin-right 300ms;
   }
 
   .item:last-child {
     margin-bottom: 0;
   }
 
-  .item--delete {
-    margin-right: 30px;
-    .delete {
-      position: absolute;
-      top: 50%;
-      left: calc(100% + 10px);
-      transform: translateY(-50%);
-    }
+  .icon {
+    position: absolute;
+    right: 15px;
   }
 
   .controls .v-btn {
@@ -308,6 +326,7 @@ export default class PlayersChange extends Vue {
   flex-direction: column;
   width: 100%;
   height: 100%;
+  overflow-y: auto;
 
   &__content {
     display: flex;
