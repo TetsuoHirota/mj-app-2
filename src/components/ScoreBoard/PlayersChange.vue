@@ -145,7 +145,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { ScoreBoard, UserInfo } from "@/models";
-import { userConfig } from "@/config/user";
+import { userConfig } from "@/config";
 import { charCount } from "@/utils";
 
 @Component({

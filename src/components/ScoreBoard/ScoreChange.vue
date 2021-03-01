@@ -93,7 +93,6 @@
 <script lang="ts">
 import { Component, Watch } from "vue-property-decorator";
 import BaseComponent from "@/components/shared/Base";
-import RuleConfig from "@/mixins/ruleConfig";
 import { ScoreBoard, Score, UserInfo } from "@/models";
 import { round } from "@/utils/scoreBoard";
 import draggable from "vuedraggable";

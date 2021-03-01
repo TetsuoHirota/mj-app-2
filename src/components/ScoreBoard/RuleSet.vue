@@ -147,7 +147,7 @@
 <script lang="ts">
 import { Component, Watch } from "vue-property-decorator";
 import BaseComponent from "@/components/shared/Base";
-import { ruleConfig } from "@/config/rule";
+import { ruleConfig } from "@/config";
 import { Rule } from "@/models";
 
 @Component({
