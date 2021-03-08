@@ -76,12 +76,4 @@ export default class Home extends BaseComponent {
 .v-crousel {
   flex: 1;
 }
-
-.v-btn:hover::before,
-.v-btn:focus-within::before,
-.v-btn:focus::before {
-  @include sp {
-    opacity: 0 !important;
-  }
-}
 </style>

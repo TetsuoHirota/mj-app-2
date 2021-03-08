@@ -55,8 +55,13 @@
         </transition-group>
       </template>
       <template v-else>
-        <div class="grey--text pa-4">
-          まだ成績表がありません。右下のアイコンからゲームを開始してください。
+        <div
+          class="pa-5 d-flex align-center justify-center"
+          style="height: 100%"
+        >
+          <v-card class="pa-5" flat>
+            まだ成績表がありません。右下のアイコンからゲームを開始してください。
+          </v-card>
         </div>
       </template>
     </template>
@@ -82,7 +87,6 @@ import { Component } from "vue-property-decorator";
 import BaseComponent from "@/components/shared/Base";
 import { ScoreBoard } from "@/models";
 import RuleSet from "@/components/scoreBoard/RuleSet.vue";
-import { getPlayerResults } from "@/utils/scoreBoard";
 
 @Component({
   components: {
@@ -133,10 +137,6 @@ export default class ScoreBoards extends BaseComponent {
 
   openRuleSet() {
     this.$refs.ruleSet.open();
-  }
-
-  getRankAvarage(scoreBoard: ScoreBoard) {
-    return getPlayerResults(scoreBoard);
   }
 
   toScoreBoard(id: string | undefined) {

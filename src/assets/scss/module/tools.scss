@@ -14,3 +14,27 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@keyframes shake {
+  0% {
+    transform: rotate(0);
+  }
+  35% {
+    transform: rotate(0) scale(1);
+  }
+  40% {
+    transform: rotate(5deg) scale(1.1);
+  }
+  45% {
+    transform: rotate(-5deg) scale(1.1);
+  }
+  50% {
+    transform: rotate(5deg) scale(1.1);
+  }
+  55% {
+    transform: rotate(-5deg) scale(1.1);
+  }
+  60% {
+    transform: scale(1) rotate(0);
+  }
+}

@@ -49,8 +49,8 @@ const mutations = {
 
 const actions = {
   create: async ({ rootGetters, dispatch }: any, rule: Rule) => {
-    const user: UserInfo = rootGetters["user/user"];
-    const players: UserInfo[] = [user];
+    const me: UserInfo = rootGetters["user/user"];
+    const players: UserInfo[] = [me];
     for (let i = 1; i < rule.playerNumber; i++) {
       players.push({
         uid: `player${i}`,
@@ -61,23 +61,33 @@ const actions = {
       });
     }
     let id = "";
+    const scoreBoard: ScoreBoard = {
+      players: players,
+      rule: rule,
+      scoress: [],
+      chips: [],
+      createdAt: new Date(),
+      createdBy: me.uid
+    };
     await db
       .collection("scores")
       .add({
-        players: players,
-        rule: rule,
+        ...scoreBoard,
         scoress: {},
-        chips: [],
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       })
       .then(doc => {
         id = doc.id;
         return dispatch("addPlayerScoreBoardId", {
-          uid: user.uid,
+          uid: me.uid,
           scoreBoardId: doc.id
         });
       });
     return id;
+  },
+
+  delete: async ({ state }: { state: State }) => {
+    return db.collection("scores").doc(state.scoreBoard.id).delete();
   },
 
   // プレイヤーの打った成績表のIDを記録
@@ -113,7 +123,7 @@ const actions = {
                       scoreBoards.push({
                         ...data,
                         createdAt: data.createdAt.toDate(),
-                        id: id
+                        id
                       })
                     ];
                 });
@@ -189,31 +199,14 @@ const actions = {
   },
 
   changePlayer: (
-    { commit, state, dispatch, rootGetters }: any,
-    { player, index }: any
+    { state }: { state: State },
+    { idx, player }: { idx: number; player: UserInfo }
   ) => {
-    const me = rootGetters["User/user"];
-    if (state.players[index].isLinked)
-      dispatch("deletePlayerScoreBoardId", {
-        playerId: state.players[index].uid,
-        scoreBoardId: state.id
-      });
-    if (player.isLinked)
-      dispatch("addPlayerScoreBoardId", {
-        playerId: player.uid,
-        scoreBoardId: state.id
-      });
-    commit("changePlayer", { player: player, index: index });
-    if (me.isLogin)
-      db.collection("scores").doc(state.id).update({
-        players: state.players
-      });
-  },
-
-  deleteScoreBoard: ({ commit, state, rootGetters }: any) => {
-    const me = rootGetters["User/user"];
-    if (me.isLogin) db.collection("scores").doc(state.id).delete();
-    commit("resetScoreBoard");
+    const players = state.scoreBoard.players;
+    players[idx] = player;
+    db.collection("scores").doc(state.scoreBoard.id).update({
+      players
+    });
   },
 
   endScoreBoard: ({ commit }: any) => {
@@ -271,13 +264,23 @@ const actions = {
   },
 
   // チップ関連
-  changeChips: ({ commit, state, rootGetters }: any, chips: any) => {
-    const me = rootGetters["User/user"];
-    commit("changeChips", chips);
-    if (me.isLogin)
-      db.collection("scores").doc(state.id).update({
-        chips: chips
+  changeChip: (
+    { state }: { state: State },
+    { value, uid }: { value: number | null; uid: string }
+  ) => {
+    const chips = state.scoreBoard.chips;
+    const chip = chips.find(c => c.uid === uid);
+    if (chip) {
+      chip.chip = value;
+    } else {
+      chips.push({
+        chip: value,
+        uid
       });
+    }
+    db.collection("scores").doc(state.scoreBoard.id).update({
+      chips
+    });
   }
 };
 

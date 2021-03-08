@@ -1,6 +1,14 @@
 <template>
-  <v-dialog v-model="show" max-width="350px" persistent>
+  <v-dialog
+    v-model="show"
+    max-width="400px"
+    persistent
+    @click:outside="close()"
+  >
     <v-card class="score-change">
+      <v-btn icon absolute top right @click="close()">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
       <v-card-title>{{ index }}半荘目</v-card-title>
       <v-col class="list px-10 py-3">
         <draggable
@@ -16,10 +24,12 @@
             no-gutters
             align="center"
           >
-            <v-btn v-if="sameScore" icon class="handle handler">
-              <v-icon>mdi-menu</v-icon>
-            </v-btn>
-            <div class="item__name bosy-2">
+            <transition name="tr-fade">
+              <v-btn v-if="sameScore" icon class="handle handler">
+                <v-icon>mdi-swap-vertical</v-icon>
+              </v-btn>
+            </transition>
+            <div class="item__name">
               {{ item.name }}
             </div>
             <div class="item__input">
@@ -36,9 +46,7 @@
                 "
                 @input="value => handleInput(item, value)"
               >
-                <template v-if="!isPtMode" slot="append">
-                  <span class="zeros">00</span>
-                </template>
+                <template v-if="!isPtMode" slot="append">00</template>
               </v-text-field>
               <div class="input__append body-1">
                 {{ isPtMode ? "pt" : "点" }}
@@ -46,7 +54,7 @@
               <v-btn
                 class="input__autoinput"
                 icon
-                color="indigo"
+                color="primary"
                 @click="inputAuto(item)"
               >
                 <v-icon>mdi-circle-edit-outline</v-icon>
@@ -81,11 +89,10 @@
         </transition>
       </v-col>
 
-      <v-card-actions>
-        <v-btn color="red" text @click="deleteScore">削除</v-btn>
+      <v-card-actions class="pb-4">
+        <v-btn color="error" text @click="deleteScore">削除</v-btn>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="close">キャンセル</v-btn>
-        <v-btn color="blue darken-1" text @click="saveScore">保存</v-btn>
+        <v-btn color="primary" depressed @click="saveScore">保存</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -94,7 +101,7 @@
 import { Component, Watch } from "vue-property-decorator";
 import BaseComponent from "@/components/shared/Base";
 import { ScoreBoard, Score, UserInfo } from "@/models";
-import { round } from "@/utils/scoreBoard";
+import { round } from "@/utils";
 import draggable from "vuedraggable";
 
 @Component({
@@ -176,10 +183,12 @@ export default class ScoreChange extends BaseComponent {
 
   close() {
     this.show = false;
-    this.data = [];
-    this.index = 0;
-    this.tobashiId = "";
-    this.errorMessage = "";
+    setTimeout(() => {
+      this.data = [];
+      this.index = 0;
+      this.tobashiId = "";
+      this.errorMessage = "";
+    }, 500);
   }
 
   handleInput(item: Score & UserInfo, value: number) {
@@ -342,14 +351,6 @@ export default class ScoreChange extends BaseComponent {
 </script>
 
 <style lang="scss" scoped>
-.v-btn:hover::before,
-.v-btn:focus-within::before,
-.v-btn:focus::before {
-  @include sp {
-    opacity: 0 !important;
-  }
-}
-
 .tr-accordion {
   $sec: 0.3s;
   &-enter {
@@ -374,34 +375,9 @@ export default class ScoreChange extends BaseComponent {
   }
 }
 
-@keyframes shake {
-  0% {
-    transform: rotate(0);
-  }
-  35% {
-    transform: rotate(0) scale(1);
-  }
-  40% {
-    transform: rotate(5deg) scale(1.1);
-  }
-  45% {
-    transform: rotate(-5deg) scale(1.1);
-  }
-  50% {
-    transform: rotate(5deg) scale(1.1);
-  }
-  55% {
-    transform: rotate(-5deg) scale(1.1);
-  }
-  60% {
-    transform: scale(1) rotate(0);
-  }
-}
-
 .handler {
   margin-right: 5px;
   margin-left: -15px;
-  animation: shake 2s infinite;
 }
 </style>
 <style lang="scss">
@@ -433,20 +409,19 @@ export default class ScoreChange extends BaseComponent {
         padding: 4px 0;
         margin: 0;
         font-size: 16px;
-        color: rgba(0, 0, 0, 0.6);
+        opacity: 0.5;
       }
       .input__append {
         display: flex;
         align-items: center;
         margin-left: 10px;
-        // color: rgba(0, 0, 0, 0.86);
       }
       .input__autoinput {
         position: relative;
         display: flex;
         justify-content: center;
         padding: 0;
-        margin-left: 10px;
+        margin-left: 15px;
         font-size: 10px;
       }
     }

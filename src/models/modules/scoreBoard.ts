@@ -22,12 +22,19 @@ export interface Score {
   rank: number | null;
 }
 
+export interface Chip {
+  uid: string;
+  chip: number | null;
+}
+
 export interface ScoreBoard {
   id?: string;
   players: UserInfo[];
   scoress: Score[][];
   rule: Rule;
+  chips: Chip[];
   createdAt: Date;
+  createdBy: string;
 }
 
 export type InputMode = "pt" | "score";

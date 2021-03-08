@@ -1,25 +1,4 @@
-import { ScoreBoard, Score, Rule, Round, UserInfo } from "@/models";
-
-export function getPlayerResults(scoreBoard: ScoreBoard) {
-  const results: {
-    [uid: string]: {
-      ranks: { index: number; rank: number }[];
-      avarageRank: number;
-    };
-  } = {};
-  const players = scoreBoard.players;
-  return 3;
-}
-
-interface ScoreBoardResult extends ScoreBoard {
-  table: {
-    uid: string;
-    pt: number | null;
-    score: number | null;
-    rank: number | null;
-    isMinus: boolean;
-  }[][];
-}
+import { Round } from "@/models";
 
 function gosya(score: number) {
   const int = Math.floor(score / 1000);
@@ -97,8 +76,7 @@ function kirisute(score: number) {
   return ans;
 }
 
-// 清算方法
-export function round(round: Round, score: number) {
+function round(round: Round, score: number) {
   let rounded = 0;
   switch (round) {
     case "goshya":
@@ -116,3 +94,5 @@ export function round(round: Round, score: number) {
   }
   return rounded;
 }
+
+export { gosya, sisya, kirisute, kiriage, round };

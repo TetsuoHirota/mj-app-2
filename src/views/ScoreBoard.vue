@@ -41,9 +41,11 @@
         :show-arrows="false"
         height="100%"
         touchless
+        :dark="$vuetify.theme.dark"
+        :light="!$vuetify.theme.dark"
       >
         <v-carousel-item>
-          <Score @request-player-change="openPlayerChangeModal($event)"></Score>
+          <Score></Score>
         </v-carousel-item>
         <v-carousel-item>
           <!-- <Data /> -->
@@ -69,7 +71,7 @@
       </v-btn>
     </v-bottom-navigation>
 
-    <PlayersChange ref="playersChange" />
+    <PlayersChange ref="playersChange" @closed="onPlayersChangeClosed()" />
   </div>
 </template>
 
@@ -81,6 +83,7 @@ import Score from "@/views/scoreBoard/Score.vue";
 // import Data from "@/components/ScoreBoard/Data.vue";
 // import Graph from "@/components/ScoreBoard/Graph.vue";
 import PlayersChange from "@/components/scoreBoard/PlayersChange.vue";
+import { ScoreBoard, UserInfo } from "@/models";
 
 @Component({
   components: {
@@ -100,9 +103,9 @@ export default class ScoreBoardPage extends BaseComponent {
 
   isPtMode = this.$store.getters["scoreBoard/inputMode"] === "pt";
 
-  // get scoreBoard() {
-  //   return this.$store.getters["scoreBoard/scoreBoard"];
-  // }
+  get scoreBoard(): ScoreBoard {
+    return this.$store.getters["scoreBoard/scoreBoard"];
+  }
 
   @Watch("isPtMode")
   changeIsPtMode() {
@@ -120,22 +123,43 @@ export default class ScoreBoardPage extends BaseComponent {
       });
   }
 
+  mounted() {
+    if (this.$route.query.new) {
+      this.$refs.playersChange.open();
+    }
+  }
+
   openPlayersChangeModal() {
     this.$refs.playersChange.open();
     this.showMenu = false;
   }
 
+  onPlayersChangeClosed() {
+    if (this.$route.query.new) {
+      this.$router.replace({ query: {} });
+    }
+  }
+
   deleteScoreBoard() {
-    const result = confirm("本当に削除しますか？");
+    const createdBy = this.scoreBoard.createdBy;
+    const user = this.$store.state.user;
+    if (createdBy !== user.uid) {
+      this._error("この成績表の作成者以外削除できません");
+      return;
+    }
+    const result = confirm("本当に削除しますか？この操作は取り消せません。");
     if (result) {
-      this.$store.dispatch("scoreBoard/delete");
-      this.$router.push({ name: "Home" });
+      this.$store
+        .dispatch("scoreBoard/delete")
+        .then(() => {
+          this.$router.push({ name: "home" });
+        })
+        .catch(err => this._error(err));
     }
   }
 
   finishScoreBoard() {
-    this.$store.dispatch("ScoreBoard/endScoreBoard");
-    this.$router.push({ name: "Home" });
+    this.$router.push({ name: "home" });
   }
 }
 </script>
@@ -161,15 +185,5 @@ export default class ScoreBoardPage extends BaseComponent {
 
 .v-main {
   height: 100%;
-}
-
-.v-bottom-navigation {
-  .v-btn:hover::before,
-  .v-btn:focus-within::before,
-  .v-btn:focus::before {
-    @include sp {
-      background-color: transparent;
-    }
-  }
 }
 </style>

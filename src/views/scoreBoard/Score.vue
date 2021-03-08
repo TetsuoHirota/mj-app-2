@@ -2,92 +2,93 @@
   <div class="score">
     <header>
       <div class="tr-head"></div>
-      <div v-for="(player, idx) in players" :key="player.uid" class="tr-body">
-        <v-btn class="name-btn" text @click="onPlayerClick(idx)">
-          {{ player.name }}
-        </v-btn>
+      <div v-for="player in players" :key="player.uid" class="tr-body">
+        {{ player.name }}
       </div>
     </header>
-
+    <v-divider style="opacity: 0.5"></v-divider>
     <body>
-      <div v-for="index in gameNumber" :key="index" class="body__row">
-        <div class="tr-head">{{ index }}</div>
-        <div
-          v-for="player in players"
-          :key="player.uid"
-          class="tr-body"
-          :class="{
-            minus: getPtFromScores(index, player.uid).isMinus
-          }"
-        >
-          {{ getPtFromScores(index, player.uid).pt }}
-        </div>
-        <v-btn
-          absolute
-          text
-          tile
-          color="#DDD"
-          height="100%"
-          width="100%"
-          @click="changeScore(index)"
-        ></v-btn>
+      <div v-for="index in gameNumber" :key="index">
+        <v-list-item class="body__row pa-0" @click="changeScore(index)">
+          <div class="tr-head">{{ index }}</div>
+          <div
+            v-for="player in players"
+            :key="player.uid"
+            class="tr-body"
+            :class="{
+              minus: getPtFromScores(index, player.uid).isMinus
+            }"
+          >
+            {{ getPtFromScores(index, player.uid).pt }}
+          </div>
+        </v-list-item>
+        <v-divider style="opacity: 0.5"></v-divider>
       </div>
     </body>
 
-    <!-- <footer>
+    <footer>
       <div class="footer__row">
         <div class="tr-head">計</div>
         <div
-          class="tr-body"
-          v-for="player in players"
+          v-for="(player, idx) in players"
           :key="player.uid"
-          :class="{ minus: getTotal(player.uid) < 0 }"
+          class="tr-body"
+          :class="{ minus: result.totalPts[idx] < 0 }"
         >
-          {{ getTotal(player.uid) }}
+          {{ result.totalPts[idx] }}
         </div>
       </div>
       <v-divider></v-divider>
       <div class="footer__row">
         <div class="tr-head">
-          <img class="casino-chip" src="@/assets/svgs/casino-chip.svg" alt="" />
+          <v-badge overlap color="error" :value="totalChip !== 0">
+            <template #badge>!</template>
+            <Casino-chip></Casino-chip>
+          </v-badge>
         </div>
-        <div class="tr-body" v-for="player in players" :key="player.uid">
-          <v-chip
-            v-if="getChip(player.uid) || getChip(player.uid) === 0"
-            color="orange"
-            small
-            class="px-2"
+        <div v-for="(player, idx) in players" :key="player.uid" class="tr-body">
+          <v-edit-dialog
+            :return-value.sync="a"
+            @open="onDialogOpened()"
+            @close="onDialogClosed()"
           >
-            ￥ {{ getChip(player.uid) > 0 ? "+" : "" }}{{ getChip(player.uid) }}
-          </v-chip>
+            <v-chip
+              v-if="result.chips[idx] || result.chips[idx] === 0"
+              color="orange"
+              small
+              class="px-2"
+            >
+              {{ result.chips[idx] | chip }}
+            </v-chip>
+            <template #input>
+              <v-text-field
+                style="width: 60px"
+                type="number"
+                single-line
+                :value="result.chips[idx]"
+                suffix="枚"
+                @change="v => onChipChange(v, player)"
+              ></v-text-field>
+            </template>
+          </v-edit-dialog>
         </div>
       </div>
       <v-divider></v-divider>
       <div class="footer__row">
         <div class="tr-head">￥</div>
         <div
-          class="tr-body"
-          v-for="player in players"
+          v-for="(player, idx) in players"
           :key="player.uid"
-          :class="{ minus: getYen(player.uid) < 0 }"
+          class="tr-body"
+          :class="{ minus: result.yens[idx] < 0 }"
         >
-          {{ getYen(player.uid) }}
+          {{ result.yens[idx] }}
         </div>
       </div>
-    </footer> -->
+    </footer>
 
-    <!-- ボタン -->
     <v-btn
-      class="btn btn__player"
-      absolute
-      fab
-      color="pink"
-      @click.stop="openPlayersModal"
-    >
-      <v-icon>mdi-account</v-icon>
-    </v-btn>
-    <v-btn
-      class="btn btn__chip"
+      class="btn btn--chip"
       absolute
       fab
       color="orange"
@@ -100,7 +101,7 @@
       />
     </v-btn>
     <v-btn
-      class="btn btn__score"
+      class="btn btn--score"
       absolute
       fab
       color="primary"
@@ -110,30 +111,53 @@
     </v-btn>
 
     <ScoreChange ref="scoreChange" />
-    <!-- <PlayersChange ref="playersChange" />
-    <ChipsChange ref="chipsChange" /> -->
+    <div v-if="isDialogOpened" class="dialog-overlay"></div>
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import scoreClac from "@/mixins/scoreCalc";
-import Utilities from "@/mixins/utilities";
-import { ScoreBoard } from "@/models";
+import { Component } from "vue-property-decorator";
+import BaseComponent from "@/components/shared/Base";
+
+import { ScoreBoard, UserInfo } from "@/models";
+import { scoreBoardResult } from "@/utils";
 
 import ScoreChange from "@/components/scoreBoard/ScoreChange.vue";
-// import PlayersChange from "@/components/socreBoard/PlayersChange.vue";
-// import ChipsChange from "@/components/socreBoard/ChipsChange.vue";
+import CasinoChip from "@/components/shared/Casino-chip.vue";
 
 @Component({
   components: {
-    ScoreChange
-    // PlayersChange,
-    // ChipsChange,
+    ScoreChange,
+    CasinoChip
+  },
+  filters: {
+    chip: (v: number | null): string => {
+      if (v === null) {
+        return "";
+      } else {
+        return `${v > 0 ? "+" : ""}${v}`;
+      }
+    }
   }
 })
-export default class Score extends Vue {
+export default class Score extends BaseComponent {
+  isDialogOpened = false;
+  a = "";
+
+  $refs!: {
+    scoreChange: ScoreChange;
+  };
+  gameNumber = 100;
+  // get isPtMode() {
+  //   return this.$store.getters["scoreBoard/inputMode"] === "pt";
+  // }
   get scoreBoard(): ScoreBoard {
     return this.$store.getters["scoreBoard/scoreBoard"];
+  }
+
+  mounted() {
+    setTimeout(() => {
+      // console.debug(this.scoreBoard);
+    }, 0);
   }
 
   get players() {
@@ -144,7 +168,20 @@ export default class Score extends Vue {
     return this.scoreBoard.scoress || [];
   }
 
-  gameNumber = 100;
+  get result() {
+    return scoreBoardResult(this.scoreBoard);
+  }
+
+  get totalChip(): number {
+    return this.result.chips.reduce((acc: number, cur) => {
+      console.debug(this.result.chips);
+      if (cur == null) {
+        return acc;
+      }
+
+      return acc + cur;
+    }, 0);
+  }
 
   getPtFromScores(
     index: number,
@@ -194,6 +231,26 @@ export default class Score extends Vue {
     const length = scoreBoard.scoress ? scoreBoard.scoress.length : 0;
     (this.$refs.scoreChange as ScoreChange).open(length + 1);
   }
+
+  onDialogOpened() {
+    console.debug("open");
+    this.isDialogOpened = true;
+  }
+  onDialogClosed() {
+    this.isDialogOpened = false;
+    console.debug("close");
+  }
+
+  onChipChange(value: string, player: UserInfo) {
+    let v = null;
+    if (value !== "") {
+      v = Number(value);
+    }
+    this.$store.dispatch("scoreBoard/changeChip", {
+      value: v,
+      uid: player.uid
+    });
+  }
 }
 </script>
 
@@ -203,6 +260,7 @@ $tr-head: 30px;
 $tr-body: 75px;
 
 .score {
+  position: relative;
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100%;
@@ -228,21 +286,9 @@ $tr-body: 75px;
 
 header {
   display: flex;
-  padding: $padding;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0px -1px 10px 0px rgba(0, 0, 0, 0.12);
-  .tr-body {
-    .v-btn {
-      width: calc(100% - 8px);
-      min-width: 0;
-      max-width: 200px;
-      padding: 0 !important;
-      margin: 0 4px;
-      overflow: hidden;
-      font-size: 0.875rem;
-      text-transform: none;
-    }
-  }
+  padding: 15px $padding;
+  // border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  // box-shadow: 0px -1px 10px 0px rgba(0, 0, 0, 0.12);
 }
 
 body {
@@ -260,7 +306,7 @@ body {
     position: relative;
     display: flex;
     min-height: 30px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    // border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     &:last-of-type {
       border: none;
     }
@@ -271,7 +317,7 @@ footer {
   display: flex;
   flex-flow: column;
   padding: 0 $padding;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  // border-top: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   .footer__row {
     display: flex;
@@ -296,19 +342,14 @@ footer {
     width: $size-sp;
     height: $size-sp;
   }
-  &__player {
-    right: calc(#{$right-lg} + (#{$distance-lg} * 2));
-    @include sp {
-      right: calc(#{$right-sp} + (#{$distance-sp} * 2));
-    }
-  }
-  &__chip {
+
+  &--chip {
     right: calc(#{$right-lg} + #{$distance-lg});
     @include sp {
       right: calc(#{$right-sp} + #{$distance-sp});
     }
   }
-  &__score {
+  &--score {
     right: $right-lg;
     @include sp {
       right: $right-sp;
@@ -318,5 +359,25 @@ footer {
 
 .minus {
   color: red;
+}
+
+.dialog-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+}
+</style>
+<style lang="scss">
+.score {
+  .v-small-dialog__activator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>

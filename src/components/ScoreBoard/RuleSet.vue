@@ -5,11 +5,12 @@
     persistent
     @click:outside="close()"
   >
-    <v-card>
+    <v-card class="ruleset">
       <v-btn icon absolute top right @click="close()">
         <v-icon>mdi-close</v-icon>
       </v-btn>
       <v-card-title>新規ゲーム開始</v-card-title>
+      <v-subheader>※この設定は後から変更できません。</v-subheader>
       <v-card-text class="px-6 py-6">
         <v-form ref="form">
           <v-row dense align="center">
@@ -135,8 +136,7 @@
           </v-row>
         </v-form>
       </v-card-text>
-      <v-subheader>※この設定は後から変更できません。</v-subheader>
-      <v-card-actions class="pb-4">
+      <v-card-actions class="pb-5">
         <v-spacer></v-spacer>
         <v-btn color="primary" @click="start()">このルールで開始</v-btn>
       </v-card-actions>
@@ -222,7 +222,11 @@ export default class RuleSet extends BaseComponent {
         .dispatch("scoreBoard/create", rule)
         .then(id => {
           this._loading(false);
-          this.$router.push({ name: "scoreBoard", params: { id: id } });
+          this.$router.push({
+            name: "scoreBoard",
+            params: { id: id },
+            query: { new: "true" }
+          });
         })
         .catch(err => {
           this._error(err);
@@ -237,25 +241,27 @@ export default class RuleSet extends BaseComponent {
 </script>
 
 <style lang="scss">
-.v-text-field {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
+.ruleset {
+  .v-text-field {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
 
-.v-expansion-panel {
-  color: inherit !important;
-}
+  .v-expansion-panel {
+    color: inherit !important;
+  }
 
-.v-expansion-panel-header {
-  justify-content: flex-end !important;
-  font-size: 14px !important;
-}
+  .v-expansion-panel-header {
+    justify-content: flex-end !important;
+    font-size: 14px !important;
+  }
 
-.v-expansion-panel-header__icon {
-  margin-left: 10px !important;
-}
+  .v-expansion-panel-header__icon {
+    margin-left: 10px !important;
+  }
 
-.v-expansion-panel-content__wrap {
-  padding: 0 !important;
+  .v-expansion-panel-content__wrap {
+    padding: 0 !important;
+  }
 }
 </style>

@@ -11,43 +11,58 @@
       </v-btn>
       <v-card-title>プレイヤー設定</v-card-title>
       <v-card-text class="py-5">
-        <transition-group name="tr-list">
-          <v-card
-            v-for="(player, idx) in players"
-            :key="player.uid"
+        <template v-if="skeleton">
+          <v-skeleton-loader
+            v-for="n of 4"
+            :key="n"
+            type="list-item-avatar-two-line"
             class="item"
-            color="rgba(128,128,128,0.05)"
-            elevation="0"
-            @click="onClickPlayer(idx)"
-          >
-            <v-list-item two-line>
-              <div>
-                <v-list-item-title class="primary--text">
-                  {{ player.name }}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ player.mid ? `@${player.mid}` : "" }}
-                </v-list-item-subtitle>
-              </div>
-              <v-spacer></v-spacer>
-              <transition name="tr-fade">
-                <v-btn v-if="!isDeleteMode" class="icon" icon disabled>
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn
-                  v-if="isDeleteMode"
-                  class="icon"
-                  icon
-                  @click="deletePlayer($event, idx)"
-                >
-                  <v-icon color="error">mdi-delete</v-icon>
-                </v-btn>
-              </transition>
-            </v-list-item>
-          </v-card>
-        </transition-group>
+          ></v-skeleton-loader>
+        </template>
+        <template v-else>
+          <transition-group name="tr-list">
+            <v-card
+              v-for="(player, idx) in players"
+              :key="player.uid"
+              class="item"
+              color="rgba(128,128,128,0.05)"
+              elevation="0"
+              @click="onPlayerClick(idx)"
+            >
+              <v-list-item two-line>
+                <div>
+                  <v-list-item-title class="primary--text">
+                    {{ player.name }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ player.mid ? `@${player.mid}` : "" }}
+                  </v-list-item-subtitle>
+                </div>
+                <v-spacer></v-spacer>
+                <transition name="tr-fade">
+                  <v-btn v-if="!isDeleteMode" class="icon" icon disabled>
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn
+                    v-if="isDeleteMode"
+                    class="icon"
+                    icon
+                    @click="deletePlayer($event, idx)"
+                  >
+                    <v-icon color="error">mdi-delete</v-icon>
+                  </v-btn>
+                </transition>
+              </v-list-item>
+            </v-card>
+          </transition-group>
+        </template>
         <v-row class="controls my-5" no-gutters>
-          <v-btn class="mr-3" outlined color="primary" @click="addPlayer()">
+          <v-btn
+            class="mr-3"
+            outlined
+            color="primary"
+            @click="onAddPlayerClick()"
+          >
             <v-icon class="mr-2">mdi-account-plus</v-icon>
             追加
           </v-btn>
@@ -55,7 +70,7 @@
             depressed
             :outlined="!isDeleteMode"
             color="error"
-            @click="onClickDeleteModeButton()"
+            @click="onDeleteModeClick()"
           >
             <v-icon class="mr-2">mdi-account-minus</v-icon>
             削除
@@ -74,10 +89,10 @@
           <v-card-text class="player-input__content">
             <div
               class="player-input__item"
-              :class="{ 'player-input__item--active': selectedInput === 0 }"
-              @click="onPlayerInputClick(0)"
+              :class="{ 'player-input__item--active': inputType === 'name' }"
+              @click="changeInputType('name')"
             >
-              <v-radio-group v-model="selectedInput" class="mt-0">
+              <v-radio-group v-model="inputType" class="mt-0">
                 <v-radio :value="0" label="プレイヤー名入力"></v-radio>
               </v-radio-group>
               <v-form ref="form">
@@ -94,10 +109,10 @@
             </div>
             <div
               class="player-input__item player-input__item--friend"
-              :class="{ 'player-input__item--active': selectedInput === 1 }"
-              @click="onPlayerInputClick(1)"
+              :class="{ 'player-input__item--active': inputType === 'friend' }"
+              @click="changeInputType('friend')"
             >
-              <v-radio-group v-model="selectedInput" class="mt-0">
+              <v-radio-group v-model="inputType" class="mt-0">
                 <v-radio :value="1" label="フレンドから選ぶ"></v-radio>
               </v-radio-group>
               <v-sheet class="rounded" outlined>
@@ -128,11 +143,9 @@
             </div>
           </v-card-text>
           <v-card-actions class="pa-5">
-            <v-btn color="primary" text @click="onClickBackButton()">
-              戻る
-            </v-btn>
+            <v-btn color="primary" text @click="onBackClick()">戻る</v-btn>
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click="onClickSaveButton()">決定</v-btn>
+            <v-btn color="primary" @click="onSaveClick()">決定</v-btn>
           </v-card-actions>
         </v-card>
       </v-expand-transition>
@@ -146,6 +159,8 @@ import { ScoreBoard, UserInfo } from "@/models";
 import { userConfig } from "@/config";
 import { charCount } from "@/utils";
 
+type InputType = "name" | "friend";
+
 @Component({
   components: {}
 })
@@ -153,13 +168,14 @@ export default class PlayersChange extends BaseComponent {
   $refs!: {
     form: any;
   };
-  show = true;
+  skeleton = true;
+  show = false;
   isDeleteMode = false;
 
   selectedPlayerIdx: number | null = null;
   selectedPlayerName = "";
   selectedFriendIdx: number | null = null;
-  selectedInput = 0;
+  inputType: InputType = "name";
 
   nameRules = [
     (v: string) => !!v || "名前を入力してください",
@@ -183,6 +199,8 @@ export default class PlayersChange extends BaseComponent {
     if (!value) {
       this.selectedPlayerIdx = null;
       this.selectedPlayerName = "";
+      this.inputType = "name";
+      this.selectedFriendIdx = null;
     }
   }
 
@@ -194,12 +212,22 @@ export default class PlayersChange extends BaseComponent {
     return this.scoreBoard.players || [];
   }
 
-  get friends(): UserInfo {
-    return this.$store.getters["friends/friends"];
+  get friends(): UserInfo[] {
+    const allFriends: UserInfo[] = this.$store.getters["friends/friends"];
+    const filteredFriends = allFriends.filter((f: UserInfo) => {
+      const playerUids = this.players.map(p => p.uid);
+      return !playerUids.includes(f.uid);
+    });
+    return filteredFriends;
   }
 
   created() {
-    this.$store.dispatch("friends/get");
+    this.$store
+      .dispatch("friends/get")
+      .then(() => {
+        this.skeleton = false;
+      })
+      .catch(err => this._error(err));
   }
 
   open() {
@@ -209,16 +237,17 @@ export default class PlayersChange extends BaseComponent {
   close() {
     this.show = false;
     this.isDeleteMode = false;
+    this.$emit("closed");
   }
 
-  onClickPlayer(idx: number) {
+  onPlayerClick(idx: number) {
     if (!this.isDeleteMode) {
       this.selectedPlayerIdx = idx;
       this.selectedPlayerName = this.players[idx].name;
     }
   }
 
-  addPlayer() {
+  onAddPlayerClick() {
     this.isDeleteMode = false;
     this.selectedPlayerIdx = -1;
   }
@@ -235,51 +264,66 @@ export default class PlayersChange extends BaseComponent {
         this.$store.dispatch("scoreBoard/deletePlayer", idx);
       }
     }
+    this.isDeleteMode = false;
   }
 
-  onClickDeleteModeButton() {
+  onDeleteModeClick() {
     this.isDeleteMode = !this.isDeleteMode;
   }
 
-  onClickBackButton() {
+  changeInputType(inputType: InputType) {
+    this.inputType = inputType;
+    this.$refs.form.resetValidation();
+  }
+
+  onBackClick() {
     this.showPlayerInput = false;
   }
 
-  onClickSaveButton() {
-    if (this.selectedInput === 0) {
-      if (this.$refs.form.validate()) {
-        this.savePlayerAsTextInput();
-      }
-    } else if (this.selectedInput === 1) {
-      this.savePlayerAsFriend();
+  onSaveClick() {
+    if (this.selectedPlayerIdx === null) {
+      return;
     }
-  }
-
-  savePlayerAsTextInput() {
-    const player: UserInfo = {
+    let player: UserInfo = {
       mid: "",
-      name: this.selectedPlayerName,
-      uid: this.selectedPlayerName
+      name: "",
+      uid: ""
     };
-    if (this.selectedPlayerIdx === -1) {
-      this.$store
-        .dispatch("scoreBoard/addPlayer", player)
-        .then(() => {})
-        .catch(err => this._error(err));
-      this.showPlayerInput = false;
-    } else {
-      // this.$store.dispatch("scoreBoard/changePlayer", {
-      //   idx: this.selectedPlayerIdx,
-      //   player
-      // });
+    if (this.inputType === "name") {
+      if (!this.$refs.form.validate()) {
+        return;
+      }
+      player = {
+        mid: "",
+        name: this.selectedPlayerName,
+        uid: this.selectedPlayerName
+      };
+    } else if (this.inputType === "friend") {
+      if (this.selectedFriendIdx == null) {
+        return;
+      }
+      player = this.friends[this.selectedFriendIdx];
     }
+    if (this.selectedPlayerIdx === -1) {
+      this.addPlayer(player);
+    } else {
+      this.changePlayer(this.selectedPlayerIdx, player);
+    }
+    this.showPlayerInput = false;
   }
 
-  savePlayerAsFriend() {}
+  addPlayer(player: UserInfo) {
+    this.$store
+      .dispatch("scoreBoard/addPlayer", player)
+      .then(() => {})
+      .catch(err => this._error(err));
+  }
 
-  onPlayerInputClick(idx: number) {
-    this.selectedInput = idx;
-    this.$refs.form.resetValidation();
+  changePlayer(idx: number, player: UserInfo) {
+    this.$store.dispatch("scoreBoard/changePlayer", {
+      idx,
+      player
+    });
   }
 }
 </script>
@@ -301,10 +345,6 @@ export default class PlayersChange extends BaseComponent {
 
   .controls .v-btn {
     flex-grow: 1;
-  }
-
-  .controls .v-btn:hover::before {
-    opacity: 0;
   }
 
   .error {
