@@ -63,7 +63,7 @@
           </v-row>
         </draggable>
         <transition name="tr-accordion">
-          <v-row v-if="tobi" class="form__li mb-3">
+          <v-row v-if="tobi" no-gutters class="form__li my-3">
             <div>飛ばした人</div>
             <v-select
               v-model="tobashiId"
@@ -211,10 +211,10 @@ export default class ScoreChange extends BaseComponent {
       this._error("成績表が見つかりません");
       return false;
     }
-    const { id, players, scoress, rule, createdAt } = scoreBoard;
+    const { rule } = scoreBoard;
 
     const inputNumber = data.filter(item => {
-      return Number.isFinite(isPtMode ? item.pt! : item.score!);
+      return Number.isFinite(isPtMode ? item.pt : item.score);
     }).length;
 
     if (inputNumber !== rule.playerNumber) {
@@ -321,7 +321,6 @@ export default class ScoreChange extends BaseComponent {
   }
 
   saveScore() {
-    const { data, isPtMode } = this;
     if (this.validate()) {
       const scores: Score[] = this.getPt().map(e => {
         const score: Score = {
@@ -332,10 +331,12 @@ export default class ScoreChange extends BaseComponent {
         };
         return score;
       });
-      this.$store.dispatch("scoreBoard/saveScores", {
-        index: this.index,
-        scores: scores
-      });
+      this.$store
+        .dispatch("scoreBoard/saveScores", {
+          index: this.index,
+          scores: scores
+        })
+        .catch(err => this._error(err));
       this.close();
     }
   }
@@ -430,6 +431,14 @@ export default class ScoreChange extends BaseComponent {
       bottom: 40px;
       content: "自動入力";
     }
+  }
+}
+</style>
+<style lang="scss">
+.score-change {
+  .v-text-field {
+    padding-top: 0;
+    margin-top: 0;
   }
 }
 </style>

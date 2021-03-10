@@ -48,7 +48,7 @@
           <Score></Score>
         </v-carousel-item>
         <v-carousel-item>
-          <!-- <Data /> -->
+          <Data></Data>
         </v-carousel-item>
         <v-carousel-item>
           <!-- <Graph /> -->
@@ -80,16 +80,16 @@ import { Component, Watch } from "vue-property-decorator";
 import BaseComponent from "@/components/shared/Base";
 import AppBar from "@/components/shared/AppBar.vue";
 import Score from "@/views/scoreBoard/Score.vue";
-// import Data from "@/components/ScoreBoard/Data.vue";
+import Data from "@/views/scoreBoard/Data.vue";
 // import Graph from "@/components/ScoreBoard/Graph.vue";
 import PlayersChange from "@/components/scoreBoard/PlayersChange.vue";
-import { ScoreBoard, UserInfo } from "@/models";
+import { ScoreBoard } from "@/models";
 
 @Component({
   components: {
     AppBar,
     Score,
-    // Data,
+    Data,
     // Graph,
     PlayersChange
   }
@@ -99,7 +99,7 @@ export default class ScoreBoardPage extends BaseComponent {
     playersChange: PlayersChange;
   };
   showMenu = false;
-  nav = 0;
+  nav = 1;
 
   isPtMode = this.$store.getters["scoreBoard/inputMode"] === "pt";
 

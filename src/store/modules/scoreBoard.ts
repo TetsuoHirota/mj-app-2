@@ -237,13 +237,14 @@ const actions = {
   },
 
   // スコア関連
-  saveScores: (
+  saveScores: async (
     { state }: { state: State },
     { index, scores }: { index: number; scores: Score[] }
   ) => {
     const scoress = [...state.scoreBoard.scoress];
     scoress[index - 1] = scores;
-    db.collection("scores")
+    return db
+      .collection("scores")
       .doc(state.scoreBoard.id)
       .update({
         scoress: formatNestedArray(scoress)

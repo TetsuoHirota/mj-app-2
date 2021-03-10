@@ -7,33 +7,63 @@ export const scoreBoardResult = (scoreBoard: ScoreBoard) => {
     rule,
     chips: scoreBoardChips = []
   } = scoreBoard;
-  const totalPts: number[] = [];
-  const chips: (number | null)[] = [];
-  console.debug(players);
+
+  let results: {
+    totalPt: number;
+    chip: number | null;
+    ranks: (number | null)[];
+    rankCounts: number[];
+    rankPercentages: string[];
+    totalRank: number;
+    avarageRank: string;
+    yen: number;
+  }[] = [];
 
   for (let i = 0; i < players.length; i++) {
-    totalPts.push(0);
     const chip = scoreBoardChips.find(c => c.uid === players[i].uid);
-
-    chips.push(chip ? chip.chip : null);
+    results.push({
+      totalPt: 0,
+      chip: chip ? chip.chip : null,
+      ranks: [],
+      rankCounts: Array(rule.playerNumber).fill(0),
+      rankPercentages: [],
+      totalRank: 0,
+      avarageRank: "",
+      yen: 0
+    });
   }
+
   scoress.forEach(scores => {
     scores.forEach(score => {
       players.forEach((player, idx) => {
         if (score.uid === player.uid) {
-          totalPts[idx] += score.pt || 0;
+          const result = results[idx];
+          result.totalPt += score.pt || 0;
+          result.ranks.push(score.rank);
+          if (score.rank !== null) {
+            result.totalRank += score.rank;
+            result.rankCounts[score.rank - 1] += 1;
+          }
         }
       });
     });
   });
 
-  const yens = totalPts.map(p => {
-    return p * rule.rate;
+  results = results.map(result => {
+    const { totalPt, chip, totalRank, rankCounts } = result;
+    let yen = totalPt * rule.rate * 10;
+    yen += (chip || 0) * rule.chip;
+    const avarageRank = (totalRank / scoress.length).toFixed(2);
+    const rankPercentages = rankCounts.map(rankCount =>
+      ((rankCount / rankCounts.length) * 100).toFixed(1)
+    );
+    return {
+      ...result,
+      avarageRank,
+      yen,
+      rankPercentages
+    };
   });
 
-  return {
-    totalPts,
-    yens,
-    chips
-  };
+  return results;
 };

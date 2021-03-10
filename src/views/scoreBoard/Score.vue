@@ -33,9 +33,9 @@
           v-for="(player, idx) in players"
           :key="player.uid"
           class="tr-body"
-          :class="{ minus: result.totalPts[idx] < 0 }"
+          :class="{ minus: results[idx].totalPt < 0 }"
         >
-          {{ result.totalPts[idx] }}
+          {{ results[idx].totalPt }}
         </div>
       </div>
       <v-divider></v-divider>
@@ -47,25 +47,21 @@
           </v-badge>
         </div>
         <div v-for="(player, idx) in players" :key="player.uid" class="tr-body">
-          <v-edit-dialog
-            :return-value.sync="a"
-            @open="onDialogOpened()"
-            @close="onDialogClosed()"
-          >
+          <v-edit-dialog @open="onDialogOpened()" @close="onDialogClosed()">
             <v-chip
-              v-if="result.chips[idx] || result.chips[idx] === 0"
+              v-if="results[idx].chip || results[idx].chip === 0"
               color="orange"
               small
               class="px-2"
             >
-              {{ result.chips[idx] | chip }}
+              {{ results[idx].chip | chip }}
             </v-chip>
             <template #input>
               <v-text-field
                 style="width: 60px"
                 type="number"
                 single-line
-                :value="result.chips[idx]"
+                :value="results[idx].chip"
                 suffix="枚"
                 @change="v => onChipChange(v, player)"
               ></v-text-field>
@@ -80,28 +76,15 @@
           v-for="(player, idx) in players"
           :key="player.uid"
           class="tr-body"
-          :class="{ minus: result.yens[idx] < 0 }"
+          :class="{ minus: results[idx].yen < 0 }"
         >
-          {{ result.yens[idx] }}
+          {{ results[idx].yen }}
         </div>
       </div>
     </footer>
 
     <v-btn
-      class="btn btn--chip"
-      absolute
-      fab
-      color="orange"
-      @click.stop="openChipsModal"
-    >
-      <img
-        style="height: 20px"
-        src="@/assets/svgs/casino-chip-white.svg"
-        alt=""
-      />
-    </v-btn>
-    <v-btn
-      class="btn btn--score"
+      class="btn"
       absolute
       fab
       color="primary"
@@ -140,24 +123,13 @@ import CasinoChip from "@/components/shared/Casino-chip.vue";
   }
 })
 export default class Score extends BaseComponent {
-  isDialogOpened = false;
-  a = "";
-
   $refs!: {
     scoreChange: ScoreChange;
   };
+  isDialogOpened = false;
   gameNumber = 100;
-  // get isPtMode() {
-  //   return this.$store.getters["scoreBoard/inputMode"] === "pt";
-  // }
   get scoreBoard(): ScoreBoard {
     return this.$store.getters["scoreBoard/scoreBoard"];
-  }
-
-  mounted() {
-    setTimeout(() => {
-      // console.debug(this.scoreBoard);
-    }, 0);
   }
 
   get players() {
@@ -168,18 +140,13 @@ export default class Score extends BaseComponent {
     return this.scoreBoard.scoress || [];
   }
 
-  get result() {
+  get results() {
     return scoreBoardResult(this.scoreBoard);
   }
 
   get totalChip(): number {
-    return this.result.chips.reduce((acc: number, cur) => {
-      console.debug(this.result.chips);
-      if (cur == null) {
-        return acc;
-      }
-
-      return acc + cur;
+    return this.results.reduce((acc: number, cur) => {
+      return acc + (cur.chip || 0);
     }, 0);
   }
 
@@ -233,12 +200,10 @@ export default class Score extends BaseComponent {
   }
 
   onDialogOpened() {
-    console.debug("open");
     this.isDialogOpened = true;
   }
   onDialogClosed() {
     this.isDialogOpened = false;
-    console.debug("close");
   }
 
   onChipChange(value: string, player: UserInfo) {
@@ -287,8 +252,6 @@ $tr-body: 75px;
 header {
   display: flex;
   padding: 15px $padding;
-  // border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  // box-shadow: 0px -1px 10px 0px rgba(0, 0, 0, 0.12);
 }
 
 body {
@@ -306,7 +269,6 @@ body {
     position: relative;
     display: flex;
     min-height: 30px;
-    // border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     &:last-of-type {
       border: none;
     }
@@ -317,7 +279,6 @@ footer {
   display: flex;
   flex-flow: column;
   padding: 0 $padding;
-  // border-top: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   .footer__row {
     display: flex;
@@ -329,31 +290,17 @@ footer {
 }
 
 .btn {
+  $right-sp: 18px;
+  $size-sp: 45px;
+  $right-lg: 28px;
+
+  right: $right-lg;
   bottom: 138px;
 
-  $right-sp: 18px;
-  $distance-sp: 58px;
-  $size-sp: 45px;
-
-  $right-lg: 28px;
-  $distance-lg: 80px;
-
   @include sp {
+    right: $right-sp;
     width: $size-sp;
     height: $size-sp;
-  }
-
-  &--chip {
-    right: calc(#{$right-lg} + #{$distance-lg});
-    @include sp {
-      right: calc(#{$right-sp} + #{$distance-sp});
-    }
-  }
-  &--score {
-    right: $right-lg;
-    @include sp {
-      right: $right-sp;
-    }
   }
 }
 
